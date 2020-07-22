@@ -115,6 +115,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/sopenjualan/update/{id}', 'PemesananPenjualanController@update');
     Route::get('/sopenjualan/destroy/{id}', 'PemesananPenjualanController@destroy');
     Route::post('/sopenjualan/confirm/{id}', 'PemesananPenjualanController@confirm');
+    Route::get('/sopenjualan/cancel/{id}', 'PemesananPenjualanController@cancel');
     Route::get('/sopenjualan/print/{id}', 'PemesananPenjualanController@print');
 
     Route::get('/konfirmasiPenjualan', 'PemesananPenjualanController@konfirmasiPenjualan');
@@ -130,6 +131,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/suratJalan', 'SuratJalanController@index');
     // Route::get('/suratJalan/create/{id}','SuratJalanController@create');
     Route::post('/suratJalan/store/{id}', 'SuratJalanController@store');
+    Route::get('/suratJalan/edit/{id}', 'SuratJalanController@edit');
+    Route::post('/suratJalan/update/{id}', 'SuratJalanController@update');
     Route::get('/suratJalan/create', 'SuratJalanController@createByCust');
     Route::get('/suratJalan/searchsobycustid/{id}', 'SuratJalanController@searchSOByCustId');
     Route::get('/suratJalan/createbasedso/{id}', 'SuratJalanController@createBasedSO');
@@ -172,11 +175,23 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/stokmasuk/view/{id}', 'StokMasukController@view');
     Route::post('/stokmasuk/store', 'StokMasukController@store');
 
+    //route stok keluar
+    Route::get('/stokkeluar', 'StokKeluarController@index');
+    Route::get('/stokkeluar/create', 'StokKeluarController@create');
+    Route::get('/stokkeluar/view/{id}', 'StokKeluarController@view');
+    Route::post('/stokkeluar/store', 'StokKeluarController@store');
+
     //route kartu stok
     Route::get('/kartustok', 'KartuStokController@index');
     Route::get('/kartustok/show', 'KartuStokController@show');
     Route::post('/kartustok/filter', 'KartuStokController@filter');
     Route::post('/kartustok/print', 'KartuStokController@print');
+
+    //route pengeluaran tambahan
+    Route::get('/pengeluarantambahan', 'PengeluaranTambahanController@index');
+    Route::get('/pengeluarantambahan/create', 'PengeluaranTambahanController@create');
+    Route::post('/pengeluarantambahan/store', 'PengeluaranTambahanController@store');
+    Route::get('/pengeluarantambahan/destroy/{id}', 'PengeluaranTambahanController@destroy');
 
     //ROUTE HUTANG
     //route pelunasan hutang
@@ -194,6 +209,8 @@ Route::group(['middleware' => 'auth'], function () {
     //ROUTE PIUTANG
     //route invoice piutang
     Route::get('/invoicepiutang', 'InvoicePiutangController@piutang');
+    Route::get('/invoicepiutang/edit/{id}', 'InvoicePiutangController@edit');
+    Route::post('/invoicepiutang/update/{id}', 'InvoicePiutangController@update');
     Route::get('/invoicepiutang/print/{id}', 'InvoicePiutangController@print');
     Route::get('/fixinvoicepiutang', 'SuratJalanController@fixInvoideID');
 

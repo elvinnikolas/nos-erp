@@ -153,13 +153,26 @@ class MasterPelangganController extends Controller
 
         foreach ($alamats as $key => $value) {
             $noindeks++;
-            DB::table('alamatpelanggans')->where('KodePelanggan', $request->KodePelanggan)->update([
-                'KodePelanggan' => $request->KodePelanggan,
-                'Alamat' => $alamats[$key],
-                'Kota' => $kotas[$key],
-                'NoIndeks' => $noindeks,
-                'updated_at' => \Carbon\Carbon::now()
-            ]);
+            $checkalamat = DB::table('alamatpelanggans')->where('KodePelanggan', $request->KodePelanggan)->where('NoIndeks', $noindeks)->first();
+
+            if (!empty($checkalamat)) {
+                DB::table('alamatpelanggans')->where('KodePelanggan', $request->KodePelanggan)->where('NoIndeks', $noindeks)->update([
+                    'KodePelanggan' => $request->KodePelanggan,
+                    'Alamat' => $alamats[$key],
+                    'Kota' => $kotas[$key],
+                    'NoIndeks' => $noindeks,
+                    'updated_at' => \Carbon\Carbon::now()
+                ]);
+            } else {
+                DB::table('alamatpelanggans')->insert([
+                    'KodePelanggan' => $request->KodePelanggan,
+                    'Alamat' => $alamats[$key],
+                    'Kota' => $kotas[$key],
+                    'NoIndeks' => $noindeks,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now()
+                ]);
+            }
         }
 
         DB::table('eventlogs')->insert([

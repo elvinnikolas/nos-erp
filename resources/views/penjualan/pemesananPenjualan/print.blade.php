@@ -6,7 +6,7 @@
     <style>
         p,
         tr {
-            font-size: 9px;
+            font-size: 12px;
             margin: 0;
         }
 
@@ -77,10 +77,10 @@
                         <div class="form-row" id="marginless">
                             <div class="column">
                                 @foreach($data as $dt)
-                                <p>No. SO : {{$dt->KodeSO}}</p>
+                                <p>No. SO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {{$dt->KodeSO}}</p>
                                 @endforeach
                                 @foreach($data as $dt)
-                                <p>Tanggal kirim : {{$dt->tgl_kirim}}</p>
+                                <p>Tanggal Kirim : {{\Carbon\Carbon::parse($dt->tgl_kirim)->format('d-m-Y')}}</p>
                                 @endforeach
                             </div>
                             <div class="column">
@@ -92,7 +92,7 @@
                             <div class="column">
                                 <p id="right">Kepada yth.</p>
                                 @foreach($data as $dt)
-                                <p id="right">Tuan/Toko : {{$dt->NamaPelanggan}}</p>
+                                <p id="right">Pelanggan/Toko : {{$dt->NamaPelanggan}}</p>
                                 @endforeach
                             </div>
                         </div>
@@ -110,19 +110,19 @@
                                     @foreach($items as $item)
                                     <tr class="rowinput">
                                         <td>
-                                            {{$item->KodeItem}}
+                                            &nbsp;&nbsp;&nbsp;{{$item->KodeItem}}
                                         </td>
                                         <td>
-                                            {{$item->NamaItem}}
+                                            &nbsp;&nbsp;&nbsp;{{$item->NamaItem}}
                                         </td>
                                         <td id="right">
-                                            {{$item->Qty}} &nbsp; {{$item->NamaSatuan}}
+                                            {{$item->Qty}} &nbsp; {{$item->NamaSatuan}}&nbsp;&nbsp;&nbsp;
                                         </td>
                                         <td id="right">
-                                            Rp. {{number_format($item->HargaJual)}},-
+                                            Rp. {{number_format($item->HargaJual)}},-&nbsp;&nbsp;&nbsp;
                                         </td>
                                         <td id="right">
-                                            Rp. {{number_format($item->HargaJual*$item->Qty)}},-
+                                            Rp. {{number_format($item->HargaJual*$item->Qty)}},-&nbsp;&nbsp;&nbsp;
                                         </td>
                                     </tr>
                                     @endforeach

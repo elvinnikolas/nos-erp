@@ -6,7 +6,8 @@
     <style>
         p,
         tr {
-            font-size: 9px;
+            font-size: 12px;
+            margin: 0;
         }
 
         form {
@@ -15,7 +16,7 @@
 
         form input,
         button {
-            padding: 5px;
+            padding: 0px;
         }
 
         table {
@@ -33,7 +34,7 @@
 
         table th,
         table td {
-            padding: 10px;
+            padding: 0;
             text-align: left;
         }
 
@@ -58,6 +59,10 @@
         #right {
             text-align: right;
         }
+
+        #marginless {
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -71,20 +76,21 @@
                         <!-- Contents -->
                         <div class="form-row">
                             <div class="column">
-                                <p>No. Inv : {{$invoice->KodeInvoicePiutangShow}}</p>
-                                <p>No. SJ : {{$suratjalan->KodeSuratJalan}}</p>
+                                <p>No. Inv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {{$invoice->KodeInvoicePiutangShow}}</p>
+                                <p>No. SJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {{$suratjalan->KodeSuratJalan}}</p>
+                                <p>Jatuh Tempo&nbsp;: {{\Carbon\Carbon::parse($invoice->Tanggal)->addDays($invoice->Term)->format('d-m-Y')}}</p>
                             </div>
                             <div class="column">
                                 <p id="center">Invoice Piutang</p>
-                                <p id="center">{{$invoice->Tanggal}}</p>
+                                <p id="center">{{$invoice->TanggalFormat}}</p>
                             </div>
                             <div class="column">
                                 <p id="right">Kepada yth.</p>
-                                <p id="right">Tuan/Toko : {{$invoice->NamaPelanggan}}</p>
+                                <p id="right">Pelanggan/Toko : {{$invoice->NamaPelanggan}}</p>
                                 <p id="right">Alamat : {{$suratjalan->Alamat}}</p>
                             </div>
                         </div>
-                        <br><br><br><br><br><br>
+                        <br><br><br><br>
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <table id="items">
@@ -98,23 +104,24 @@
                                     @foreach($items as $item)
                                     <tr class="rowinput">
                                         <td>
-                                            {{$item->KodeItem}}
+                                            &nbsp;&nbsp;&nbsp;{{$item->KodeItem}}
                                         </td>
                                         <td>
-                                            {{$item->NamaItem}}
+                                            &nbsp;&nbsp;&nbsp;{{$item->NamaItem}}
                                         </td>
                                         <td id="right">
-                                            {{$item->Qty}} &nbsp; {{$item->NamaSatuan}}
+                                            {{$item->Qty}} &nbsp; {{$item->NamaSatuan}}&nbsp;&nbsp;&nbsp;
                                         </td>
                                         <td id="right">
-                                            Rp. {{number_format($item->HargaJual)}},-
+                                            Rp. {{number_format($item->HargaJual)}},-&nbsp;&nbsp;&nbsp;
                                         </td>
                                         <td id="right">
-                                            Rp. {{number_format($item->HargaJual*$item->Qty)}},-
+                                            Rp. {{number_format($item->HargaJual*$item->Qty)}},-&nbsp;&nbsp;&nbsp;
                                         </td>
                                     </tr>
                                     @endforeach
                                 </table>
+                                <br><br>
                                 <div class="row">
                                     <div class="column">
                                         <p>Total Barang : {{$jml}}</p>

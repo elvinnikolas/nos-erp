@@ -63,9 +63,6 @@
             </div>
             <div class="col-md-6 col-sm-6">
               <br><br>
-              <a href="{{ url('/sopenjualan/create')}}" class="btn btn-primary pull-right">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-              </a>
             </div>
           </div>
         </div>
@@ -76,11 +73,10 @@
                 <th>Kode SO</th>
                 <th>Tanggal</th>
                 <th>Tanggal Kirim</th>
-                <th>Expired</th>
-                <th>Mata Uang</th>
-                <th>Gudang</th>
-                <th>Pelanggan</th>
                 <th>Term</th>
+                <th>Pelanggan</th>
+                <th>Gudang</th>
+                <th>Total</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -89,14 +85,16 @@
               <td>{{ $p->KodeSO}}</td>
               <td>{{ \Carbon\Carbon::parse($p->Tanggal)->format('d-m-Y') }}</td>
               <td>{{ \Carbon\Carbon::parse($p->tgl_kirim)->format('d-m-Y') }}</td>
-              <td>{{ $p->Expired }}</td>
-              <td>{{ $p->NamaMataUang }}</td>
-              <td>{{ $p->NamaLokasi  }}</td>
+              <td>{{ $p->term }} hari</td>
               <td>{{ $p->NamaPelanggan }}</td>
-              <td>{{ $p->term }}</td>
+              <td>{{ $p->NamaLokasi  }}</td>
+              <td>Rp. {{ number_format($p->Total, 0, ',', '.') }},-</td>
               <td>
                 <a href="{{ url('/sopenjualan/lihat/'. $p->KodeSO )}}" class="btn-xs btn btn-primary">
                   <i class="fa fa-eye" aria-hidden="true"></i> Lihat
+                </a>
+                <a href="{{ url('/sopenjualan/destroy/'.$p->KodeSO)}}" class="btn-xs btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
+                  <i class="fa fa-trash" aria-hidden="true"></i> Hapus
                 </a>
               </td>
             </tr>
@@ -120,6 +118,11 @@
     format: 'YYYY-MM-DD'
   });
 
-  $('#table').DataTable();
+  $('#table').DataTable({
+    "order": [
+      [1, "desc"],
+      [0, "desc"]
+    ]
+  });
 </script>
 @endpush

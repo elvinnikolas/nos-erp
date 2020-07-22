@@ -31,10 +31,10 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1>Stok Masuk</h1><br>
-                    <a href="/stokmasuk/create" class="btn btn-primary">
+                    <h1>Stok Keluar</h1><br>
+                    <a href="/stokkeluar/create" class="btn btn-primary">
                         <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;
-                        Tambah Stok Masuk
+                        Tambah Stok Keluar
                     </a>
                 </div>
 
@@ -68,7 +68,7 @@
                     <table class="table table-light table-striped" id="table">
                         <thead class="thead-light">
                             <tr>
-                                <th>Kode Stok Masuk</th>
+                                <th>Kode Stok Keluar</th>
                                 <th>Gudang</th>
                                 <th>Tanggal</th>
                                 <th>Total Item</th>
@@ -76,14 +76,14 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($stokmasuks as $stokmasuk)
+                            @foreach ($stokkeluars as $stokkeluar)
                             <tr>
-                                <td>{{ $stokmasuk->KodeStokMasuk}}</td>
-                                <td>{{ $stokmasuk->NamaLokasi}}</td>
-                                <td>{{ \Carbon\Carbon::parse($stokmasuk->Tanggal)->format('d-m-Y')}}</td>
-                                <td>{{ $stokmasuk->TotalItem}}</td>
+                                <td>{{ $stokkeluar->KodeStokKeluar}}</td>
+                                <td>{{ $stokkeluar->NamaLokasi}}</td>
+                                <td>{{ \Carbon\Carbon::parse($stokkeluar->Tanggal)->format('d-m-Y')}}</td>
+                                <td>{{ $stokkeluar->TotalItem}}</td>
                                 <td>
-                                    <a href="{{ url('/stokmasuk/view/'.$stokmasuk->KodeStokMasuk) }}" class="btn-xs btn btn-primary">
+                                    <a href="{{ url('/stokkeluar/view/'.$stokkeluar->KodeStokKeluar) }}" class="btn-xs btn btn-primary">
                                         <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                                     </a>
                                 </td>

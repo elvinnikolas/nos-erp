@@ -17,19 +17,19 @@
                     <table class="table table-light" id="table">
                         <thead class="thead-light">
                             <tr>
-                                <th>Pelanggan</th>
-                                <th>No Tagihan</th>
-                                <th>Tanggal</th>
+                                <th>Tanggal Bayar</th>
                                 <th>Total Bayar</th>
+                                <th>Metode</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($payments as $payment)
                             <tr>
-                                <td>{{ $pelanggan->NamaPelanggan }}</td>
-                                <td>{{ $invoice->KodeInvoicePiutangShow}}</td>
-                                <td>{{ $payment->Tanggal}}</td>
-                                <td>{{ $payment->Jumlah}}</td>
+                                <td>{{ \Carbon\Carbon::parse($payment->Tanggal)->format('d-m-Y') }}</td>
+                                <td>Rp. {{ number_format($payment->Jumlah, 0, ',', '.') }},-</td>
+                                <td>{{ $payment->TipeBayar }}</td>
+                                <td>{{ $payment->Keterangan}}</td>
                             </tr>
                             @endforeach
                         </tbody>

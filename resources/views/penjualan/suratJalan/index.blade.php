@@ -57,6 +57,33 @@
             </form>
         </div>
     </div>
+
+    <!-- Alert -->
+    @if(session()->get('created'))
+    <div class="alert alert-success alert-dismissible fade-show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ session()->get('created') }}
+    </div>
+
+    @elseif(session()->get('edited'))
+    <div class="alert alert-info alert-dismissible fade-show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ session()->get('edited') }}
+    </div>
+
+    @elseif(session()->get('deleted'))
+    <div class="alert alert-danger alert-dismissible fade-show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ session()->get('deleted') }}
+    </div>
+
+    @elseif(session()->get('error'))
+    <div class="alert alert-warning alert-dismissible fade-show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ session()->get('error') }}
+    </div>
+    @endif
+
     <div class="x_panel">
         <div class="x_title">
             <div class="row">
@@ -71,8 +98,8 @@
                     <tr>
                         <th scope="col">Nomor SJ</th>
                         <th scope="col">Nomor SO</th>
-                        <th scope="col">Nama Pelanggan</th>
                         <th scope="col">Tanggal</th>
+                        <th scope="col">Pelanggan</th>
                         <th scope="col">Gudang</th>
                         <th scope="col">Action</th>
                     </tr>
@@ -82,16 +109,16 @@
                     <tr>
                         <td>{{ $suratjalan->KodeSuratJalan }}</td>
                         <td>{{ $suratjalan->KodeSO }}</td>
-                        <td>{{ $suratjalan->NamaPelanggan }}</td>
                         <td>{{ \Carbon\Carbon::parse($suratjalan->Tanggal)->format('d-m-Y') }}</td>
+                        <td>{{ $suratjalan->NamaPelanggan }}</td>
                         <td>{{ $suratjalan->NamaLokasi }}</td>
                         <td>
                             <a href="{{ url('/suratJalan/show/'.$suratjalan->KodeSuratJalanID) }}" class="btn-xs btn btn-primary">
                                 <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                             </a>
-                            <!-- <a href="{{ url('suratJalan/print/'.$suratjalan->KodeSuratJalanID)}}" class="btn btn-md btn-success">
-                                <i class="fa fa-print"></i>
-                            </a> -->
+                            <a href="{{ url('suratJalan/edit/'.$suratjalan->KodeSuratJalanID)}}" class="btn btn-xs btn-success">
+                                <i class="fa fa-pencil" aria-hidden="true"></i> Ubah
+                            </a>
                             <a href="{{ url('/suratJalan/destroy/'.$suratjalan->KodeSuratJalan)}}" class="btn-xs btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
                                 <i class="fa fa-trash" aria-hidden="true"></i> Hapus
                             </a>
@@ -118,6 +145,7 @@
 
     $('#tsuratjalan').DataTable({
         "order": [
+            [2, "desc"],
             [0, "desc"]
         ]
     });

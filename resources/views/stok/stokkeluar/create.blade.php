@@ -37,11 +37,11 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1 id="header">Buat Stok Masuk</h1>
+                    <h1 id="header">Buat Stok Keluar</h1>
                     <h3 id="header">{{$newID}}</h3>
                 </div>
                 <div class="x_content">
-                    <form action="{{ url('/stokmasuk/store') }}" method="post">
+                    <form action="{{ url('/stokkeluar/store') }}" method="post">
                         <div class="form-row">
                             <div class="form-group col-md-4">
                                 @csrf
@@ -49,7 +49,7 @@
                                 <br>
                                 <div class="form-row">
                                     <div class="form-group">
-                                        <input type="hidden" class="form-control" name="KodeStokMasuk" value="{{$newID}}">
+                                        <input type="hidden" class="form-control" name="KodeStokKeluar" value="{{$newID}}">
                                         <label for="">Gudang</label>
                                         <select name="KodeLokasi" id="gudang" class="form-control">
                                             @foreach ($lokasi as $l)

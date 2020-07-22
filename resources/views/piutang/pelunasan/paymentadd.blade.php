@@ -59,7 +59,7 @@
                                 <div class="form-group">
                                     <label for="inputDate">Status</label>
                                     <select class="form-control" name="status">
-                                        <option value="AR">Puitang (AR)</option>
+                                        <option value="AR">Piutang (AR)</option>
                                         <option value="AP">Hutang (AP)</option>
                                     </select>
                                 </div>
@@ -69,7 +69,7 @@
 
                                 <div class="form-group">
                                     <label for="inputDate">Tanggal Pembayaran</label>
-                                    <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required">
+                                    <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Metode Pembayaran</label>

@@ -22,7 +22,7 @@ class PelunasanPiutangController extends Controller
 
     public function invoice($id)
     {
-        $invoice = DB::select("SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, p.NamaPelanggan, i.Tanggal, d.Subtotal, COALESCE(sum(pp.Jumlah),0) as bayar 
+        $invoice = DB::select("SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, p.NamaPelanggan, i.Tanggal, i.Term, d.KodeSuratJalan, d.Subtotal, COALESCE(sum(pp.Jumlah),0) as bayar 
             FROM invoicepiutangs i 
             inner join invoicepiutangdetails d on i.KodeInvoicePiutang = d.KodeInvoicePiutang
             inner join pelanggans p on p.KodePelanggan = i.KodePelanggan
@@ -61,7 +61,6 @@ class PelunasanPiutangController extends Controller
             $tot += $bill->Jumlah;
         }
         $sub = $detail->Subtotal;
-        // $sisa = (($sub * 1000) - ($tot * 1000)) / 1000;
         $sisa = $sub - $tot;
 
         return view('piutang.pelunasan.paymentadd', compact('invoice', 'payments', 'matauang', 'sub', 'sisa'));

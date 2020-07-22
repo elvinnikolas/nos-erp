@@ -86,7 +86,7 @@
       $.get(my_url, function(datas, status) {
         var html = '';
         if ($.isEmptyObject(datas)) {
-          html = '<label for="">Tidak ada SO ditemukan atas nama {{$customer->NamaPelanggan}}</label>';
+          html = '<label for="">Tidak ada SO ditemukan</label>';
         } else {
           $('.so-select-empty').removeClass('hidden');
           var options = ''

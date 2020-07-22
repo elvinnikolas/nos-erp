@@ -55,6 +55,36 @@
                                     <label for="inputDate">Tanggal</label>
                                     <input type="text" class="form-control" name="Tanggal" id="inputDate" readonly="readonly" value="{{\Carbon\Carbon::parse($suratjalanreturn->Tanggal)->format('d-m-Y')}}">
                                 </div>
+                            </div>
+                            <!-- pembatas -->
+                            <div class="form-group col-md-1"></div>
+                            <!-- column 2 -->
+                            <div class="form-group col-md-3">
+                                <div class="form-group">
+                                    <label for="inputPelanggan">Pelanggan</label>
+                                    <input type="text" class="form-control" name="KodePelanggan" readonly="readonly" value="{{$pelanggan->NamaPelanggan}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputMatauang">Mata Uang</label>
+                                    <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$matauang->NamaMataUang}}">
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputGudang">Gudang</label>
+                                    <input type="text" class="form-control" name="KodeLokasi" readonly="readonly" value="{{$lokasi->NamaLokasi}}">
+                                </div>
+                                <!-- <div class="form-group">
+                                    <label for="inputPelanggan">Diskon</label> -->
+                                <input type="hidden" readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$suratjalan->Diskon}}">
+                                <!-- </div>
+                                <div class="form-group">
+                                    <label for="inputPelanggan">PPN</label> -->
+                                <input type="hidden" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$suratjalan->PPN}}">
+                                <!-- </div> -->
+                            </div>
+                            <!-- pembatas -->
+                            <div class="form-group col-md-1"></div>
+                            <!-- column 3 -->
+                            <div class="form-group col-md-3">
                                 <div class="form-group">
                                     <label for="inputBerlaku">Alamat</label>
                                     <input type="text" class="form-control" name="Alamat" id="inputBerlaku" readonly="readonly" value="{{$suratjalan->Alamat}}">
@@ -64,43 +94,10 @@
                                     <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$driver->Nama}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputMatauang">Mata Uang</label>
-                                    <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$matauang->NamaMataUang}}">
-                                </div>
-                            </div>
-                            <!-- pembatas -->
-                            <div class="form-group col-md-1"></div>
-                            <!-- column 2 -->
-                            <div class="form-group col-md-4">
-                                <div class="form-group">
                                     <label for="inputPO">No Polisi</label>
                                     <input type="text" class="form-control" name="nopol" readonly="readonly" value="{{$suratjalan->Nopol}}">
                                 </div>
-                                <div class="form-group">
-                                    <label for="inputGudang">Gudang</label>
-                                    <input type="text" class="form-control" name="KodeLokasi" readonly="readonly" value="{{$lokasi->NamaLokasi}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPelanggan">Pelanggan</label>
-                                    <input type="text" class="form-control" name="KodePelanggan" readonly="readonly" value="{{$pelanggan->NamaPelanggan}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPelanggan">Diskon</label>
-                                    <input type="number" readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$suratjalan->Diskon}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPelanggan">PPN</label>
-                                    <input type="text" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$suratjalan->PPN}}">
-                                </div>
                             </div>
-                            <!-- pembatas -->
-                            <div class="form-group col-md-1"></div>
-                            <!-- column 3 -->
-                            <!-- <div class="form-group col-md-3">
-                                <label for="inputKeterangan">Keterangan</label>
-                                <textarea class="form-control" name="Keterangan" id="inputKeterangan" rows="5"></textarea>
-                                <br><br>
-                            </div> -->
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-12">
@@ -109,7 +106,7 @@
                                 <br>
                                 <h3 id="header">Daftar Item</h3>
                                 <br>
-                                <table id="items">
+                                <table id="items">Fkey
                                     <tr>
                                         <td id="header">Nama Barang</td>
                                         <td id="header">Qty</td>
@@ -124,20 +121,20 @@
                                             <input type="text" class="form-control" readonly="readonly" name="item[]" value="{{$data->NamaItem}}">
                                         </td>
                                         <td>
-                                            <input type="number" readonly="readonly" onchange="qty({{$key+1}})" name="qty[]" class="form-control qty{{$key+1}}" required="" value="{{$data->jml}}">
+                                            <input type="number" step=0.01 readonly="readonly" onchange="qty({{$key+1}})" name="qty[]" class="form-control qty{{$key+1}}" required="" value="{{$data->jml}}">
                                             <input type="hidden" class="max{{$key+1}}" value="{{$data->jml}}">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control" readonly="readonly" nsme=satuan[] value="{{$data->NamaSatuan}}">
                                         </td>
                                         <!-- <td>
-                                            <input readonly="" type="text" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->HargaJual}}">
+                                            <input readonly="" type="text" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
                                         </td> -->
                                         <td>
                                             <input type="text" class="form-control" readonly="readonly" name="Keterangan[]" value="{{$data->Keterangan}}" />
                                         </td>
                                         <!-- <td>
-                                            <input readonly="" type="text" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->HargaJual * $data->jml}}">
+                                            <input readonly="" type="text" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
                                         </td> -->
                                     </tr>
                                     @endforeach
@@ -145,7 +142,6 @@
                                 </table>
                                 <div class="col-md-9">
                                     <button type="submit" class="btn btn-success">Konfirmasi</button>
-                                    <button type="button" class="btn btn-danger">Batal</button>
                                 </div>
                                 <!-- <div class="col-md-3">
                                     <label for="inputPelanggan">Subtotal</label>

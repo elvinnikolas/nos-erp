@@ -95,16 +95,16 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" onchange="konversi(1)" name="konversi[]" class="form-control konv1" id="setreadonly" required value="1">
+                                            <input type="number" step=0.01 onchange="konversi(1)" name="konversi[]" class="form-control konv1" id="setreadonly" required value="1">
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control hargabeli1" name="hargabeli[]" required value="0">
+                                            <input type="number" step=0.01 class="form-control hargabeli1" name="hargabeli[]" required value="0">
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control hargajual1" name="hargajual[]" required value="0">
+                                            <input type="number" step=0.01 class="form-control hargajual1" name="hargajual[]" required value="0">
                                         </td>
                                         <td>
-                                            <input type="number" class="form-control hargagrosir1" name="hargagrosir[]" required value="0">
+                                            <input type="number" step=0.01 class="form-control hargagrosir1" name="hargagrosir[]" required value="0">
                                         </td>
                                         <td></td>
                                     </tr>

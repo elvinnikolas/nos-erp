@@ -13,13 +13,55 @@ class InvoicePiutangController extends Controller
 {
     public function piutang()
     {
-        $invoice = DB::select('SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, i.Term, p.NamaPelanggan, i.Tanggal, d.Subtotal,COALESCE(sum(pp.Jumlah),0) as bayar
+        $invoice = DB::select('SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, i.NoFaktur, i.Term, p.NamaPelanggan, i.Tanggal, d.KodeSuratJalan, d.Subtotal, COALESCE(sum(pp.Jumlah),0) as bayar
                     FROM invoicepiutangs i
                     inner join invoicepiutangdetails d on i.KodeInvoicePiutang = d.KodeInvoicePiutang
                     inner join pelanggans p on p.KodePelanggan = i.KodePelanggan
                     left join pelunasanpiutangs pp on pp.KodeInvoice = i.KodeInvoicePiutang
                     GROUP by i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, p.NamaPelanggan, i.Tanggal, d.Subtotal, i.Term');
         return view('piutang.invoice.index', compact('invoice'));
+    }
+
+    public function edit($id)
+    {
+        $invoice = DB::select("SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, i.NoFaktur, i.Term, p.NamaPelanggan, i.Tanggal, d.KodeSuratJalan, d.Subtotal, COALESCE(sum(pp.Jumlah),0) as bayar
+                    FROM invoicepiutangs i
+                    inner join invoicepiutangdetails d on i.KodeInvoicePiutang = d.KodeInvoicePiutang
+                    inner join pelanggans p on p.KodePelanggan = i.KodePelanggan
+                    left join pelunasanpiutangs pp on pp.KodeInvoice = i.KodeInvoicePiutang
+                    where i.KodeInvoicePiutangShow = '" . $id . "'
+                    group by i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, p.NamaPelanggan, i.Tanggal, d.Subtotal, i.Term");
+        return view('piutang.invoice.edit', compact('invoice'));
+    }
+
+    public function update(Request $request)
+    {
+        DB::table('invoicepiutangs')->where('KodeInvoicePiutangShow', $request->KodeInvoice)
+            ->update([
+                'NoFaktur' => $request->NoFaktur,
+                'KodeUser' => \Auth::user()->name,
+                'updated_at' => \Carbon\Carbon::now()
+            ]);
+
+        $detail = DB::table('invoicepiutangdetails')->where('KodePiutang', $request->KodeInvoice)->first();
+        DB::table('suratjalans')->where('KodeSuratJalan', $detail->KodeSuratJalan)
+            ->update([
+                'NoFaktur' => $request->NoFaktur,
+                'KodeUser' => \Auth::user()->name,
+                'updated_at' => \Carbon\Carbon::now()
+            ]);
+
+        DB::table('eventlogs')->insert([
+            'KodeUser' => \Auth::user()->name,
+            'Tanggal' => \Carbon\Carbon::now(),
+            'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+            'Keterangan' => 'Update invoice piutang ' . $request->KodeInvoice,
+            'Tipe' => 'OPN',
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now(),
+        ]);
+
+        return redirect('/invoicepiutang');
     }
 
     public function print($id)
@@ -47,7 +89,7 @@ class InvoicePiutangController extends Controller
         foreach ($items as $value) {
             $jml += $value->Qty;
         }
-        $invoice->Tanggal = \Carbon\Carbon::parse($invoice->Tanggal)->format('d/m/Y');
+        $invoice->TanggalFormat = \Carbon\Carbon::parse($invoice->Tanggal)->format('d-m-Y');
 
         $pdf = PDF::loadview('piutang.invoice.print', compact('invoice', 'id', 'items', 'jml', 'suratjalan', 'driver'));
 

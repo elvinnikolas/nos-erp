@@ -61,8 +61,13 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Tanggal</label>
-                                    <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required">
+                                    <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
                                 </div>
+                            </div>
+                            <!-- pembatas -->
+                            <div class="form-group col-md-1"></div>
+                            <!-- column 2 -->
+                            <div class="form-group col-md-3">
                                 <div class="form-group">
                                     <label for="inputBerlaku">Alamat</label>
                                     <input type="text" class="form-control" name="Alamat" id="inputBerlaku" value="{{$sjDet->Alamat}}" readonly="" required="required">
@@ -72,17 +77,25 @@
                                     <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" value="{{$sopir->Nama}}" readonly="" required="required">
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputMatauang">Mata Uang</label>
-                                    <input type="text" class="form-control" name="KodeMataUang" id="KodeMataUang" value="{{$sjDet->uang->NamaMataUang}}" readonly="" required="required">
+                                    <label for="inputPO">No Polisi</label>
+                                    <input type="text" class="form-control" name="nopol" value="{{$sjDet->Nopol}}" readonly="" required="required">
                                 </div>
+                                <!-- <div class="form-group">
+                                    <label for="inputPelanggan">Diskon</label> -->
+                                <input type="hidden" step=0.01 readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$so->Diskon}}">
+                                <!-- </div>
+                                <div class="form-group">
+                                    <label for="inputPelanggan">PPn</label> -->
+                                <input type="hidden" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$so->PPN}}">
+                                <!-- </div> -->
                             </div>
                             <!-- pembatas -->
                             <div class="form-group col-md-1"></div>
-                            <!-- column 2 -->
-                            <div class="form-group col-md-4">
+                            <!-- column 3 -->
+                            <div class="form-group col-md-3">
                                 <div class="form-group">
-                                    <label for="inputPO">No Polisi</label>
-                                    <input type="text" class="form-control" name="nopol" value="{{$sjDet->Nopol}}" readonly="" required="required">
+                                    <label for="inputMatauang">Mata Uang</label>
+                                    <input type="text" class="form-control" name="KodeMataUang" id="KodeMataUang" value="{{$sjDet->uang->NamaMataUang}}" readonly="" required="required">
                                 </div>
                                 <div class="form-group">
                                     <label for="inputGudang">Gudang</label>
@@ -92,17 +105,7 @@
                                     <label for="inputPelanggan">Pelanggan</label>
                                     <input type="text" class="form-control" name="KodePelanggan" id="KodePelanggan" value="{{$sjDet->pelanggan->NamaPelanggan}}" readonly="" required="required">
                                 </div>
-                                <div class="form-group">
-                                    <label for="inputPelanggan">Diskon</label>
-                                    <input type="number" step=0.01 readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$so->Diskon}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPelanggan">PPn</label>
-                                    <input type="text" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$so->PPN}}">
-                                </div>
                             </div>
-                            <!-- pembatas -->
-                            <div class="form-group col-md-1"></div>
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-12">
@@ -128,20 +131,20 @@
                                         </td>
                                         <td>
                                             <input type="number" step=0.01 onchange="qty({{$key+1}})" name="qty[]" class="form-control qty{{$key+1}} qtyj" required="" placeholder="{{$data->jml}}">
-                                            <input type="hidden" class="max{{$key+1}}" value="{{$data->jml}}">
+                                            <input type="hidden" step=0.01 class="max{{$key+1}}" value="{{$data->jml}}">
                                         </td>
                                         <td>
                                             <input type="hidden" class="form-control" readonly name="satuan[]" value="{{$data->KodeSatuan}}">
                                             <input type="text" class="form-control" readonly value="{{$data->NamaSatuan}}">
                                         </td>
                                         <!-- <td> -->
-                                        <input readonly="" type="hidden" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->HargaJual}}">
+                                        <input readonly="" type="hidden" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
                                         <!-- </td> -->
                                         <td>
                                             <input type="text" class="form-control" readonly name="keterangan[]" value="{{$data->Keterangan}}" />
                                         </td>
                                         <!-- <td> -->
-                                        <input readonly type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->HargaJual * $data->jml}}">
+                                        <input readonly type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
                                         <!-- </td> -->
                                     </tr>
                                     @endforeach
@@ -149,7 +152,6 @@
                                 </table>
                                 <div class="col-md-9">
                                     <button type="submit" class="btn btn-success">Simpan</button>
-                                    <button type="button" class="btn btn-danger">Batal</button>
                                 </div>
                                 <div class="col-md-3">
                                     <input type="hidden" value="{{sizeof($items)}}" class="tot">

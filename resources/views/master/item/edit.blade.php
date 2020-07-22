@@ -33,19 +33,19 @@
                         </div>
                         <div class="form-group">
                             <label>Konversi:</label>
-                            <input type="number" required="required" name="Konversi" value="{{ $itk->Konversi }}" class="form-control">
+                            <input type="number" step=0.01 required="required" name="Konversi" value="{{ $itk->Konversi }}" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Harga Jual:</label>
-                            <input type="number" required="required" name="HargaJual" value="{{ $itk->HargaJual }}" class="form-control">
+                            <input type="number" step=0.01 required="required" name="HargaJual" value="{{ $itk->HargaJual }}" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Harga Beli:</label>
-                            <input type="number" required="required" name="HargaBeli" value="{{ $itk->HargaBeli }}" class="form-control">
+                            <input type="number" step=0.01 required="required" name="HargaBeli" value="{{ $itk->HargaBeli }}" class="form-control">
                         </div>
                         <div class="form-group">
                             <label>Harga Grosir:</label>
-                            <input type="number" required="required" name="HargaGrosir" value="{{ $itk->HargaGrosir }}" class="form-control">
+                            <input type="number" step=0.01 required="required" name="HargaGrosir" value="{{ $itk->HargaGrosir }}" class="form-control">
                         </div>
                         @endforeach
                         @foreach($item as $itm)

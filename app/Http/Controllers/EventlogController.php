@@ -9,7 +9,7 @@ class EventlogController extends Controller
 {
     public function index()
     {
-        $eventlog = eventlog::orderBy('id', 'DESC')->paginate(20);
+        $eventlog = eventlog::orderBy('id', 'DESC')->get();
         return view('eventlog.index', compact('eventlog'));
     }
 }

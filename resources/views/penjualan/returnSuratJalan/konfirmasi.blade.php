@@ -52,6 +52,32 @@
     </div>
   </div>
 
+  <!-- Alert -->
+  @if(session()->get('created'))
+  <div class="alert alert-success alert-dismissible fade-show">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ session()->get('created') }}
+  </div>
+
+  @elseif(session()->get('edited'))
+  <div class="alert alert-info alert-dismissible fade-show">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ session()->get('edited') }}
+  </div>
+
+  @elseif(session()->get('deleted'))
+  <div class="alert alert-danger alert-dismissible fade-show">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ session()->get('deleted') }}
+  </div>
+
+  @elseif(session()->get('error'))
+  <div class="alert alert-warning alert-dismissible fade-show">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    {{ session()->get('error') }}
+  </div>
+  @endif
+
   <div class="x_panel">
     <div class="x_content">
       <table class="table table-light table-striped" id="table">
@@ -97,7 +123,8 @@
 
   $('#table').DataTable({
     "order": [
-      [0, "desc"]
+      [2, "desc"],
+      [0, "desc"],
     ]
   });
 </script>

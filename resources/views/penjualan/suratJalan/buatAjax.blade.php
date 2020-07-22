@@ -8,7 +8,7 @@
       <input type="hidden" name="KodePelanggan" value="{{$so->KodePelanggan}}">
       <div class="form-group">
         <label for="inputDate">Tanggal</label>
-        <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required">
+        <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
       </div>
       <div class="form-group">
         <label for="inputBerlaku">Alamat</label>
@@ -59,14 +59,14 @@
           @endforeach
         </select>
       </div> -->
+      <!-- <div class="form-group">
+        <label for="inputPelanggan">Diskon</label> -->
+      <input type="hidden" step=0.01 readonly="readonly" class="form-control diskon" name="diskon" value="{{$so->Diskon}}">
+      <!-- </div>
       <div class="form-group">
-        <label for="inputPelanggan">Diskon</label>
-        <input type="number" step=0.01 readonly="readonly" class="form-control diskon" name="diskon" value="{{$so->Diskon}}">
-      </div>
-      <div class="form-group">
-        <label for="inputPelanggan">PPn</label>
-        <input type="text" readonly="readonly" class="form-control ppn" name="ppn" value="{{$so->PPN}}">
-      </div>
+        <label for="inputPelanggan">PPN</label> -->
+      <input type="hidden" readonly="readonly" class="form-control ppn" name="ppn" value="{{$so->PPN}}">
+      <!-- </div> -->
     </div>
     <!-- pembatas -->
     <div class="form-group col-md-1"></div>
@@ -102,13 +102,13 @@
             <input type="text" class="form-control" readonly value="{{$data->NamaSatuan}}">
           </td>
           <!-- <td> -->
-          <input readonly="" type="hidden" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->HargaJual}}">
+          <input readonly="" type="hidden" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
           <!-- </td> -->
           <td>
             <input type="text" class="form-control" readonly name="keterangan[]" value="{{$data->Keterangan}}">
           </td>
           <!-- <td> -->
-          <input readonly type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->HargaJual * $data->jml}}">
+          <input readonly type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
           <!-- </td> -->
         </tr>
         @endforeach
@@ -116,7 +116,6 @@
       </table>
       <div class="col-md-9">
         <button type="submit" class="btn btn-success">Simpan</button>
-        <button type="button" class="btn btn-danger">Batal</button>
       </div>
       <div class="col-md-3">
         <input type="hidden" value="{{sizeof($items)}}" class="tot">

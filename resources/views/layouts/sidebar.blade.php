@@ -19,34 +19,34 @@
             <li>
                 <a><i class="fa fa-dollar"> </i> Penjualan <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li><a>Pemesanan penjualan<span class="fa fa-chevron-down"></span></a>
+                    <li><a>Pemesanan Penjualan<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="{{ url('/sopenjualan')}}">S.O Penjualan</a></li>
+                            <li><a href="{{ url('/sopenjualan')}}">S.O</a></li>
                             <li><a href="{{ url('/konfirmasiPenjualan') }}">S.O Konfirmasi</a></li>
-                            <li><a href="{{ url('/dikirimPenjualan') }}">S.O Dikirim</a></li>
+                            <li><a href="{{ url('/dikirimPenjualan') }}">S.O Selesai</a></li>
                             <!-- <li><a href="{{ url('/batalPenjualan') }}">S.O Batal</a></li> -->
                         </ul>
                     </li>
-                    <li><a>Surat jalan<span class="fa fa-chevron-down"></span></a>
+                    <li><a>Surat Jalan<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="{{ url('/suratJalan/create') }}">Buat Surat Jalan </a></li>
                             <li><a href="{{ url('/suratJalan') }}">Surat Jalan </a></li>
                             <li><a href="{{ url('/konfirmasiSuratJalan') }}">Surat Jalan Konfirmasi</a></li>
                         </ul>
                     </li>
-                    <li><a>Return Surat jalan<span class="fa fa-chevron-down"></span></a>
+                    <li><a>Return Surat Jalan<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="{{ url('/returnSuratJalan/add/0') }}">Buat Return Surat Jalan </a></li>
                             <li><a href="{{ url('/returnSuratJalan') }}">Return Surat Jalan </a></li>
                             <li><a href="{{ url('/konfirmasiReturnSuratJalan') }}">Return Surat Jalan Konfirmasi</a></li>
                         </ul>
                     </li>
-                    <li><a>Penjualan Langsung<span class="fa fa-chevron-down"></span></a>
+                    <!-- <li><a>Penjualan Langsung<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="{{ url('/penjualanLangsung') }}">Penjualan Langsung (Kasir)</a></li>
-                            <!-- <li><a href="{{ url('/returnPenjualanLangsung/0') }}">Return Penjualan Langsung</a></li> -->
+                            <li><a href="{{ url('/returnPenjualanLangsung/0') }}">Return Penjualan Langsung</a></li>
                         </ul>
-                    </li>
+                    </li> -->
                     <li><a>Piutang<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
                             <li><a href="{{ url('/invoicepiutang') }}">Invoice</a></li>
@@ -61,7 +61,7 @@
                 <ul class="nav child_menu">
                     <li><a>Pemesanan Pembelian<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
-                            <li><a href="{{ url('/popembelian') }}">P.O Pembelian</a></li>
+                            <li><a href="{{ url('/popembelian') }}">P.O</a></li>
                             <li><a href="{{ url('/pokonfirmasi') }}">P.O Konfirmasi</a></li>
                             <li><a href="{{ url('/poditerima') }}">P.O Diterima</a></li>
                             <li><a href="{{ url('/pobatal') }}">P.O Batal</a></li>
@@ -93,12 +93,10 @@
             <li>
                 <a><i class="fa fa-list"></i> Stok <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li>
-                        <a href="{{ url('/stokmasuk') }}">Stok Masuk</a>
-                    </li>
-                    <li>
-                        <a href="{{ url('/kartustok') }}">Kartu Stok</a>
-                    </li>
+                    <li><a href="{{ url('/kartustok') }}">Kartu Stok</a></li>
+                    <li><a href="{{ url('/stokmasuk') }}">Stok Masuk</a></li>
+                    <li><a href="{{ url('/stokkeluar') }}">Stok Keluar</a></li>
+                    <li><a href="{{ url('/pengeluarantambahan') }}">Pengeluaran Tambahan</a></li>
                 </ul>
             </li>
 

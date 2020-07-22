@@ -87,19 +87,21 @@
                                 <th>User</th>
                                 <th>QTY</th>
                                 <th>Saldo</th>
+                                <th>Satuan</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($stok as $stokmasuk)
+                            @foreach ($stok as $stk)
                             <tr>
-                                <td>{{ $stokmasuk->Tanggal}}</td>
-                                <td>{{ $stokmasuk->NamaItem}}</td>
-                                <td>{{ $stokmasuk->NamaLokasi}}</td>
-                                <td>{{ $stokmasuk->JenisTransaksi }}</td>
-                                <td>{{ $stokmasuk->KodeTransaksi}}</td>
-                                <td>{{ $stokmasuk->KodeUser}}</td>
-                                <td>{{ $stokmasuk->Qty}}</td>
-                                <td>{{ $stokmasuk->saldo}}</td>
+                                <td>{{ \Carbon\Carbon::parse($stk->Tanggal)->format('d-m-Y') }}</td>
+                                <td>{{ $stk->NamaItem }}</td>
+                                <td>{{ $stk->NamaLokasi }}</td>
+                                <td>{{ $stk->JenisTransaksi }}</td>
+                                <td>{{ $stk->KodeTransaksi }}</td>
+                                <td>{{ $stk->KodeUser }}</td>
+                                <td>{{ $stk->Qty }}</td>
+                                <td>{{ $stk->saldo }}</td>
+                                <td>{{ $stk->NamaSatuan }}</td>
                             </tr>
                             @endforeach
                         </tbody>

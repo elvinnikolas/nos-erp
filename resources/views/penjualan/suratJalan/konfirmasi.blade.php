@@ -57,6 +57,33 @@
             </form>
         </div>
     </div>
+
+    <!-- Alert -->
+    @if(session()->get('created'))
+    <div class="alert alert-success alert-dismissible fade-show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ session()->get('created') }}
+    </div>
+
+    @elseif(session()->get('edited'))
+    <div class="alert alert-info alert-dismissible fade-show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ session()->get('edited') }}
+    </div>
+
+    @elseif(session()->get('deleted'))
+    <div class="alert alert-danger alert-dismissible fade-show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ session()->get('deleted') }}
+    </div>
+
+    @elseif(session()->get('error'))
+    <div class="alert alert-warning alert-dismissible fade-show">
+        <button type="button" class="close" data-dismiss="alert">&times;</button>
+        {{ session()->get('error') }}
+    </div>
+    @endif
+
     <div class="x_panel">
         <div class="x_title">
             <h3>Konfirmasi Surat Jalan</h3>
@@ -67,7 +94,7 @@
                     <tr>
                         <th scope="col">Nomor SJ</th>
                         <th scope="col">Nomor SO</th>
-                        <th scope="col">Nama Pelanggan</th>
+                        <th scope="col">Pelanggan</th>
                         <th scope="col">Tanggal</th>
                         <th scope="col">Gudang</th>
                         <th scope="col">Action</th>
@@ -108,6 +135,7 @@
 
     $('#table').DataTable({
         "order": [
+            [2, "desc"],
             [0, "desc"]
         ]
     });
