@@ -156,7 +156,7 @@ class ReturnSuratJalanController extends Controller
 
     public function index()
     {
-        $suratjalanreturns = suratjalanreturn::where('Status', 'OPN')->get();
+        $suratjalanreturns = suratjalanreturn::where('Status', 'OPN')->orderBy('KodeSuratJalanID', 'desc')->get();
         return view('penjualan.returnSuratJalan.index', compact('suratjalanreturns'));
     }
 
@@ -232,14 +232,14 @@ class ReturnSuratJalanController extends Controller
             $invoice = invoicepiutangdetail::where('KodeSuratJalan', $suratjalanreturn->KodeSuratJalan)->first();
             $piutang = invoicepiutang::where('KodeInvoicePiutangShow', $invoice->KodePiutang)->first();
             if (!empty($invoice)) {
-                $now = $invoice->Subtotal;
-                $invoice->Subtotal = $now - $totalreturn;
+                // $now = $invoice->Subtotal;
+                // $invoice->Subtotal = $now - $totalreturn;
+                $invoice->TotalReturn += $totalreturn;
                 $invoice->save();
             }
             if (!empty($piutang)) {
-                $now = $piutang->Total;
-                $piutang->Total = $now - $totalreturn;
-                $piutang->save();
+                // $now = $piutang->Total;
+                // $piutang->Total = $now - $totalreturn;
             }
 
             $checkitem = DB::select("SELECT (a.qty-COALESCE(SUM(sjd.qty),0)) as jml
@@ -314,7 +314,7 @@ class ReturnSuratJalanController extends Controller
 
     public function konfirmasiSuratJalanReturn()
     {
-        $suratjalanreturns = suratjalanreturn::where('Status', 'CFM')->get();
+        $suratjalanreturns = suratjalanreturn::where('Status', 'CFM')->orderBy('KodeSuratJalanID', 'desc')->get();
         return view('penjualan.returnSuratJalan.konfirmasi', compact('suratjalanreturns'));
     }
 

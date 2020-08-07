@@ -22,6 +22,7 @@
                                 <th>No Faktur</th>
                                 <th>Total</th>
                                 <th>Total Bayar</th>
+                                <th>Total Return</th>
                                 <th>Selisih</th>
                                 <th>Aksi</th>
                             </tr>
@@ -29,7 +30,7 @@
                         <tbody>
                             @foreach ($invoice as $inv)
 
-                            @if($inv->Subtotal <= 0) @elseif ($inv->Subtotal <= $inv->bayar)
+                            @if ($inv->Subtotal <= $inv->bayar)
                                     <tr class="success">
                                         <td>{{ $inv->KodeInvoicePiutangShow}}</td>
                                         <td>{{ $inv->KodeSuratJalan}}</td>
@@ -38,12 +39,15 @@
                                         <td>{{ $inv->NoFaktur}}</td>
                                         <td>Rp. {{ number_format($inv->Subtotal, 0, ',', '.') }},-</td>
                                         <td>Rp. {{ number_format($inv->bayar, 0, ',', '.') }},-</td>
-                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar, 0, ',', '.')}},-</td>
+                                        <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
+                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                         <td>
                                             <a href="{{url('invoicepiutang/print/'.$inv->KodeInvoicePiutangShow)}}" class="btn btn-xs btn-primary">Print</a>
+                                            @if($inv->PPN == "ya")
                                             <a href="{{url('invoicepiutang/edit/'.$inv->KodeInvoicePiutangShow)}}" class="btn btn-xs btn-success">
                                                 <i class="fa fa-plus" aria-hidden="true"></i>
                                             </a>
+                                            @endif
                                         </td>
                                     </tr>
                                     @elseif(\Carbon\Carbon::parse($inv->Tanggal)->addDays($inv->Term) > \Carbon\Carbon::now())
@@ -55,12 +59,15 @@
                                         <td>{{ $inv->NoFaktur}}</td>
                                         <td>Rp. {{ number_format($inv->Subtotal, 0, ',', '.') }},-</td>
                                         <td>Rp. {{ number_format($inv->bayar, 0, ',', '.') }},-</td>
-                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar, 0, ',', '.')}},-</td>
+                                        <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
+                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                         <td>
                                             <a href="{{url('invoicepiutang/print/'.$inv->KodeInvoicePiutangShow)}}" class="btn btn-xs btn-primary">Print</a>
+                                            @if($inv->PPN == "ya")
                                             <a href="{{url('invoicepiutang/edit/'.$inv->KodeInvoicePiutangShow)}}" class="btn btn-xs btn-success">
                                                 <i class="fa fa-plus" aria-hidden="true"></i>
                                             </a>
+                                            @endif
                                         </td>
                                     </tr>
                                     @else
@@ -72,12 +79,15 @@
                                         <td>{{ $inv->NoFaktur}}</td>
                                         <td>Rp. {{ number_format($inv->Subtotal, 0, ',', '.') }},-</td>
                                         <td>Rp. {{ number_format($inv->bayar, 0, ',', '.') }},-</td>
-                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar, 0, ',', '.')}},-</td>
+                                        <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
+                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                         <td>
                                             <a href="{{url('invoicepiutang/print/'.$inv->KodeInvoicePiutangShow)}}" class="btn btn-xs btn-primary">Print</a>
+                                            @if($inv->PPN == "ya")
                                             <a href="{{url('invoicepiutang/edit/'.$inv->KodeInvoicePiutangShow)}}" class="btn btn-xs btn-success">
                                                 <i class="fa fa-plus" aria-hidden="true"></i>
                                             </a>
+                                            @endif
                                         </td>
                                     </tr>
                                     @endif

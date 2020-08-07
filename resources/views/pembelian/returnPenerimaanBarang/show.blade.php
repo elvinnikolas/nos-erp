@@ -37,10 +37,10 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1 id="header">Surat Jalan</h1>
+                    <h1 id="header">Return Penerimaan Barang</h1>
                 </div>
                 <div class="x_content">
-                    <form action="#" method="get">
+                    <form action="/returnPenerimaanBarang/confirm/{{$id}}" method="post">
                         @csrf
                         <!-- Contents -->
                         <br>
@@ -48,31 +48,21 @@
                             <!-- column 1 -->
                             <div class="form-group col-md-3">
                                 <div class="form-group">
-                                    <label>Nomor SO</label>
-                                    <input type="text" class="form-control" name="Expired" readonly="readonly" value="{{$suratjalan->KodeSO}}" id="inputBerlaku">
+                                    <label for="">Nomor PB</label>
+                                    <input type="text" class="form-control" name="Expired" readonly="readonly" value="{{$penerimaanbarangreturn->KodePenerimaanBarangReturn}}" id="inputBerlaku">
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Tanggal</label>
-                                    <input type="text" class="form-control" name="Tanggal" id="inputDate" readonly="readonly" value="{{\Carbon\Carbon::parse($suratjalan->Tanggal)->format('d-m-Y')}}">
+                                    <input type="text" class="form-control" name="Tanggal" id="inputDate" readonly="readonly" value="{{\Carbon\Carbon::parse($penerimaanbarangreturn->Tanggal)->format('d-m-Y')}}">
                                 </div>
-                                @if($suratjalan->PPN == "ya")
-                                <div class="form-group">
-                                    <label for="inputDate">No Faktur</label>
-                                    <input type="text" class="form-control" name="NoFaktur" id="" readonly="readonly" value="{{$suratjalan->NoFaktur}}">
-                                </div>
-                                @endif
                             </div>
                             <!-- pembatas -->
                             <div class="form-group col-md-1"></div>
                             <!-- column 2 -->
                             <div class="form-group col-md-3">
                                 <div class="form-group">
-                                    <label for="inputPelanggan">Pelanggan</label>
-                                    <input type="text" class="form-control" name="KodePelanggan" readonly="readonly" value="{{$pelanggan->NamaPelanggan}}">
-                                </div>
-                                <div class="form-group">
                                     <label for="inputMatauang">Mata Uang</label>
-                                    <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$matauang->NamaMataUang}}">
+                                    <input type="text" class="form-control" name="KodeMataUang" id="inputBerlaku" readonly="readonly" value="{{$matauang->NamaMataUang}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="inputGudang">Gudang</label>
@@ -80,11 +70,11 @@
                                 </div>
                                 <!-- <div class="form-group">
                                     <label for="inputPelanggan">Diskon</label> -->
-                                <input type="hidden" readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$suratjalan->Diskon}}">
+                                <input type="hidden" readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$penerimaanbarang->Diskon}}">
                                 <!-- </div>
                                 <div class="form-group">
                                     <label for="inputPelanggan">PPN</label> -->
-                                <input type="hidden" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$suratjalan->PPN}}">
+                                <input type="hidden" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$penerimaanbarang->PPN}}">
                                 <!-- </div> -->
                             </div>
                             <!-- pembatas -->
@@ -92,16 +82,12 @@
                             <!-- column 3 -->
                             <div class="form-group col-md-3">
                                 <div class="form-group">
-                                    <label for="inputBerlaku">Alamat</label>
-                                    <input type="text" class="form-control" name="Alamat" id="inputBerlaku" readonly="readonly" value="{{$suratjalan->Alamat}}">
+                                    <label for="inputTerm">Sales</label>
+                                    <input type="text" class="form-control" name="KodeSales" id="inputBerlaku" readonly="readonly" value="{{$sales->Nama}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputTerm">Sopir</label>
-                                    <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$driver->Nama}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPO">No Polisi</label>
-                                    <input type="text" class="form-control" name="nopol" readonly="readonly" value="{{$suratjalan->Nopol}}">
+                                    <label for="inputPelanggan">Supplier</label>
+                                    <input type="text" class="form-control" name="KodeSupplier" readonly="readonly" value="{{$supplier->NamaSupplier}}">
                                 </div>
                             </div>
                         </div>
@@ -144,9 +130,10 @@
                                         </td>
                                     </tr>
                                     @endforeach
+
                                 </table>
                                 <div class="col-md-9">
-                                    <button type="submit" class="btn btn-primary" formaction="{{ url('/suratJalan/print/'.$id) }}">Print</button>
+                                    <button type="submit" class="btn btn-primary">Konfirmasi</button>
                                 </div>
                                 <div class="col-md-3">
                                     <input type="hidden" value="{{sizeof($items)}}" class="tot">
@@ -166,53 +153,53 @@
             </div>
         </div>
     </div>
+</div>
+<script type="text/javascript">
+    function refresh(val) {
+        var base = "{{ url('/') }}" + "/suratJalan/create/" + val.value;
+        window.location.href = base;
+    }
 
-    <script type="text/javascript">
-        function refresh(val) {
-            var base = "{{ url('/') }}" + "/suratJalan/create/" + val.value;
-            window.location.href = base;
+    updatePrice($(".tot").val());
+
+    function updatePrice(tot) {
+
+        $(".subtotal").val(0);
+        var diskon = 0;
+        if ($(".diskon").val() != "") {
+            diskon = parseInt($(".diskon").val());
         }
-
-        updatePrice($(".tot").val());
-
-        function updatePrice(tot) {
-
-            $(".subtotal").val(0);
-            var diskon = 0;
-            if ($(".diskon").val() != "") {
-                diskon = parseInt($(".diskon").val());
+        for (var i = 1; i <= tot; i++) {
+            if ($(".total" + i).val() != undefined) {
+                $(".subtotal").val(parseInt($(".subtotal").val()) + parseInt($(".total" + i).val()));
             }
-            for (var i = 1; i <= tot; i++) {
-                if ($(".total" + i).val() != undefined) {
-                    $(".subtotal").val(parseInt($(".subtotal").val()) + parseInt($(".total" + i).val()));
-                }
-            }
-            var befDis = $(".subtotal").val();
-            diskon = parseInt($(".subtotal").val()) * diskon / 100;
-            $(".subtotal").val(parseInt($(".subtotal").val()) - diskon);
-            var ppn = $(".ppn").val();
-            if (ppn == "ya") {
-                ppn = parseInt(befDis) * 10 / 100;
-            } else {
-                ppn = parseInt(0);
-            }
-            $(".ppnval").val(ppn);
-            $(".diskonval").val(diskon);
-            $(".befDis").val(parseInt($(".subtotal").val()));
-            $(".subtotal").val(parseInt($(".subtotal").val()) + ppn);
         }
-
-        function qty(int) {
-            var qty = $(".qty" + int).val();
-            var max = $(".max" + int).val();
-            if (parseInt(qty) > parseInt(max)) {
-                $(".qty" + int).val(max);
-            }
-            var qty = $(".qty" + int).val();
-            var price = $(".price" + int).val();
-            $(".total" + int).val(price * qty);
-            var count = $(".tot").val();
-            updatePrice(count);
+        var befDis = $(".subtotal").val();
+        diskon = parseInt($(".subtotal").val()) * diskon / 100;
+        $(".subtotal").val(parseInt($(".subtotal").val()) - diskon);
+        var ppn = $(".ppn").val();
+        if (ppn == "ya") {
+            ppn = parseInt(befDis) * 10 / 100;
+        } else {
+            ppn = parseInt(0);
         }
-    </script>
-    @endsection
+        $(".ppnval").val(ppn);
+        $(".diskonval").val(diskon);
+        $(".befDis").val(parseInt($(".subtotal").val()));
+        $(".subtotal").val(parseInt($(".subtotal").val()) + ppn);
+    }
+
+    function qty(int) {
+        var qty = $(".qty" + int).val();
+        var max = $(".max" + int).val();
+        if (parseInt(qty) > parseInt(max)) {
+            $(".qty" + int).val(max);
+        }
+        var qty = $(".qty" + int).val();
+        var price = $(".price" + int).val();
+        $(".total" + int).val(price * qty);
+        var count = $(".tot").val();
+        updatePrice(count);
+    }
+</script>
+@endsection

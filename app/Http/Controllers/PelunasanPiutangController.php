@@ -22,7 +22,7 @@ class PelunasanPiutangController extends Controller
 
     public function invoice($id)
     {
-        $invoice = DB::select("SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, p.NamaPelanggan, i.Tanggal, i.Term, d.KodeSuratJalan, d.Subtotal, COALESCE(sum(pp.Jumlah),0) as bayar 
+        $invoice = DB::select("SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, p.NamaPelanggan, i.Tanggal, i.Term, d.KodeSuratJalan, d.Subtotal, d.TotalReturn, COALESCE(sum(pp.Jumlah),0) as bayar 
             FROM invoicepiutangs i 
             inner join invoicepiutangdetails d on i.KodeInvoicePiutang = d.KodeInvoicePiutang
             inner join pelanggans p on p.KodePelanggan = i.KodePelanggan
@@ -38,14 +38,15 @@ class PelunasanPiutangController extends Controller
         $pelanggan = pelanggan::where('KodePelanggan', $invoice->KodePelanggan)->first();
         $payments = pelunasanpiutang::where('KodeInvoice', $id)->get();
         $detail = invoicepiutangdetail::where('KodeInvoicePiutang', $id)->first();
-        $tot = 0;
 
+        $tot = 0;
         foreach ($payments as $bill) {
             $tot += $bill->Jumlah;
         }
 
         $sub = $detail->Subtotal;
-        $sisa = $sub - $tot;
+        $return = $detail->TotalReturn;
+        $sisa = $sub - $tot - $return;
         return view('piutang.pelunasan.paymentlist', compact('invoice', 'payments', 'sisa', 'pelanggan'));
     }
 
@@ -60,8 +61,10 @@ class PelunasanPiutangController extends Controller
         foreach ($payments as $bill) {
             $tot += $bill->Jumlah;
         }
+
         $sub = $detail->Subtotal;
-        $sisa = $sub - $tot;
+        $return = $detail->TotalReturn;
+        $sisa = $sub - $tot - $return;
 
         return view('piutang.pelunasan.paymentadd', compact('invoice', 'payments', 'matauang', 'sub', 'sisa'));
     }
@@ -109,7 +112,8 @@ class PelunasanPiutangController extends Controller
         $kas->TipeBayar = '';
         $kas->NoLink = '';
         $kas->BayarDari = '';
-        $kas->Untuk = $invoice->KodeInvoicePiutangShow;
+        $kas->Untuk = 'PEL';
+        $kas->KodeInvoice = $invoice->KodeInvoicePiutangShow;
         $kas->Keterangan = $keterangan;
         $kas->KodeUser = \Auth::user()->name;
         $kas->Tipe = $status;
@@ -157,7 +161,7 @@ class PelunasanPiutangController extends Controller
         $pp->KodeMataUang = $matauang;
         $pp->KodeUser = \Auth::user()->name;
         $pp->KodeSupplier = 'SUP';
-        $pp->KodeKasBank = $kas->KodeKasBankID;
+        $pp->KodeKasBank = $kas->KodeKasBank;
         $pp->created_at = \Carbon\Carbon::now();
         $pp->updated_at = \Carbon\Carbon::now();
         $pp->save();

@@ -86,6 +86,7 @@
             <th scope="col">Nomor SJ Return</th>
             <th scope="col">Nomor SJ</th>
             <th scope="col">Tanggal</th>
+            <th scope="col">Total</th>
             <th scope="col">Action</th>
           </tr>
         </thead>
@@ -95,6 +96,7 @@
             <td>{{ $suratjalan->KodeSuratJalanReturn}}</td>
             <td>{{ $suratjalan->KodeSuratJalan}}</td>
             <td>{{ \Carbon\Carbon::parse($suratjalan->Tanggal)->format('d-m-Y') }}</td>
+            <td>Rp. {{ number_format($suratjalan->Subtotal, 0, ',', '.') }},-</td>
             <td>
               <a href="{{ url('/returnSuratJalan/view/'.$suratjalan->KodeSuratJalanReturnID ) }}" class="btn-xs btn btn-primary">
                 <i class="fa fa-eye" aria-hidden="true"></i> Lihat
@@ -122,10 +124,7 @@
   });
 
   $('#table').DataTable({
-    "order": [
-      [2, "desc"],
-      [0, "desc"],
-    ]
+    "order": []
   });
 </script>
 @endpush

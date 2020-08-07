@@ -9,24 +9,27 @@
                 </div>
                 <div class="x_body">
                     @if($sisa > 0)
-                    <a class="btn btn-primary " href="{{url('/pelunasanhutang/payment/'.$invoice[0]->KodeInvoiceHutang.'/add')}}">Tambah Pembayaran</a>
+                    <a class="btn btn-primary " href="{{url('/pelunasanhutang/payment/'.$invoice->KodeInvoiceHutang.'/add')}}">
+                        <i class="fa fa-plus" aria-hidden="true"></i> Pembayaran
+                    </a>
                     @endif
-                    <table class="table table-light">
+                    <br><br>
+                    <table class="table table-light" id="table">
                         <thead class="thead-light">
                             <tr>
-                                <th>Supplier</th>
-                                <th>No Tagihan</th>
-                                <th>Tanggal</th>
+                                <th>Tanggal Bayar</th>
                                 <th>Total Bayar</th>
+                                <th>Metode</th>
+                                <th>Keterangan</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($payments as $payment)
                             <tr>
-                                <td>{{ $supplier[0]->NamaSupplier }}</td>
-                                <td>{{ $invoice[0]->KodeInvoiceHutangShow}}</td>
-                                <td>{{ $payment->Tanggal}}</td>
-                                <td>{{ $payment->Jumlah}}</td>
+                                <td>{{ \Carbon\Carbon::parse($payment->Tanggal)->format('d-m-Y') }}</td>
+                                <td>Rp. {{ number_format($payment->Jumlah, 0, ',', '.') }},-</td>
+                                <td>{{ $payment->TipeBayar }}</td>
+                                <td>{{ $payment->Keterangan}}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -37,3 +40,9 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script type="text/javascript">
+    $('#table').DataTable();
+</script>
+@endpush

@@ -21,13 +21,14 @@
                                 <th>Jatuh Tempo</th>
                                 <th>Total</th>
                                 <th>Total Bayar</th>
+                                <th>Total Return</th>
                                 <th>Selisih</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($invoice as $inv)
-                            @if($inv->Subtotal <= 0) @continue @elseif ($inv->Subtotal <= $inv->bayar)
+                            @if ($inv->Subtotal <= $inv->bayar)
                                     <tr class="success">
                                         <td>{{ $inv->KodeInvoicePiutangShow}}</td>
                                         <td>{{ $inv->KodeSuratJalan}}</td>
@@ -35,7 +36,8 @@
                                         <td>{{ \Carbon\Carbon::parse($inv->Tanggal)->addDays($inv->Term)->format('d-m-Y') }}</td>
                                         <td>Rp. {{ number_format($inv->Subtotal, 0, ',', '.') }},-</td>
                                         <td>Rp. {{ number_format($inv->bayar, 0, ',', '.') }},-</td>
-                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar, 0, ',', '.')}},-</td>
+                                        <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
+                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                         <td><a href="{{url('pelunasanpiutang/payment/'.$inv->KodeInvoicePiutang)}}" class="btn-sm btn-primary">
                                                 <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                                             </a>
@@ -49,7 +51,8 @@
                                         <td>{{ \Carbon\Carbon::parse($inv->Tanggal)->addDays($inv->Term)->format('d-m-Y') }}</td>
                                         <td>Rp. {{ number_format($inv->Subtotal, 0, ',', '.') }},-</td>
                                         <td>Rp. {{ number_format($inv->bayar, 0, ',', '.') }},-</td>
-                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar, 0, ',', '.')}},-</td>
+                                        <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
+                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                         <td><a href="{{url('pelunasanpiutang/payment/'.$inv->KodeInvoicePiutang)}}" class="btn-sm btn-primary">
                                                 <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                                             </a>
@@ -63,7 +66,8 @@
                                         <td>{{ \Carbon\Carbon::parse($inv->Tanggal)->addDays($inv->Term)->format('d-m-Y') }}</td>
                                         <td>Rp. {{ number_format($inv->Subtotal, 0, ',', '.') }},-</td>
                                         <td>Rp. {{ number_format($inv->bayar, 0, ',', '.') }},-</td>
-                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar, 0, ',', '.')}},-</td>
+                                        <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
+                                        <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                         <td><a href="{{url('pelunasanpiutang/payment/'.$inv->KodeInvoicePiutang)}}" class="btn-sm btn-primary">
                                                 <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                                             </a>

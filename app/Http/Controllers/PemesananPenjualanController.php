@@ -26,7 +26,7 @@ class PemesananPenjualanController extends Controller
             ->join('matauangs', 'matauangs.KodeMataUang', '=', 'pemesananpenjualans.KodeMataUang')
             ->join('pelanggans', 'pelanggans.KodePelanggan', '=', 'pemesananpenjualans.KodePelanggan')
             ->select('pemesananpenjualans.*', 'lokasis.NamaLokasi', 'matauangs.NamaMataUang', 'pelanggans.NamaPelanggan')
-            ->orderBy('pemesananpenjualans.KodeSO', 'desc')
+            ->orderBy('pemesananpenjualans.id', 'desc')
             ->get();
         $pemesananpenjualan = $pemesananpenjualan->where('Status', 'OPN');
         $pemesananpenjualan->all();
@@ -319,7 +319,7 @@ class PemesananPenjualanController extends Controller
 
         $so->Tanggal = Carbon::parse($so->Tanggal)->format('Y-m-d');
         $so->tgl_kirim = Carbon::parse($so->tgl_kirim)->format('Y-m-d');
-        return view('penjualan.pemesananpenjualan.edit', compact('so', 'id', 'items', 'lokasi', 'pelanggan', 'matauang', 'satuan', 'dataharga', 'datasatuan', 'itemlist', 'itemcount'));
+        return view('penjualan.pemesananPenjualan.edit', compact('so', 'id', 'items', 'lokasi', 'pelanggan', 'matauang', 'satuan', 'dataharga', 'datasatuan', 'itemlist', 'itemcount'));
     }
 
     /**
@@ -475,7 +475,7 @@ class PemesananPenjualanController extends Controller
             ->join('matauangs', 'matauangs.KodeMataUang', '=', 'pemesananpenjualans.KodeMataUang')
             ->join('pelanggans', 'pelanggans.KodePelanggan', '=', 'pemesananpenjualans.KodePelanggan')
             ->select('pemesananpenjualans.*', 'lokasis.NamaLokasi', 'matauangs.NamaMataUang', 'pelanggans.NamaPelanggan')
-            ->orderBy('pemesananpenjualans.KodeSO', 'desc')
+            ->orderBy('pemesananpenjualans.id', 'desc')
             ->get();
         $pemesananpenjualan = $pemesananpenjualan->where('Status', 'CFM');
         $pemesananpenjualan->all();
@@ -489,7 +489,7 @@ class PemesananPenjualanController extends Controller
             ->join('matauangs', 'matauangs.KodeMataUang', '=', 'pemesananpenjualans.KodeMataUang')
             ->join('pelanggans', 'pelanggans.KodePelanggan', '=', 'pemesananpenjualans.KodePelanggan')
             ->select('pemesananpenjualans.*', 'lokasis.NamaLokasi', 'matauangs.NamaMataUang', 'pelanggans.NamaPelanggan')
-            ->orderBy('pemesananpenjualans.KodeSO', 'desc')
+            ->orderBy('pemesananpenjualans.id', 'desc')
             ->get();
         $pemesananpenjualan = $pemesananpenjualan->where('Status', 'CLS');
         $pemesananpenjualan->all();
@@ -503,7 +503,7 @@ class PemesananPenjualanController extends Controller
             ->join('matauangs', 'matauangs.KodeMataUang', '=', 'pemesananpenjualans.KodeMataUang')
             ->join('pelanggans', 'pelanggans.KodePelanggan', '=', 'pemesananpenjualans.KodePelanggan')
             ->select('pemesananpenjualans.*', 'lokasis.NamaLokasi', 'matauangs.NamaMataUang', 'pelanggans.NamaPelanggan')
-            ->orderBy('pemesananpenjualans.KodeSO', 'desc')
+            ->orderBy('pemesananpenjualans.id', 'desc')
             ->get();
         $pemesananpenjualan = $pemesananpenjualan->where('Status', 'DEL');
         $pemesananpenjualan->all();
@@ -557,18 +557,6 @@ class PemesananPenjualanController extends Controller
         $pemesananpenjualan = $hasil1->whereBetween('Tanggal', [$start . ' 00:00:01', $end . ' 23:59:59']);
         $pemesananpenjualan->all();
         return view('penjualan.pemesananPenjualan.konfirmasi', compact('pemesananpenjualan', 'filter', 'start', 'finish'));
-    }
-
-    public function konfirmasiPenjualanPrint(Request $request)
-    {
-        if ($request->start != null) {
-            $pemesananpenjualan = pemesananpenjualan::all()->where('Status', 'CFM')->where('Tanggal', '>=', $request->start)->where('Tanggal', '<=', $request->finish);
-        } else {
-            $pemesananpenjualan = pemesananpenjualan::all()->where('Status', 'CFM');
-        }
-        $pdf = PDF::loadview('penjualan.pemesananPenjualan.pdf', ['pemesananpenjualan' => $pemesananpenjualan]);
-
-        return $pdf->download('penjualan.pemesananpenjualan.pdf');
     }
 
     public function print($id)

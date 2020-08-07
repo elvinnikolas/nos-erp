@@ -40,138 +40,27 @@
                     <h1 id="header">Buat Penerimaan Barang</h1>
                 </div>
                 <div class="x_content">
-                    <form action="/penerimaanBarang/store/{{$id}}" method="post" class="formsub">
-                        @csrf
-                        <!-- Contents -->
-                        <br>
-                        <div class="form-row">
-                            <!-- column 1 -->
-                            <div class="form-group col-md-3">
-                                <div class="form-group">
-                                    <label for="">Nomor PO</label>
-                                    <select name="KodePO" class="form-control" id="KodePO" onchange="refresh(this)">
-                                        @foreach($pemesananpembelians as $data)
-                                        @if($data->KodePO == $id)
-                                        <option selected="selected" value="{{$data->KodePO}}">{{$data->KodePO}}</option>
-                                        @else
-                                        <option value="{{$data->KodePO}}">{{$data->KodePO}}</option>
-                                        @endif
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputDate">Tanggal PO</label>
-                                    @foreach($pemesananpembelians as $data)
-                                    @if($data->KodePO == $id)
-                                    <input type="date" class="form-control" id="inputDate" value="{{$data->Tanggal}}" disabled>
-                                    @endif
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <div class="form-group">
+                                <br>
+                                <label for="">Supplier</label>
+                                <select name="supId" class="form-control" id="supId">
+                                    <option value="0">- Pilih Supplier -</option>
+                                    @foreach($suppliers as $supplier)
+                                    <option name="KodeSupplier" value="{{$supplier->KodeSupplier}}">{{$supplier->NamaSupplier}}</option>
                                     @endforeach
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputDate">Tanggal Penerimaan</label>
-                                    <input type="date" class="form-control" name="Tanggal" id="inputDate" value="{{$dateNow}}">
-                                </div>
-                            </div>
-                            <!-- pembatas -->
-                            <div class="form-group col-md-1"></div>
-                            <!-- column 2 -->
-                            <div class="form-group col-md-4">
-                                <div class="form-group">
-                                    <label for="inputGudang">Gudang</label>
-                                    <select class="form-control" name="KodeLokasi" id="inputGudang" readonly>
-                                        @foreach($lokasis as $lok)
-                                        <option value="{{$lok->KodeLokasi}}">{{$lok->NamaLokasi}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputSupplier">Supplier</label>
-                                    <select class="form-control" name="KodeSupplier" id="inputSupplier" readonly>
-                                        @foreach($suppliers as $sup)
-                                        <option value="{{$sup->KodeSupplier}}">{{$sup->NamaSupplier}}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <!-- <div class="form-group">
-                                    <label for="inputPelanggan">Diskon</label> -->
-                                <input type="hidden" readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$po['Diskon']}}">
-                                <!-- </div>
-                                <div class="form-group">
-                                    <label for="inputPelanggan">PPN</label> -->
-                                <input type="hidden" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$po['PPN']}}">
-                                <!-- </div> -->
-                            </div>
-                            <!-- pembatas -->
-                            <div class="form-group col-md-1"></div>
-                            <!-- column 3 -->
-                            <!-- <div class="form-group col-md-3">
-                                <label for="inputKeterangan">Keterangan</label>
-                                <textarea class="form-control" name="Keterangan" id="inputKeterangan" rows="5"></textarea>
+                                </select>
                                 <br><br>
-                            </div> -->
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-12">
-                                <div class="x_title"></div>
-                                <div class="x_title">
-                                    <h3>Daftar Barang</h3>
-                                </div>
-                                <table id="items">
-                                    <tr>
-                                        <td id="header"><b>Nama Barang</b></td>
-                                        <td id="header"><b>Qty</b></td>
-                                        <td id="header"><b>Satuan</b></td>
-                                        <!-- <td id="header"><b>Harga</b></td> -->
-                                        <td id="header"><b>Keterangan</b></td>
-                                        <!-- <td id="header"><b>Total</b></td> -->
-                                    </tr>
-                                    @foreach($items as $key => $data)
-                                    <tr class="rowinput">
-                                        <td>
-                                            {{$data->NamaItem}}
-                                            <input type="hidden" readonly="readonly" name="item[]" value="{{$data->KodeItem}}">
-                                        </td>
-                                        <td>
-                                            {{$data->jml}}
-                                            <input type="hidden" onchange="qty({{$key+1}})" name="qty[]" class="form-control qty{{$key+1}} qtyj" required="" value="{{$data->jml}}">
-                                            <input type="hidden" class="max{{$key+1}}" value="{{$data->jml}}">
-                                        </td>
-                                        <td>
-                                            {{$data->NamaSatuan}}
-                                        </td>
-                                        <!-- <td> -->
-                                        <!-- {{$string_total = "Rp. " . number_format($data->HargaBeli, 0, ',', '.') .",-"}} -->
-                                        <input readonly="" type="hidden" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->HargaBeli}}">
-                                        <!-- </td> -->
-                                        <td>
-                                            {{$data->Keterangan}}
-                                        </td>
-                                        <!-- <td> -->
-                                        <!-- {{$string_total = "Rp. " . number_format($data->HargaBeli * $data->jml, 0, ',', '.') .",-"}} -->
-                                        <input readonly="" type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->HargaBeli * $data->jml}}">
-                                        <!-- </td> -->
-                                    </tr>
-                                    @endforeach
-
-                                </table>
-                                <div class="col-md-9">
-                                    <button type="submit" class="btn btn-success">Simpan</button>
-                                    <button type="submit" class="btn btn-danger">Batal</button>
-                                </div>
-                                <div class="col-md-3">
-                                    <!-- <label for="inputPelanggan">Diskon</label> -->
-                                    <input type="hidden" readonly name="diskonval" class="form-control diskonval">
-                                    <!-- <label for="inputPelanggan">Subtotal</label> -->
-                                    <input type="hidden" value="{{sizeof($items)}}" name="" class="tot">
-                                    <input type="hidden" readonly="" class="form-control befDis" id="inputBerlaku">
-                                    <!-- <label for="inputPelanggan">PPN</label> -->
-                                    <input type="hidden" readonly="" name="ppnval" class="ppnval form-control">
-                                    <!-- <label for="inputPelanggan">Total</label> -->
-                                    <input type="hidden" readonly="" class="form-control subtotal" name="subtotal" id="inputBerlaku">
+                                <div class="po-select-container">
                                 </div>
                             </div>
                         </div>
-                    </form>
+                        <div class="form-group col-md-1">
+                        </div>
+                        <div class="po-detail-container">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -181,6 +70,54 @@
 
 @push('scripts')
 <script type="text/javascript">
+    $('#supId').select2()
+    $('#alamat').select2()
+    $('#sales').select2()
+    $('#gudang').select2()
+    $('#matauang').select2()
+
+    $('#supId').on('change', function() {
+        var nameId = $('#supId option:selected').attr('value');
+        if (nameId == 0) {
+            $('.po-select-container').html('');
+        } else {
+            $('.po-select-container').html('');
+            var my_url = '/penerimaanBarang/searchpobysupid/' + nameId;
+            $.get(my_url, function(datas, status) {
+                var html = '';
+                if ($.isEmptyObject(datas)) {
+                    html = '<label for="">Tidak ada PO ditemukan</label>';
+                } else {
+                    $('.po-select-empty').removeClass('hidden');
+                    var options = ''
+                    $.each(datas, function(i, val) {
+                        options = options + '<option value="' + val + '">' + val + '</option>'
+                    });
+                    html = '<label for="">Kode PO</label>' +
+                        '<select name="poId" class="form-control" id="poId">' +
+                        '<option  selected="selected" value="0">- Pilih kode PO -</option>' +
+                        options +
+                        '</select>';
+                }
+                $('.po-select-container').html(html)
+                $('#poId').select2()
+            });
+        }
+        $('.po-detail-container').html('');
+    });
+    $('body').on('change', '#poId', function() {
+        var poId = $('#poId option:selected').attr('value');
+        if (poId == 0) {
+            $('.po-detail-container').html('')
+        } else {
+            var my_url = '/penerimaanBarang/createbasedpo/' + poId;
+            $.get(my_url, function(datas, status) {
+                $('.po-detail-container').html(datas)
+            });
+        }
+
+    });
+
     function refresh(val) {
         var base = "{{ url('/') }}" + "/penerimaanBarang/create/" + val.value;
         window.location.href = base;
@@ -202,17 +139,17 @@
         }
         var befDis = $(".subtotal").val();
         diskon = parseInt($(".subtotal").val()) * diskon / 100;
-        $(".subtotal").val(parseInt($(".subtotal").val()) - diskon);
+        $(".subtotal").val(parseInt($(".subtotal").val()));
         var ppn = $(".ppn").val();
         if (ppn == "ya") {
             ppn = parseInt(befDis) * 10 / 100;
         } else {
-            ppn = 0
+            ppn = parseInt(0);
         }
         $(".ppnval").val(ppn);
         $(".diskonval").val(diskon);
         $(".befDis").val(parseInt($(".subtotal").val()));
-        $(".subtotal").val(parseInt($(".subtotal").val()) + ppn);
+        $(".subtotal").val(parseInt($(".subtotal").val()) + ppn - diskon);
     }
 
     function qty(int) {
@@ -231,15 +168,14 @@
     $('.formsub').submit(function(event) {
         tot = $(".tot").val();
         for (var i = 1; i <= tot; i++) {
-            if (typeof $(".qty" + i).val() === 'undefined') {} else {
-                if ($(".qty" + i).val() == 0) {
-                    event.preventDefault();
-                    $(".qty" + i).focus();
-                }
-            }
-
+            if (typeof $(".qty" + i).val() === 'undefined') {}
+            // else {
+            //   if ($(".qty" + i).val() == 0) {
+            //     event.preventDefault();
+            //     $(".qty" + i).focus();
+            //   }
+            // }
         }
-
     });
 </script>
 @endpush

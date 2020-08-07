@@ -117,9 +117,7 @@
 @push('scripts')
 <script type="text/javascript">
     $('#table').DataTable({
-        "order": [
-            [0, "desc"]
-        ]
+        "order": []
     });
     $('#lokasi').select2({
         width: '100%'

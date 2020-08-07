@@ -58,38 +58,45 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/pokonfirmasi', 'PemesananPembelianController@konfirmasiPembelian');
     Route::get('/poditerima', 'PemesananPembelianController@diterimaPembelian');
     Route::get('/pobatal', 'PemesananPembelianController@batalPembelian');
+    Route::get('/pokonfirmasi/filter', 'PemesananPembelianController@konfirmasiPembelianFilter');
+    Route::get('/poditerima/filter', 'PemesananPembelianController@diterimaPembelianFilter');
+    Route::get('/pobatal/filter', 'PemesananPembelianController@batalPembelianFilter');
 
     //route PO
-    Route::get('/popembelian/store', 'PemesananPembelianController@store');
+    Route::get('/popembelian/cari', 'PemesananPembelianController@filterData');
+    Route::post('/popembelian/store', 'PemesananPembelianController@store');
     Route::get('/popembelian/create', 'PemesananPembelianController@create');
     Route::get('/popembelian/show/{id}', 'PemesananPembelianController@show');
     Route::get('/popembelian/lihat/{id}', 'PemesananPembelianController@lihat');
+    Route::get('/popembelian/edit/{id}', 'PemesananPembelianController@edit');
+    Route::post('/popembelian/update/{id}', 'PemesananPembelianController@update');
     Route::get('/popembelian/destroy/{id}', 'PemesananPembelianController@destroy');
     Route::post('/popembelian/confirm/{id}', 'PemesananPembelianController@confirm');
     Route::post('/popembelian/cancel/{id}', 'PemesananPembelianController@cancel');
     Route::post('/popembelian/print/{id}', 'PemesananPembelianController@print');
-    Route::get('api/popembelianOPN', 'PemesananPembelianController@apiOPN')->name('api.popembelianOPN');
-    Route::get('api/popembelianCFM', 'PemesananPembelianController@apiCFM')->name('api.popembelianCFM');
-    Route::get('api/popembelianDEL', 'PemesananPembelianController@apiDEL')->name('api.popembelianDEL');
-    Route::get('api/popembelianCLS', 'PemesananPembelianController@apiCLS')->name('api.popembelianCLS');
 
     //route penerimaan barang
     Route::get('/penerimaanBarang', 'PenerimaanBarangController@index');
-    Route::get('/penerimaanBarang/create/{id}', 'PenerimaanBarangController@create');
+    Route::get('/penerimaanBarang/cari', 'PenerimaanBarangController@filterData');
+    Route::get('/penerimaanBarang/create', 'PenerimaanBarangController@createBySup');
     Route::post('/penerimaanBarang/store/{id}', 'PenerimaanBarangController@store');
+    Route::get('/penerimaanBarang/edit/{id}', 'PenerimaanBarangController@edit');
+    Route::post('/penerimaanBarang/update/{id}', 'PenerimaanBarangController@update');
+    Route::get('/penerimaanBarang/searchpobysupid/{id}', 'PenerimaanBarangController@searchPOBySupId');
+    Route::get('/penerimaanBarang/createbasedpo/{id}', 'PenerimaanBarangController@createBasedPO');
     Route::get('/penerimaanBarang/show/{id}', 'PenerimaanBarangController@show');
     Route::get('/penerimaanBarang/lihat/{id}', 'PenerimaanBarangController@lihat');
+    Route::get('/penerimaanBarang/destroy/{id}', 'PenerimaanBarangController@destroy');
     Route::post('/penerimaanBarang/confirm/{id}', 'PenerimaanBarangController@confirm');
     Route::post('/penerimaanBarang/cancel/{id}', 'PenerimaanBarangController@cancel');
     Route::post('/penerimaanBarang/print/{id}', 'PenerimaanBarangController@print');
     Route::get('/konfirmasiPenerimaanBarang', 'PenerimaanBarangController@konfirmasiPenerimaanBarang');
+    Route::get('/konfirmasiPenerimaanBarang/cari', 'PenerimaanBarangController@filterKonfirmasiPenerimaanBarang');
     Route::get('/batalPenerimaanBarang', 'PenerimaanBarangController@batalPenerimaanBarang');
-    Route::get('api/penerimaanbarangOPN', 'PenerimaanBarangController@apiOPN')->name('api.penerimaanbarangOPN');
-    Route::get('api/penerimaanbarangCFM', 'PenerimaanBarangController@apiCFM')->name('api.penerimaanbarangCFM');
-    Route::get('api/penerimaanbarangDEL', 'PenerimaanBarangController@apiDEL')->name('api.penerimaanbarangDEL');
 
     //route return penerimaan barang
     Route::get('/returnPenerimaanBarang', 'ReturnPenerimaanBarangController@index');
+    Route::get('/returnPenerimaanBarang/cari', 'ReturnPenerimaanBarangController@filterData');
     Route::get('/returnPenerimaanBarang/create/{id}', 'ReturnPenerimaanBarangController@create');
     Route::post('/returnPenerimaanBarang/store/{id}', 'ReturnPenerimaanBarangController@store');
     Route::get('/returnPenerimaanBarang/show/{id}', 'ReturnPenerimaanBarangController@show');
@@ -97,11 +104,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/returnPenerimaanBarang/print/{id}', 'ReturnPenerimaanBarangController@print');
     Route::post('/returnPenerimaanBarang/confirm/{id}', 'ReturnPenerimaanBarangController@confirm');
     Route::post('/returnPenerimaanBarang/cancel/{id}', 'ReturnPenerimaanBarangController@cancel');
+    Route::get('/returnPenerimaanBarang/destroy/{id}', 'ReturnPenerimaanBarangController@destroy');
     Route::get('/konfirmasiReturnPenerimaanBarang', 'ReturnPenerimaanBarangController@konfirmasi');
+    Route::get('/konfirmasiReturnPenerimaanBarang/cari', 'ReturnPenerimaanBarangController@filterKonfirmasi');
     Route::get('/batalReturnPenerimaanBarang', 'ReturnPenerimaanBarangController@batal');
-    Route::get('api/returnpenerimaanbarangOPN', 'ReturnPenerimaanBarangController@apiOPN')->name('api.returnpenerimaanbarangOPN');
-    Route::get('api/returnpenerimaanbarangCFM', 'ReturnPenerimaanBarangController@apiCFM')->name('api.returnpenerimaanbarangCFM');
-    Route::get('api/returnpenerimaanbarangDEL', 'ReturnPenerimaanBarangController@apiDEL')->name('api.returnpenerimaanbarangDEL');
 
     //ROUTE PENJUALAN
     //route pemesananpenjualan
@@ -203,7 +209,9 @@ Route::group(['middleware' => 'auth'], function () {
 
     //route invoice hutang
     Route::get('/invoicehutang', 'InvoiceHutangController@hutang');
-    Route::get('/invoicehutang/print/{id}', 'InvoiceHutangController@printhutang');
+    Route::get('/invoicehutang/edit/{id}', 'InvoiceHutangController@edit');
+    Route::post('/invoicehutang/update/{id}', 'InvoiceHutangController@update');
+    Route::get('/invoicehutang/print/{id}', 'InvoiceHutangController@print');
     Route::get('/fixinvoicehutang', 'PenerimaanBarangController@fixInvoiceID');
 
     //ROUTE PIUTANG

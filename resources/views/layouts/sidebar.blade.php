@@ -64,21 +64,21 @@
                             <li><a href="{{ url('/popembelian') }}">P.O</a></li>
                             <li><a href="{{ url('/pokonfirmasi') }}">P.O Konfirmasi</a></li>
                             <li><a href="{{ url('/poditerima') }}">P.O Diterima</a></li>
-                            <li><a href="{{ url('/pobatal') }}">P.O Batal</a></li>
+                            <!-- <li><a href="{{ url('/pobatal') }}">P.O Batal</a></li> -->
                         </ul>
                     </li>
                     <li><a>Penerimaan Barang<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
+                            <li><a href="{{ url('/penerimaanBarang/create') }}">Buat Penerimaan Barang</a></li>
                             <li><a href="{{ url('/penerimaanBarang') }}">Penerimaan Barang</a></li>
                             <li><a href="{{ url('/konfirmasiPenerimaanBarang') }}">Penerimaan Konfirmasi</a></li>
-                            <li><a href="{{ url('/batalPenerimaanBarang') }}">Penerimaan Batal</a></li>
                         </ul>
                     </li>
                     <li><a>Return Penerimaan<span class="fa fa-chevron-down"></span></a>
                         <ul class="nav child_menu">
+                            <li><a href="{{ url('/returnPenerimaanBarang/create/0') }}">Buat Return Penerimaan Barang</a></li>
                             <li><a href="{{ url('/returnPenerimaanBarang') }}">Return Penerimaan Barang</a></li>
                             <li><a href="{{ url('/konfirmasiReturnPenerimaanBarang') }}">Return Penerimaan Konfirmasi</a></li>
-                            <li><a href="{{ url('/batalReturnPenerimaanBarang') }}">Return Penerimaan Batal</a></li>
                         </ul>
                     </li>
                     <li><a>Hutang<span class="fa fa-chevron-down"></span></a>

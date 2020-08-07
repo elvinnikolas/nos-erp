@@ -42,7 +42,7 @@ class KartuStokController extends Controller
             left join itemkonversis c on a.KodeItem = c.KodeItem and c.Konversi = 1
             left join satuans s on c.KodeSatuan = s.KodeSatuan
             group by a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, a.Qty, a.HargaRata, a.KodeUser, a.idx, a.indexmov, l.NamaLokasi, i.NamaItem
-            order by a.Tanggal desc, a.created_at desc ");
+            order by convert(a.Tanggal, datetime) desc, a.created_at desc ");
         $store = lokasi::where('Status', 'OPN')->get();
         $item = DB::select("SELECT s.KodeItem, s.NamaItem, s.Keterangan 
             FROM items s

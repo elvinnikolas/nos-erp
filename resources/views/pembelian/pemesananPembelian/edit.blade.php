@@ -19,7 +19,7 @@
     table,
     th,
     td {
-        border: 1px solid #cdcdcd;
+        border: 1px polid #cdcdcd;
     }
 
     table th,
@@ -37,32 +37,22 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1 id="header">Pemesanan Penjualan</h1>
-                    <h3 id="header" class="a" style="display: none;">{{$newID}}</h3>
-                    <h3 id="header" class="b">{{$newIDP}}</h3>
+                    <h1 id="header">Pemesanan Pembelian</h1>
+                    <h3 id="header">{{$id}}</h3>
                 </div>
                 <div class="x_content">
-                    <form action="{{ url('/sopenjualan/store') }}" method="post" class="formsub">
+                    <form action="{{ url('/popembelian/update/' . $po->KodePO ) }}" method="post" class="formsub">
                         @csrf
                         <!-- Contents -->
                         <br>
                         <div class="form-row">
                             <!-- column 1 -->
                             <div class="form-group col-md-3">
-                                <input type="hidden" class="form-control idp" name="KodeSO" value="{{$newIDP}}">
+                                <input type="hidden" class="form-control idp" name="KodePO" value="{{$id}}">
                                 <div class="form-group">
                                     <label for="inputDate">Tanggal</label>
                                     <div class="input-group date" id="inputDate">
-                                        <input type="text" class="form-control" name="Tanggal" id="inputDate">
-                                        <span class="input-group-addon">
-                                            <span class="glyphicon glyphicon-calendar"></span>
-                                        </span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputDate2">Tanggal Kirim</label>
-                                    <div class="input-group date" id="inputDate2">
-                                        <input type="text" class="form-control" name="TanggalKirim" id="inputDate2">
+                                        <input type="text" class="form-control" name="Tanggal" id="inputDate" value="{{$po->Tanggal}}">
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -70,11 +60,11 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="inputBerlaku">Masa Berlaku</label>
-                                    <input type="text" class="form-control" name="Expired" id="inputBerlaku" placeholder="/hari">
+                                    <input type="text" class="form-control" name="Expired" id="inputBerlaku" placeholder="/hari" value="{{$po->Expired}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="inputTerm">Term of Payment</label>
-                                    <input type="text" required class="form-control" name="Term" id="inputTerm" placeholder="/hari">
+                                    <input type="text" class="form-control" name="Term" id="inputTerm" placeholder="/hari" value="{{$po->term}}">
                                 </div>
                             </div>
                             <!-- pembatas -->
@@ -85,7 +75,11 @@
                                     <label for="inputMatauang">Mata Uang</label>
                                     <select class="form-control" name="KodeMataUang" id="inputMatauang" placeholder="Pilih mata uang">
                                         @foreach($matauang as $mu)
+                                        @if($mu->KodeMataUang == $po->KodeMataUang)
+                                        <option value="{{$mu->KodeMataUang}}" selected>{{$mu->NamaMataUang}}</option>
+                                        @else
                                         <option value="{{$mu->KodeMataUang}}">{{$mu->NamaMataUang}}</option>
+                                        @endif
                                         @endforeach
                                     </select>
                                 </div>
@@ -93,40 +87,53 @@
                                     <label for="inputGudang">Gudang</label>
                                     <select class="form-control" name="KodeLokasi" id="inputGudang">
                                         @foreach($lokasi as $lok)
+                                        @if($lok->KodeLokasi == $po->KodeLokasi)
+                                        <option value="{{$lok->KodeLokasi}}" selected>{{$lok->NamaLokasi}}</option>
+                                        @else
                                         <option value="{{$lok->KodeLokasi}}">{{$lok->NamaLokasi}}</option>
+                                        @endif
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputPelanggan">Pelanggan</label>
-                                    <select class="form-control" name="KodePelanggan" id="pelanggan">
-                                        @foreach($pelanggan as $pel)
-                                        <option value="{{$pel->KodePelanggan}}">{{$pel->NamaPelanggan}}</option>
+                                    <label for="inputPelanggan">Supplier</label>
+                                    <select class="form-control" name="KodeSupplier" id="inputPelanggan">
+                                        @foreach($supplier as $sup)
+                                        @if($sup->KodeSupplier == $po->KodeSupplier)
+                                        <option value="{{$sup->KodeSupplier}}" selected>{{$sup->NamaSupplier}}</option>
+                                        @else
+                                        <option value="{{$sup->KodeSupplier}}">{{$sup->NamaSupplier}}</option>
+                                        @endif
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="inputPelanggan">Diskon</label>
-                                    <input type="number" required step=0.01 onchange="disc()" class="diskon form-control" name="diskon" id="inputBerlaku" placeholder="%">
+                                    <input type="number" step=0.01 onchange="disc()" class="diskon form-control" name="diskon" id="inputBerlaku" placeholder="%" value="{{$po->Diskon}}">
                                 </div>
                             </div>
                             <!-- pembatas -->
-                            <div class="form-group col-md-1"></div>
+                            <div class=" form-group col-md-1"></div>
                             <!-- column 3 -->
                             <div class="form-group col-md-3">
                                 <div class="form-group">
                                     <label for="inputPelanggan">PPN</label>
-                                    <select class="form-control ppn" onchange="ppnfunc(this)" name="ppn" id="ppn">
-                                        <option value="ya">Ya</option>
-                                        <option value="tidak">Tidak</option>
-                                    </select>
+                                    @if($po->PPN == "ya")
+                                    <input type="text" class="form-control" placeholder="" value="Ya" readonly>
+                                    <input type="hidden" class="form-control" name="ppn" placeholder="" value="ya" readonly>
+                                    @else
+                                    <input type="text" class="form-control" placeholder="" value="Tidak" readonly>
+                                    <input type="hidden" class="form-control" name="ppn" placeholder="" value="tidak" readonly>
+                                    @endif
                                 </div>
                                 <div class="form-group">
+                                    @if($po->PPN == "ya")
                                     <label class="b">No Faktur Pajak</label>
-                                    <input type="text" class="form-control b" name="NoFaktur" id="inputFaktur">
+                                    <input type="text" class="form-control" name="NoFaktur" id="inputFaktur" value="{{$po->NoFaktur}}">
+                                    @endif
                                 </div>
-                                <label for="inputKeterangan">Keterangan</label>
-                                <textarea class="form-control" name="Keterangan" id="inputKeterangan" rows="5"></textarea>
+                                <label for=" inputKeterangan">Keterangan</label>
+                                <textarea class="form-control" name="Keterangan" id="inputKeterangan" rows="5">{{$po->Keterangan}}</textarea>
                             </div>
                         </div>
                         <div class="form-row">
@@ -140,15 +147,16 @@
                                     <i class="fa fa-plus" aria-hidden="true"></i>
                                 </a>
                                 <br><br><br>
-                                <input type="hidden" value="1" name="totalItem" id="totalItem">
+                                <input type="hidden" value="{{$itemcount}}" name="totalItem" id="totalItem">
+                                <input type="hidden" value="{{$itemcount}}" name="itemcount" id="itemcount">
 
-                                @foreach($item as $itemData)
-                                <input type="hidden" id="{{$itemData->KodeItem}}Ket" value="{{$itemData->Keterangan}}">
-                                @foreach($datasatuan["$itemData->KodeItem"] as $dsat)
-                                <input type="hidden" id="{{$itemData->KodeItem}}{{$dsat}}" value="{{$dsat}}">
+                                @foreach($itemlist as $item)
+                                <input type="hidden" id="{{$item->KodeItem}}Ket" value="{{$item->Keterangan}}">
+                                @foreach($datasatuan["$item->KodeItem"] as $dsat)
+                                <input type="hidden" id="{{$item->KodeItem}}{{$dsat}}" value="{{$dsat}}">
                                 @endforeach
-                                @foreach($dataharga["$itemData->KodeItem"] as $dsatuan => $dharga)
-                                <input type="hidden" id="{{$itemData->KodeItem}}{{$dsatuan}}Harga" value="{{$dharga}}">
+                                @foreach($dataharga["$item->KodeItem"] as $dsatuan => $dharga)
+                                <input type="hidden" id="{{$item->KodeItem}}{{$dsatuan}}Harga" value="{{$dharga}}">
                                 @endforeach
                                 @endforeach
 
@@ -162,36 +170,46 @@
                                         <td id="header">Total</td>
                                         <td></td>
                                     </tr>
+                                    @foreach($items as $key => $item)
                                     <tr class="rowinput">
                                         <td>
-                                            <select name="item[]" onchange="barang(this,1);" class="form-control item1" id="item1">
-                                                @foreach($item as $itemData)
+                                            <select name="item[]" onchange="barang(this,{{$key+1}});" class="form-control item{{$key+1}}" id="item{{$key+1}}">
+                                                @foreach($itemlist as $itemData)
+                                                @if($itemData->KodeItem == $item->KodeItem)
+                                                <option selected value="{{$itemData->KodeItem}}">{{$itemData->NamaItem}}</option>
+                                                @else
                                                 <option value="{{$itemData->KodeItem}}">{{$itemData->NamaItem}}</option>
+                                                @endif
                                                 @endforeach
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" step=0.01 onchange="qty(1)" name="qty[]" class="form-control qty1" value="0" required="">
+                                            <input type="number" step=0.01 onchange="qty({{$key+1}})" name="qty[]" class="form-control qty{{$key+1}}" value="{{$item->Qty}}">
                                         </td>
                                         <td>
-                                            <select name="satuan[]" onchange="satuan(this,1);" class="form-control satuan1" id="satuan1">
+                                            <select name="satuan[]" onchange="satuan(this,{{$key+1}});" class="form-control satuan{{$key+1}}" id="satuan{{$key+1}}">
                                                 @foreach($satuan as $satuanData)
+                                                @if($satuanData->KodeSatuan == $item->KodeSatuan)
+                                                <option selected value="{{$satuanData->KodeSatuan}}">{{$satuanData->NamaSatuan}}</option>
+                                                @else
                                                 <option value="{{$satuanData->KodeSatuan}}">{{$satuanData->NamaSatuan}}</option>
+                                                @endif
                                                 @endforeach
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="text" onchange="price(1)" name="price[]" class="form-control price1" required="" value="0">
+                                            <input type="text" onchange="price({{$key+1}})" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$item->Harga}}">
                                         </td>
                                         <td>
-                                            <input readonly type="text" class="form-control keterangan1" required="" value="0">
+                                            <input readonly type="text" class="form-control keterangan{{$key+1}}" required="" value="{{$item->Keterangan}}">
                                         </td>
                                         <td>
-                                            <input readonly="" type="hidden" name="total[]" class="form-control total1" required="" value="0">
-                                            <input readonly type="text" class="form-control showtotal1" value="Rp 0,-">
+                                            <input readonly="" type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$item->Subtotal}}"">
+                                                <input readonly type=" text" class="form-control showtotal{{$key+1}}" value="{{$string_total = "Rp " . number_format($item->Subtotal, 0, ',', '.') .",-"}}">
                                         </td>
                                         <td></td>
                                     </tr>
+                                    @endforeach
                                 </table>
                                 <div class="col-md-9">
                                     <button type="submit" class="btn btn-success">Simpan</button>
@@ -199,7 +217,7 @@
                                 </div>
                                 <div class="col-md-3">
                                     <label for="inputPelanggan">Subtotal</label>
-                                    <input type="hidden" readonly="" class="form-control befDis" name="bef" value="0" placeholder="">
+                                    <input type="hidden" readonly="" class="form-control befDis" value="0" name="bef" placeholder="">
                                     <input type="text" readonly="" class="form-control showbefDis" value="Rp 0,-">
                                     <label for="inputPelanggan">Nilai PPN</label>
                                     <input type="hidden" readonly value="0" name="ppnval" class="ppnval form-control">
@@ -233,10 +251,11 @@
         format: 'YYYY-MM-DD'
     });
     $('#item').select2();
-    $('#pelanggan').select2();
     var item = $(".item" + 1).val();
     var ket = $("#" + item + "Ket").val();
     $(".keterangan" + 1).val(ket);
+    var count = $("#totalItem").val();
+    updatePrice(count);
 
     function qty(int) {
         var qty = $(".qty" + int).val();

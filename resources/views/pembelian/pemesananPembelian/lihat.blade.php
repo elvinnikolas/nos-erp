@@ -28,7 +28,7 @@
         text-align: left;
     }
 
-    header {
+    #header {
         text-align: center;
     }
 </style>
@@ -38,8 +38,8 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1>Pemesanan Pembelian</h1>
-                    <h3>{{$id}}</h3>
+                    <h1 id="header">Pemesanan Pembelian</h1>
+                    <h3 id="header">{{$id}}</h3>
                 </div>
                 <div class="x_content">
                     <form action="#" method="post">
@@ -52,29 +52,21 @@
                                 <input type="hidden" class="form-control" value="{{$id}}" readonly>
                                 <div class="form-group">
                                     <label for="inputDate">Tanggal</label>
-                                    <input type="date" class="form-control" id="inputDate" value="{{$data->Tanggal}}" readonly>
+                                    <input type="text" class="form-control" id="inputDate" value="{{$data->Tanggal}}" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label for="inputBerlaku">Masa Berlaku</label>
                                     <input type="text" class="form-control" id="inputBerlaku" placeholder="/hari" value="{{$data->Expired}}" readonly>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputPelanggan">Diskon</label>
-                                    <input type="number" class="diskon form-control" name="diskon" id="" placeholder="%" value="{{$data->Diskon}}" readonly>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPelanggan">PPN</label>
-                                    @if($data->PPN == "ya")
-                                    <input type="text" class="form-control" name="po" id="inputBerlaku" placeholder="" value="Ya" readonly>
-                                    @else
-                                    <input type="text" class="form-control" name="po" id="inputBerlaku" placeholder="" value="Tidak" readonly>
-                                    @endif
+                                    <label for="inputTerm">Term of Payment</label>
+                                    <input type="text" class="form-control" name="Term" id="inputTerm" value="{{$data->term}}" readonly>
                                 </div>
                             </div>
                             <!-- pembatas -->
                             <div class="form-group col-md-1"></div>
                             <!-- column 2 -->
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <div class="form-group">
                                     <label for="inputMatauang">Mata Uang</label>
                                     <input type="text" class="form-control" placeholder="" value="{{$data->NamaMataUang}}" readonly>
@@ -87,11 +79,29 @@
                                     <label for="inputSupplier">Supplier</label>
                                     <input type="text" class="form-control" placeholder="" value="{{$data->NamaSupplier}}" readonly>
                                 </div>
+                                <div class="form-group">
+                                    <label for="inputPelanggan">Diskon</label>
+                                    <input type="number" class="diskon form-control" name="diskon" id="" placeholder="%" value="{{$data->Diskon}}" readonly>
+                                </div>
                             </div>
                             <!-- pembatas -->
                             <div class="form-group col-md-1"></div>
                             <!-- column 3 -->
                             <div class="form-group col-md-3">
+                                <div class="form-group">
+                                    <label for="inputPelanggan">PPN</label>
+                                    @if($data->PPN == "ya")
+                                    <input type="text" class="form-control" name="po" id="inputBerlaku" placeholder="" value="Ya" readonly>
+                                    @else
+                                    <input type="text" class="form-control" name="po" id="inputBerlaku" placeholder="" value="Tidak" readonly>
+                                    @endif
+                                </div>
+                                <div class="form-group">
+                                    @if($data->PPN == "ya")
+                                    <label for="inputPelanggan">No Faktur Pajak</label>
+                                    <input type="text" class="form-control" name="nofaktur" placeholder="" value="{{$data->NoFaktur}}" readonly>
+                                    @endif
+                                </div>
                                 <label for="inputKeterangan">Keterangan</label>
                                 <textarea class="form-control" name="Keterangan" id="inputKeterangan" rows="5" readonly>{{$data->Keterangan}}</textarea>
                                 <br><br>
@@ -99,15 +109,22 @@
                         </div>
                         <div class="form-row">
                             <div class="form-group col-md-12">
+                                <br><br>
+                                <div class="x_title">
+                                </div>
+                                <br>
+                                <h3 id="header">Daftar Item</h3>
+                                <br><br><br>
                                 <input type="hidden" value="1" name="totalItem" id="totalItem">
-                                <table id="items">
+
+                                <table id="items" class="table">
                                     <tr>
-                                        <td id="header"><b>Nama Barang</b></td>
-                                        <td id="header"><b>Qty</b></td>
-                                        <td id="header"><b>Satuan</b></td>
-                                        <td id="header"><b>Harga</b></td>
-                                        <td id="header"><b>Keterangan</b></td>
-                                        <td id="header"><b>Total</b></td>
+                                        <td id="header" style="width:18%;">Nama Barang</td>
+                                        <td id="header" style="width:9%;">Qty</td>
+                                        <td id="header" style="width:12%;">Satuan</td>
+                                        <td id="header" style="width:18%;">Harga Satuan</td>
+                                        <td id="header" style="width:20%;">Keterangan</td>
+                                        <td id="header">Total</td>
                                     </tr>
                                     @foreach($items as $item)
                                     <tr class="rowinput">
@@ -127,34 +144,33 @@
                                             {{$item->Keterangan}}
                                         </td>
                                         <td>
-                                            Rp. {{number_format($item->Subtotal)}},-
+                                            Rp {{number_format($item->Subtotal)}},-
                                         </td>
                                     </tr>
                                     @endforeach
                                 </table>
+
                                 <div class="col-md-9">
                                     @if($OPN == true)
                                     <button type="submit" class="btn btn-success" formaction="{{ url('/popembelian/confirm/'.$id) }}">Konfirmasi</button>
-                                    <button type="submit" class="btn btn-danger" formaction="{{ url('/popembelian/cancel/'.$id) }}">Batal</button>
+                                    <!-- <button type="submit" class="btn btn-danger" formaction="{{ url('/popembelian/cancel/'.$id) }}">Batal</button> -->
                                     @elseif($OPN == false)
                                     <button type="submit" class="btn btn-primary" formaction="{{ url('/popembelian/print/'.$id) }}">Print</button>
                                     @endif
                                 </div>
                                 <div class="col-md-3">
-                                    @if($data->PPN == "ya")
-                                    <label>PPN (10%)</label>
-                                    <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format($data->NilaiPPN, 0, ',', '.') .",-"}}">
                                     <label>Subtotal</label>
-                                    <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format(($data->Subtotal-$data->NilaiDiskon), 0, ',', '.') .",-"}}">
+                                    <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format(($data->Subtotal), 0, ',', '.') .",-"}}">
+                                    @if($data->PPN == "ya")
+                                    <label>PPN</label>
+                                    <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format($data->NilaiPPN, 0, ',', '.') .",-"}}">
                                     @else
                                     @endif
-
                                     <label>Diskon</label>
                                     <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format($data->NilaiDiskon, 0, ',', '.') .",-"}}">
-
                                     <label>Total</label>
-                                    <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format($data->Subtotal, 0, ',', '.') .",-"}}">
-                                    <input type="hidden" readonly="" class="form-control subtotal" name="subtotal" id="inputBerlaku" placeholder="" value="{{$data->Subtotal}}">
+                                    <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format($data->Total, 0, ',', '.') .",-"}}">
+                                    <input type="hidden" readonly="" class="form-control subtotal" name="subtotal" id="inputBerlaku" placeholder="" value="{{$data->Total}}">
                                 </div>
                             </div>
                         </div>

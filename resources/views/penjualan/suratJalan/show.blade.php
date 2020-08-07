@@ -117,9 +117,9 @@
                                         <td id="header">Nama Barang</td>
                                         <td id="header">Qty</td>
                                         <td id="header">Satuan</td>
-                                        <!-- <td id="header">Harga Satuan</td> -->
+                                        <td id="header">Harga Satuan</td>
                                         <td id="header">Keterangan</td>
-                                        <!-- <td id="header">Total</td> -->
+                                        <td id="header">Total</td>
                                     </tr>
                                     @foreach($items as $key => $data)
                                     <tr class="rowinput">
@@ -133,15 +133,15 @@
                                         <td>
                                             <input type="text" class="form-control" readonly="readonly" nsme=satuan[] value="{{$data->NamaSatuan}}">
                                         </td>
-                                        <!-- <td>
+                                        <td>
                                             <input readonly="" type="text" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
-                                        </td> -->
+                                        </td>
                                         <td>
                                             <input type="text" class="form-control" readonly="readonly" name="Keterangan[]" value="{{$data->Keterangan}}" />
                                         </td>
-                                        <!-- <td>
+                                        <td>
                                             <input readonly="" type="text" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
-                                        </td> -->
+                                        </td>
                                     </tr>
                                     @endforeach
 
@@ -149,68 +149,71 @@
                                 <div class="col-md-9">
                                     <button type="submit" class="btn btn-success">Konfirmasi</button>
                                 </div>
-                                {{-- <div class="col-md-3">
-                                    <label for="inputPelanggan">Subtotal</label>
-                                    <input type="hidden" value="{{sizeof($items)}}" name="" class="tot">
-                                <input type="text" readonly="" class="form-control befDis" id="inputBerlaku" placeholder="">
-                                <label for="inputPelanggan">Nilai PPN</label>
-                                <input type="text" readonly="" name="ppnval" class="ppnval form-control">
-                                <input type="hidden" name="diskonval" class="diskonval ">
-                                <label for="inputPelanggan">Total</label>
-                                <input type="text" readonly="" class="form-control subtotal" name="subtotal" id="inputBerlaku" placeholder="">
-                            </div> --}}
+                                <div class="col-md-3">
+                                    <input type="hidden" value="{{sizeof($items)}}" class="tot">
+                                    <label for="subtotal">Subtotal</label>
+                                    <input type="text" name="total" readonly class="form-control befDis">
+                                    <label for="ppn">Nilai PPN</label>
+                                    <input type="text" readonly name="ppnval" class="ppnval form-control">
+                                    <label for="diskon">Nilai Diskon</label>
+                                    <input type="text" readonly name="diskonval" class="diskonval form-control">
+                                    <label for="total">Total</label>
+                                    <input type="text" readonly class="form-control subtotal" name="subtotal">
+                                </div>
+                            </div>
                         </div>
+                    </form>
                 </div>
-                </form>
             </div>
         </div>
     </div>
-</div>
 
-<script type="text/javascript">
-    function refresh(val) {
-        var base = "{{ url('/') }}" + "/suratJalan/create/" + val.value;
-        window.location.href = base;
-    }
-
-    updatePrice($(".tot").val());
-
-    function updatePrice(tot) {
-
-        $(".subtotal").val(0);
-        var diskon = 0;
-        if ($(".diskon").val() != "") {
-            diskon = parseInt($(".diskon").val());
+    <script type="text/javascript">
+        function refresh(val) {
+            var base = "{{ url('/') }}" + "/suratJalan/create/" + val.value;
+            window.location.href = base;
         }
-        for (var i = 1; i <= tot; i++) {
-            if ($(".total" + i).val() != undefined) {
-                $(".subtotal").val(parseInt($(".subtotal").val()) + parseInt($(".total" + i).val()));
+
+        updatePrice($(".tot").val());
+
+        function updatePrice(tot) {
+
+            $(".subtotal").val(0);
+            var diskon = 0;
+            if ($(".diskon").val() != "") {
+                diskon = parseInt($(".diskon").val());
             }
+            for (var i = 1; i <= tot; i++) {
+                if ($(".total" + i).val() != undefined) {
+                    $(".subtotal").val(parseInt($(".subtotal").val()) + parseInt($(".total" + i).val()));
+                }
+            }
+            var befDis = $(".subtotal").val();
+            diskon = parseInt($(".subtotal").val()) * diskon / 100;
+            $(".subtotal").val(parseInt($(".subtotal").val()) - diskon);
+            var ppn = $(".ppn").val();
+            if (ppn == "ya") {
+                ppn = parseInt(befDis) * 10 / 100;
+            } else {
+                ppn = 0;
+            }
+            $(".ppnval").val(ppn);
+            $(".diskonval").val(diskon);
+            $(".befDis").val(parseInt($(".subtotal").val()));
+            $(".subtotal").val(parseInt($(".subtotal").val()) + ppn);
         }
-        var befDis = $(".subtotal").val();
-        diskon = parseInt($(".subtotal").val()) * diskon / 100;
-        $(".subtotal").val(parseInt($(".subtotal").val()) - diskon);
-        var ppn = $(".ppn").val();
-        if (ppn == "ya") {
-            ppn = parseInt(befDis) * 10 / 100;
-        }
-        $(".ppnval").val(ppn);
-        $(".diskonval").val(diskon);
-        $(".befDis").val(parseInt($(".subtotal").val()));
-        $(".subtotal").val(parseInt($(".subtotal").val()) + ppn);
-    }
 
-    function qty(int) {
-        var qty = $(".qty" + int).val();
-        var max = $(".max" + int).val();
-        if (parseInt(qty) > parseInt(max)) {
-            $(".qty" + int).val(max);
+        function qty(int) {
+            var qty = $(".qty" + int).val();
+            var max = $(".max" + int).val();
+            if (parseInt(qty) > parseInt(max)) {
+                $(".qty" + int).val(max);
+            }
+            var qty = $(".qty" + int).val();
+            var price = $(".price" + int).val();
+            $(".total" + int).val(price * qty);
+            var count = $(".tot").val();
+            updatePrice(count);
         }
-        var qty = $(".qty" + int).val();
-        var price = $(".price" + int).val();
-        $(".total" + int).val(price * qty);
-        var count = $(".tot").val();
-        updatePrice(count);
-    }
-</script>
-@endsection
+    </script>
+    @endsection

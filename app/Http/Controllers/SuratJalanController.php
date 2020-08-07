@@ -22,7 +22,7 @@ class SuratJalanController extends Controller
     $suratjalans = suratjalan::join('lokasis', 'lokasis.KodeLokasi', '=', 'suratjalans.KodeLokasi')
       ->join('pelanggans', 'pelanggans.KodePelanggan', '=', 'suratjalans.KodePelanggan')
       ->select('suratjalans.KodeSuratJalanID', 'suratjalans.KodeSO', 'suratjalans.Status', 'suratjalans.Tanggal', 'lokasis.NamaLokasi', 'pelanggans.NamaPelanggan', 'suratjalans.KodeSuratJalan')
-      ->orderBy('suratjalans.KodeSuratJalan', 'desc')
+      ->orderBy('suratjalans.KodeSuratJalanID', 'desc')
       ->get();
     $suratjalans = $suratjalans->where('Status', 'OPN');
     $suratjalans->all();
@@ -54,6 +54,7 @@ class SuratJalanController extends Controller
     $suratjalans = suratjalan::join('pelanggans', 'pelanggans.KodePelanggan', '=', 'suratjalans.KodePelanggan')
       ->join('lokasis', 'lokasis.KodeLokasi', '=', 'suratjalans.KodeLokasi')
       ->where('suratjalans.Status', 'CFM')
+      ->orderBy('suratjalans.KodeSuratJalanID', 'desc')
       ->get();
     return view('penjualan.suratJalan.konfirmasi', compact('suratjalans'));
   }
@@ -573,7 +574,7 @@ class SuratJalanController extends Controller
     $pelanggan = pelanggan::where('KodePelanggan', $suratjalan->KodePelanggan)->first();
 
     $items = DB::select(
-      "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga 
+      "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga
         FROM suratjalandetails a 
         inner join items i on a.KodeItem = i.KodeItem 
         inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan 

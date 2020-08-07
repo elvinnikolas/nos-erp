@@ -7,21 +7,23 @@
         p,
         tr {
             font-size: 12px;
+            margin: 0;
         }
 
         form {
-            margin: 20px 0;
+            margin: 0;
         }
 
         form input,
         button {
-            padding: 5px;
+            padding: 0px;
         }
 
         table {
             width: 100%;
-            margin-bottom: 20px;
             border-collapse: collapse;
+            padding: 0;
+            margin: 0;
         }
 
         table,
@@ -32,11 +34,13 @@
 
         table th,
         table td {
-            padding: 10px;
+            padding: 0;
             text-align: left;
         }
 
         .column {
+            margin: 0;
+            display: inline-block;
             float: left;
             width: 33%;
         }
@@ -55,6 +59,10 @@
         #right {
             text-align: right;
         }
+
+        #marginless {
+            margin: 0;
+        }
     </style>
 </head>
 
@@ -66,10 +74,10 @@
                     <div class="x_content">
                         @csrf
                         <!-- Contents -->
-                        <div class="form-row">
+                        <div class="form-row" id="marginless">
                             <div class="column">
                                 @foreach($data as $dt)
-                                <p>Kode PO : {{$dt->KodePO}}</p>
+                                <p>No. PO : {{$dt->KodePO}}</p>
                                 @endforeach
                             </div>
                             <div class="column">
@@ -79,16 +87,13 @@
                                 @endforeach
                             </div>
                             <div class="column">
-                                <p>Kepada yth.</p>
-                                @foreach($supplier as $sup)
-                                <p>Supplier : {{$sup->NamaSupplier}}</p>
-                                @endforeach
-                                @foreach($lokasi as $lok)
-                                <p>Gudang : {{$lok->NamaLokasi}}</p>
+                                <p id="right">Kepada yth.</p>
+                                @foreach($data as $dt)
+                                <p id="right">Supplier/Toko : {{$dt->NamaSupplier}}</p>
                                 @endforeach
                             </div>
                         </div>
-                        <br><br><br><br><br><br>
+                        <br><br><br><br>
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <table id="items">
@@ -102,23 +107,24 @@
                                     @foreach($items as $item)
                                     <tr class="rowinput">
                                         <td>
-                                            {{$item->KodeItem}}
+                                            &nbsp;&nbsp;&nbsp;{{$item->KodeItem}}
                                         </td>
                                         <td>
-                                            {{$item->NamaItem}}
+                                            &nbsp;&nbsp;&nbsp;{{$item->NamaItem}}
                                         </td>
                                         <td id="right">
-                                            {{$item->jml}} &nbsp; {{$item->NamaSatuan}}
+                                            {{$item->Qty}} &nbsp; {{$item->NamaSatuan}}&nbsp;&nbsp;&nbsp;
                                         </td>
                                         <td id="right">
-                                            Rp. {{number_format($item->HargaBeli)}},-
+                                            Rp. {{number_format($item->Harga)}},-&nbsp;&nbsp;&nbsp;
                                         </td>
                                         <td id="right">
-                                            Rp. {{number_format($item->HargaBeli*$item->jml)}},-
+                                            Rp. {{number_format($item->Harga*$item->Qty)}},-&nbsp;&nbsp;&nbsp;
                                         </td>
                                     </tr>
                                     @endforeach
                                 </table>
+                                <br><br>
                                 <div class="row">
                                     <div class="column">
                                         <p>Total Barang : {{$jml}}</p>
@@ -129,9 +135,9 @@
                                     <div class="column"></div>
                                     <div class="column">
                                         @foreach($data as $dt)
-                                        <p>Diskon : Rp. {{number_format($dt->NilaiDiskon)}},-</p>
-                                        <p>PPN : Rp. {{number_format($dt->NilaiPPN)}},-</p>
-                                        <p>Subtotal : Rp. {{number_format($dt->Subtotal)}},-</p>
+                                        <p id="right">Diskon : Rp. {{number_format($dt->NilaiDiskon)}},-</p>
+                                        <p id="right">PPN : Rp. {{number_format($dt->NilaiPPN)}},-</p>
+                                        <p id="right">Subtotal : Rp. {{number_format($dt->Total)}},-</p>
                                         @endforeach
                                     </div>
                                 </div>

@@ -119,9 +119,9 @@
                                         <td id="header">Nama Barang</td>
                                         <td id="header">Qty</td>
                                         <td id="header">Satuan</td>
-                                        <!-- <td id="header">Harga Satuan</td> -->
+                                        <td id="header">Harga Satuan</td>
                                         <td id="header">Keterangan</td>
-                                        <!-- <td id="header">Total</td> -->
+                                        <td id="header">Total</td>/
                                     </tr>
                                     @foreach($items as $key => $data)
                                     <tr class="rowinput">
@@ -137,15 +137,15 @@
                                             <input type="hidden" class="form-control" readonly name="satuan[]" value="{{$data->KodeSatuan}}">
                                             <input type="text" class="form-control" readonly value="{{$data->NamaSatuan}}">
                                         </td>
-                                        <!-- <td> -->
-                                        <input readonly="" type="hidden" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
-                                        <!-- </td> -->
+                                        <td>
+                                        <input readonly="" type="text" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
+                                        </td>
                                         <td>
                                             <input type="text" class="form-control" readonly name="keterangan[]" value="{{$data->Keterangan}}" />
                                         </td>
-                                        <!-- <td> -->
-                                        <input readonly type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
-                                        <!-- </td> -->
+                                        <td>
+                                        <input readonly type="text" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
+                                        </td>
                                     </tr>
                                     @endforeach
 
@@ -155,14 +155,14 @@
                                 </div>
                                 <div class="col-md-3">
                                     <input type="hidden" value="{{sizeof($items)}}" class="tot">
-                                    <!-- <label for="subtotal">Subtotal</label> -->
-                                    <input type="hidden" name="total" readonly class="form-control befDis">
-                                    <!-- <label for="ppn">Nilai PPN</label> -->
-                                    <input type="hidden" readonly name="ppnval" class="ppnval form-control">
-                                    <!-- <label for="diskon">Nilai Diskon</label> -->
-                                    <input type="hidden" readonly name="diskonval" class="diskonval form-control">
-                                    <!-- <label for="total">Total</label> -->
-                                    <input type="hidden" readonly class="form-control subtotal" name="subtotal">
+                                    <label for="subtotal">Subtotal</label>
+                                    <input type="text" name="total" readonly class="form-control befDis">
+                                    <label for="ppn">Nilai PPN</label>
+                                    <input type="text" readonly name="ppnval" class="ppnval form-control">
+                                    <label for="diskon">Nilai Diskon</label>
+                                    <input type="text" readonly name="diskonval" class="diskonval form-control">
+                                    <label for="total">Total</label>
+                                    <input type="text" readonly class="form-control subtotal" name="subtotal">
                                 </div>
                             </div>
                         </div>
@@ -203,6 +203,8 @@
         var ppn = $(".ppn").val();
         if (ppn == "ya") {
             ppn = parseInt(befDis) * 10 / 100;
+        } else {
+            ppn = parseInt(0);
         }
         $(".ppnval").val(ppn);
         $(".diskonval").val(diskon);

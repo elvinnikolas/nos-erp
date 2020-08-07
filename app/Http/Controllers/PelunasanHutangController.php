@@ -22,46 +22,52 @@ class PelunasanHutangController extends Controller
 
     public function invoice($id)
     {
-        $invoice = DB::select("SELECT i.KodeInvoiceHutangShow, i.KodeInvoiceHutang, s.NamaSupplier, i.Tanggal, d.Subtotal, COALESCE(sum(ph.Jumlah),0) as bayar FROM invoicehutangs i inner join invoicehutangdetails d on i.KodeInvoiceHutangShow = d.KodeInvoiceHutang inner join suppliers s on s.KodeSupplier = i.KodeSupplier
-                left join pelunasanhutangs ph on ph.KodeInvoice = i.KodeInvoiceHutang
-                where s.KodeSupplier ='" . $id . "'
-                GROUP by i.KodeInvoiceHutangShow, i.KodeInvoiceHutang, s.NamaSupplier, i.Tanggal, d.Subtotal");
+        $invoice = DB::select("SELECT i.KodeInvoiceHutangShow, i.KodeInvoiceHutang, p.NamaSupplier, i.Tanggal, i.Term, d.KodeLPB, d.Subtotal, d.TotalReturn, COALESCE(sum(pp.Jumlah),0) as bayar 
+            FROM invoicehutangs i 
+            inner join invoicehutangdetails d on i.KodeInvoiceHutang = d.KodeInvoiceHutang
+            inner join suppliers p on p.KodeSupplier = i.KodeSupplier
+            left join pelunasanhutangs pp on pp.KodeInvoice = i.KodeInvoiceHutang
+            where p.KodeSupplier ='" . $id . "'
+            GROUP by i.KodeInvoiceHutangShow, i.KodeInvoiceHutang, p.NamaSupplier, i.Tanggal, d.Subtotal");
 
         return view('hutang.pelunasan.invoice', compact('invoice'));
     }
 
     public function payment($id)
     {
-        $invoice = invoicehutang::where('KodeInvoiceHutang', $id)->get();
-        $supplier = supplier::where('KodeSupplier', $invoice[0]->KodeSupplier)->get();
+        $invoice = invoicehutang::where('KodeInvoiceHutang', $id)->first();
+        $supplier = supplier::where('KodeSupplier', $invoice->KodeSupplier)->first();
         $payments = pelunasanhutang::where('KodeInvoice', $id)->get();
-        $detail = invoicehutangdetail::where('KodeHutang', $id)->get();
-        $tot = 0;
+        $detail = invoicehutangdetail::where('KodeInvoiceHutang', $id)->first();
 
+        $tot = 0;
         foreach ($payments as $bill) {
             $tot += $bill->Jumlah;
         }
-        $sub = $detail[0]->Subtotal;
-        $sisa = $sub - $tot;
 
+        $sub = $detail->Subtotal;
+        $return = $detail->TotalReturn;
+        $sisa = $sub - $tot - $return;
         return view('hutang.pelunasan.paymentlist', compact('invoice', 'payments', 'sisa', 'supplier'));
     }
 
     public function addpayment($id)
     {
-        $invoice = invoicehutang::where('KodeInvoiceHutang', $id)->get();
-        $detail = invoicehutangdetail::where('KodeHutang', $id)->get();
-        $payments = pelunasanhutang::where('KodeHutang', $id)->get();
+        $invoice = invoicehutang::where('KodeInvoiceHutang', $id)->first();
+        $payments = pelunasanhutang::where('KodeInvoice', $id)->get();
+        $detail = invoicehutangdetail::where('KodeInvoiceHutang', $id)->first();
         $matauang = matauang::all();
-        $tot = 0;
 
+        $tot = 0;
         foreach ($payments as $bill) {
             $tot += $bill->Jumlah;
         }
-        $sub = $detail[0]->Subtotal;
-        $sisa = (($sub * 1000) - ($tot * 1000)) / 1000;
 
-        return view('hutang.pelunasan.paymentadd', compact('invoice', 'payments', 'matauang', 'sisa'));
+        $sub = $detail->Subtotal;
+        $return = $detail->TotalReturn;
+        $sisa = $sub - $tot - $return;
+
+        return view('hutang.pelunasan.paymentadd', compact('invoice', 'payments', 'matauang', 'sub', 'sisa'));
     }
 
     public function addpaymentpost($id, Request $request)
@@ -77,7 +83,7 @@ class PelunasanHutangController extends Controller
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
-        $pref = "KM";
+        $pref = "KK";
         if ($last_id == null) {
             $newID = $pref . "-" . $year_now . $month_now . "0001";
         } else {
@@ -107,9 +113,10 @@ class PelunasanHutangController extends Controller
         $kas->TipeBayar = '';
         $kas->NoLink = '';
         $kas->BayarDari = '';
-        $kas->Untuk = $invoice->KodeInvoiceHutangShow;
+        $kas->Untuk = 'SUP';
+        $kas->KodeInvoice = $invoice->KodeInvoiceHutangShow;
         $kas->Keterangan = $keterangan;
-        $kas->KodeUser = 'Admin';
+        $kas->KodeUser = \Auth::user()->name;
         $kas->Tipe = $status;
         $kas->created_at = \Carbon\Carbon::now();
         $kas->updated_at = \Carbon\Carbon::now();
@@ -121,7 +128,7 @@ class PelunasanHutangController extends Controller
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
-        $pref = "PLH";
+        $pref = "PL";
         if ($last_id == null) {
             $newID = $pref . "-" . $year_now . $month_now . "0001";
         } else {
@@ -142,23 +149,33 @@ class PelunasanHutangController extends Controller
             $newID = $pref . "-" . $year_now . $month_now . $newID;
         }
 
-        $ph = new pelunasanhutang();
-        $ph->KodePelunasanHutang = $newID;
-        $ph->Tanggal = $request->Tanggal;
-        $ph->Status = 'CFM';
-        $ph->KodeHutang = $invoice->KodeInvoiceHutangShow;
-        $ph->KodeInvoice = $invoice->KodeInvoiceHutang;
-        $ph->KodeBayar = '';
-        $ph->TipeBayar = $metode;
-        $ph->Jumlah = $request->jml;
-        $ph->Keterangan = $keterangan;
-        $ph->KodeMataUang = $matauang;
-        $ph->KodeUser = 'Admin';
-        $ph->KodeSupplier = $invoice->KodeSupplier;
-        $ph->KodeKasBank = $kas->KodeKasBankID;
-        $ph->created_at = \Carbon\Carbon::now();
-        $ph->updated_at = \Carbon\Carbon::now();
-        $ph->save();
+        $pp = new pelunasanhutang();
+        $pp->KodePelunasanHutang = $newID;
+        $pp->Tanggal = $request->Tanggal;
+        $pp->Status = 'CFM';
+        $pp->KodeHutang = '';
+        $pp->KodeInvoice = $invoice->KodeInvoiceHutang;
+        $pp->KodeBayar = $metode;
+        $pp->TipeBayar = $metode;
+        $pp->Jumlah = $request->jml;
+        $pp->Keterangan = $keterangan;
+        $pp->KodeMataUang = $matauang;
+        $pp->KodeUser = \Auth::user()->name;
+        $pp->KodeSupplier = 'SUP';
+        $pp->KodeKasBank = $kas->KodeKasBank;
+        $pp->created_at = \Carbon\Carbon::now();
+        $pp->updated_at = \Carbon\Carbon::now();
+        $pp->save();
+
+        DB::table('eventlogs')->insert([
+            'KodeUser' => \Auth::user()->name,
+            'Tanggal' => \Carbon\Carbon::now(),
+            'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+            'Keterangan' => 'Tambah pelunasan hutang ' . $invoice->KodeInvoiceHutangShow,
+            'Tipe' => 'OPN',
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now(),
+        ]);
 
         return redirect('/pelunasanhutang/payment/' . $id);
     }

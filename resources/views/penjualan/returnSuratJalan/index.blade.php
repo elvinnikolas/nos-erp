@@ -87,12 +87,13 @@
           <h3>Return Surat Jalan</h3>
         </div>
         <div class="x_content">
-          <table class="table table-light" id="treturnsuratjalan">
+          <table class="table table-light" id="table">
             <thead class="thead-light">
               <tr>
                 <th scope="col">Nomor SJ Return</th>
                 <th scope="col">Nomor SJ</th>
                 <th scope="col">Tanggal</th>
+                <th scope="col">Total</th>
                 <th scope="col">Action</th>
               </tr>
             </thead>
@@ -102,6 +103,7 @@
                 <td>{{ $suratjalanreturn->KodeSuratJalanReturn}}</td>
                 <td>{{ $suratjalanreturn->KodeSuratJalan}}</td>
                 <td>{{ \Carbon\Carbon::parse($suratjalanreturn->Tanggal)->format('d-m-Y') }}</td>
+                <td>Rp. {{ number_format($suratjalanreturn->Subtotal, 0, ',', '.') }},-</td>
                 <td>
                   <a href="{{ url('/returnSuratJalan/show/'.$suratjalanreturn->KodeSuratJalanReturnID) }}" class="btn-xs btn btn-primary">
                     <i class="fa fa-eye" aria-hidden="true"></i> Lihat
@@ -133,11 +135,8 @@
     format: 'YYYY-MM-DD'
   });
 
-  $('#treturnsuratjalan').DataTable({
-    "order": [
-      [2, "desc"],
-      [0, "desc"]
-    ]
+  $('#table').DataTable({
+    "order": []
   });
 </script>
 @endpush

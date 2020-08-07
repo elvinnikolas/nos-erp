@@ -11,6 +11,9 @@ use App\Model\penerimaanbarangreturn;
 use App\Model\penerimaanbarang;
 use App\Model\lokasi;
 use App\Model\supplier;
+use App\Model\karyawan;
+use App\Model\matauang;
+use App\Model\invoicehutang;
 use App\Model\invoicehutangdetail;
 
 class ReturnPenerimaanBarangController extends Controller
@@ -22,17 +25,33 @@ class ReturnPenerimaanBarangController extends Controller
      */
     public function index()
     {
-        return view('pembelian.returnPenerimaanBarang.index');
+        $penerimaanbarangreturns = penerimaanbarangreturn::where('Status', 'OPN')->orderBy('id', 'desc')->get();
+        return view('pembelian.returnPenerimaanBarang.index', compact('penerimaanbarangreturns'));
     }
 
     public function konfirmasi()
     {
-        return view('pembelian.returnPenerimaanBarang.konfirmasi');
+        $penerimaanbarangreturns = penerimaanbarangreturn::where('Status', 'CFM')->orderBy('id', 'desc')->get();
+        return view('pembelian.returnPenerimaanBarang.konfirmasi', compact('penerimaanbarangreturns'));
     }
 
     public function batal()
     {
-        return view('pembelian.returnPenerimaanBarang.batal');
+        $penerimaanbarangreturns = penerimaanbarangreturn::where('Status', 'DEL')->orderBy('id', 'desc')->get();
+        return view('pembelian.returnPenerimaanBarang.batal', compact('penerimaanbarangreturns'));
+    }
+
+    public function filterData(Request $request)
+    {
+        $start = $request->get('start');
+        $end = $request->get('end');
+        $penerimaanbarangreturns = penerimaanbarangreturn::where('Status', 'OPN')->get();
+        if ($start && $end) {
+            $penerimaanbarangreturns = $penerimaanbarangreturns->whereBetween('Tanggal', [$start . ' 00:00:01', $end . ' 23:59:59']);
+        } else {
+            $penerimaanbarangreturns->all();
+        }
+        return view('pembelian.returnPenerimaanBarang.index', compact('penerimaanbarangreturns', 'start', 'end'));
     }
 
     /**
@@ -42,23 +61,43 @@ class ReturnPenerimaanBarangController extends Controller
      */
     public function create($id)
     {
-        $penerimaanbarang = penerimaanbarang::all()->where('Status', 'CFM');
+        $pb = DB::select("SELECT DISTINCT a.KodePenerimaanBarang from (
+            SELECT a.KodePenerimaanBarang, a.KodeItem, 
+            COALESCE(SUM(a.qty))-COALESCE(SUM(pbrd.Qty),0) as jml
+            FROM penerimaanbarangdetails a 
+            inner join items i on a.KodeItem = i.KodeItem
+            inner join itemkonversis k on i.KodeItem = k.KodeItem
+            inner join satuans s on s.KodeSatuan = k.KodeSatuan
+            inner join penerimaanbarangs pb on pb.KodePenerimaanBarang = a.KodePenerimaanBarang and pb.Status='CFM'
+            left join penerimaanbarangreturns pbr on pbr.KodePenerimaanBarang = pb.KodePenerimaanBarang
+            left join penerimaanbarangreturndetails pbrd on pbrd.KodePenerimaanBarangReturn = pbr.KodePenerimaanBarangReturn and pbrd.KodeItem = a.KodeItem and pbrd.KodeSatuan = k.KodeSatuan
+            where pb.Status = 'CFM' and a.KodeSatuan = k.KodeSatuan
+            group by a.KodeItem, a.KodeSatuan, a.KodePenerimaanBarang
+            having jml > 0) as a");
+
         if ($id == "0") {
-            $init = $penerimaanbarang->first();
-            $id = $init->KodePenerimaanBarang;
+            if (count($pb) <= 0) {
+                return redirect('/penerimaanBarang/create/0');
+            }
+            $id = $pb[0]->KodePenerimaanBarang;
         }
-        $suppliers = DB::table('suppliers')->get();
-        $lokasis = DB::table('lokasis')->get();
-        $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.qty) as jml, i.Keterangan, s.NamaSatuan, k.HargaBeli FROM penerimaanbarangdetails a inner join items i on a.KodeItem = i.KodeItem inner join itemkonversis k on i.KodeItem = k.KodeItem inner join satuans s on s.KodeSatuan = k.KodeSatuan where a.KodePenerimaanBarang='" . $id . "' group by a.KodeItem, i.Keterangan, s.NamaSatuan, k.HargaBeli, i.NamaItem ");
-        $lpb = penerimaanbarang::where('KodePenerimaanBarang', $id)->first();
-        $matauang = DB::table('matauangs')->get();
 
-        $year_now = date('Y');
-        $month_now = date('m');
-        $date_now = date('d');
-        $dateNow = $year_now . '-' . $month_now . '-' . $date_now;
-
-        return view('pembelian.returnPenerimaanBarang.buat', compact('penerimaanbarang', 'id', 'suppliers', 'lokasis', 'items', 'lpb', 'dateNow'));
+        $items = DB::select("SELECT a.KodeItem, i.NamaItem, i.Keterangan, s.KodeSatuan, s.NamaSatuan, a.Harga,
+            COALESCE(a.qty,0)-COALESCE(SUM(pbrd.Qty),0) as jml
+            FROM penerimaanbarangdetails a inner join items i on a.KodeItem = i.KodeItem 
+            inner join itemkonversis k on i.KodeItem = k.KodeItem 
+            inner join satuans s on s.KodeSatuan = k.KodeSatuan
+            left join penerimaanbarangs pb on pb.KodePenerimaanBarang = a.KodePenerimaanBarang and pb.Status='CFM'
+            left join penerimaanbarangreturns pbr on pbr.KodePenerimaanBarang = pb.KodePenerimaanBarang and pbr.Status = 'CFM'
+            left join penerimaanbarangreturndetails pbrd on pbrd.KodePenerimaanBarangReturn = pbr.KodePenerimaanBarangReturn and pbrd.KodeItem = a.KodeItem and pbrd.KodeSatuan = k.KodeSatuan
+            where pb.KodePenerimaanBarang='" . $id . "' and a.KodeSatuan = k.KodeSatuan
+            group by a.KodeItem, s.KodeSatuan
+            having jml > 0");
+        $po = DB::select("select po.* from penerimaanbarangs pb inner join pemesananpembelians po on po.KodePO 
+            = pb.KodePO where pb.KodePenerimaanBarang='" . $id . "'")[0];
+        $pbDet = penerimaanbarang::where('KodePenerimaanBarang', $id)->first();
+        $sales = karyawan::where('KodeKaryawan', $pbDet->KodeSales)->first();
+        return view('pembelian.returnPenerimaanBarang.buat', compact('pb', 'id', 'items', 'po', 'sales', 'pbDet'));
     }
 
     /**
@@ -75,6 +114,9 @@ class ReturnPenerimaanBarangController extends Controller
         $month_now = date('m');
         $date_now = date('d');
         $pref = "RPB";
+        if ($request->ppn == 'ya') {
+            $pref = "RPBT";
+        }
         if ($last_id == null) {
             $newID = $pref . "-" . $year_now . $month_now . "0001";
         } else {
@@ -94,49 +136,59 @@ class ReturnPenerimaanBarangController extends Controller
 
             $newID = $pref . "-" . $year_now . $month_now . $newID;
         }
+
         DB::table('penerimaanbarangreturns')->insert([
             'KodePenerimaanBarangReturn' => $newID,
             'Tanggal' => $request->Tanggal,
-            'KodeLokasi' => $request->KodeLokasi,
             'Status' => 'OPN',
-            'KodeUser' => 'Admin',
-            'Total' => 0,
+            'KodeUser' => \Auth::user()->name,
+            'Total' => $request->total,
             'PPN' => $request->ppn,
             'NilaiPPN' => $request->ppnval,
-            'KodeSupplier' => $request->KodeSupplier,
             'Printed' => 0,
             'Diskon' => $request->diskon,
             'NilaiDiskon' => $request->diskonval,
             'Subtotal' => $request->subtotal,
-            'KodePenerimaanBarang' => $request->KodePenerimaanBarang,
+            'KodePenerimaanBarang' => $request->KodePB,
             'created_at' => \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now(),
         ]);
 
         $items = $request->item;
         $qtys = $request->qty;
+        $prices = $request->price;
+        $satuans = $request->satuan;
+        $keterangans = $request->keterangan;
+        $nomer = 0;
         foreach ($items as $key => $value) {
-            DB::table('penerimaanbarangreturndetails')->insert([
-                'KodePenerimaanBarangReturn' => $newID,
-                'KodeItem' => $items[$key],
-                'Qty' => $qtys[$key],
-                'NoUrut' => 0,
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ]);
+            if ($qtys[$key] != 0) {
+                $nomer++;
+                DB::table('penerimaanbarangreturndetails')->insert([
+                    'KodePenerimaanBarangReturn' => $newID,
+                    'KodeItem' => $items[$key],
+                    'Qty' => $qtys[$key],
+                    'Harga' => $prices[$key],
+                    'NoUrut' => $nomer,
+                    'KodeSatuan' => $satuans[$key],
+                    'Keterangan' => $keterangans[$key],
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
+                ]);
+            }
         }
 
         DB::table('eventlogs')->insert([
-            'KodeUser' => 'admin',
+            'KodeUser' => \Auth::user()->name,
             'Tanggal' => \Carbon\Carbon::now(),
-            'Jam' => \Carbon\Carbon::now()->format('h:i:s'),
-            'Keterangan' => 'Buat return penerimaan barang ' . $newID,
+            'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+            'Keterangan' => 'Tambah return penerimaan barang ' . $newID,
             'Tipe' => 'OPN',
             'created_at' => \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now(),
         ]);
 
-        return redirect('/pembelian.returnPenerimaanBarang.index');
+        $pesan = 'Return Penerimaan Barang ' . $newID . ' berhasil ditambahkan';
+        return redirect('/returnPenerimaanBarang')->with(['created' => $pesan]);
     }
 
     /**
@@ -148,21 +200,39 @@ class ReturnPenerimaanBarangController extends Controller
     public function show($id)
     {
         $penerimaanbarangreturn = penerimaanbarangreturn::where('KodePenerimaanBarangReturn', $id)->first();
-        $lokasi = lokasi::where('KodeLokasi', $penerimaanbarangreturn->KodeLokasi)->first();
-        $supplier = supplier::where('KodeSupplier', $penerimaanbarangreturn->KodeSupplier)->first();
-        $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, k.HargaBeli FROM penerimaanbarangreturndetails a inner join items i on a.KodeItem = i.KodeItem inner join itemkonversis k on i.KodeItem = k.KodeItem inner join satuans s on s.KodeSatuan = k.KodeSatuan where a.KodePenerimaanBarangReturn='" . $penerimaanbarangreturn->KodePenerimaanBarangReturn . "' group by a.KodeItem, i.Keterangan, s.NamaSatuan, k.HargaBeli, i.NamaItem ");
-        $OPN = true;
-        return view('pembelian.returnPenerimaanBarang.lihat', compact('id', 'penerimaanbarangreturn', 'lokasi', 'supplier', 'items', 'OPN'));
+        $penerimaanbarang = penerimaanbarang::where('KodePenerimaanBarang', $penerimaanbarangreturn->KodePenerimaanBarang)->first();
+        $sales = karyawan::where('KodeKaryawan', $penerimaanbarang->KodeSales)->first();
+        $matauang = matauang::where('KodeMataUang', $penerimaanbarang->KodeMataUang)->first();
+        $lokasi = lokasi::where('KodeLokasi', $penerimaanbarang->KodeLokasi)->first();
+        $supplier = supplier::where('KodeSupplier', $penerimaanbarang->KodeSupplier)->first();
+        $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, a.Harga
+            FROM penerimaanbarangreturndetails a
+            inner join penerimaanbarangreturns b on a.KodePenerimaanBarangReturn = b.KodePenerimaanBarangReturn
+            inner join items i on a.KodeItem = i.KodeItem 
+            inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan
+            inner join satuans s on s.KodeSatuan = k.KodeSatuan 
+            where b.KodePenerimaanBarangReturn='" . $id . "' 
+            group by a.KodeItem, s.NamaSatuan");
+        return view('pembelian.returnPenerimaanBarang.show', compact('id', 'penerimaanbarangreturn', 'sales', 'matauang', 'lokasi', 'supplier', 'items', 'penerimaanbarang'));
     }
 
     public function lihat($id)
     {
         $penerimaanbarangreturn = penerimaanbarangreturn::where('KodePenerimaanBarangReturn', $id)->first();
-        $lokasi = lokasi::where('KodeLokasi', $penerimaanbarangreturn->KodeLokasi)->first();
-        $supplier = supplier::where('KodeSupplier', $penerimaanbarangreturn->KodeSupplier)->first();
-        $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, k.HargaBeli FROM penerimaanbarangreturndetails a inner join items i on a.KodeItem = i.KodeItem inner join itemkonversis k on i.KodeItem = k.KodeItem inner join satuans s on s.KodeSatuan = k.KodeSatuan where a.KodePenerimaanBarangReturn='" . $penerimaanbarangreturn->KodePenerimaanBarangReturn . "' group by a.KodeItem, i.Keterangan, s.NamaSatuan, k.HargaBeli, i.NamaItem ");
-        $OPN = false;
-        return view('pembelian.returnPenerimaanBarang.lihat', compact('id', 'penerimaanbarangreturn', 'lokasi', 'supplier', 'items', 'OPN'));
+        $penerimaanbarang = penerimaanbarang::where('KodePenerimaanBarang', $penerimaanbarangreturn->KodePenerimaanBarang)->first();
+        $sales = karyawan::where('KodeKaryawan', $penerimaanbarang->KodeSales)->first();
+        $matauang = matauang::where('KodeMataUang', $penerimaanbarang->KodeMataUang)->first();
+        $lokasi = lokasi::where('KodeLokasi', $penerimaanbarang->KodeLokasi)->first();
+        $supplier = supplier::where('KodeSupplier', $penerimaanbarang->KodeSupplier)->first();
+        $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, a.Harga
+            FROM penerimaanbarangreturndetails a
+            inner join penerimaanbarangreturns b on a.KodePenerimaanBarangReturn = b.KodePenerimaanBarangReturn
+            inner join items i on a.KodeItem = i.KodeItem 
+            inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan
+            inner join satuans s on s.KodeSatuan = k.KodeSatuan 
+            where b.KodePenerimaanBarangReturn='" . $id . "' 
+            group by a.KodeItem, s.NamaSatuan");
+        return view('pembelian.returnPenerimaanBarang.lihat', compact('id', 'penerimaanbarangreturn', 'sales', 'matauang', 'lokasi', 'supplier', 'items', 'penerimaanbarang'));
     }
 
     /**
@@ -196,178 +266,181 @@ class ReturnPenerimaanBarangController extends Controller
      */
     public function destroy($id)
     {
-        //
+        DB::table('penerimaanbarangreturns')->where('KodePenerimaanBarangReturn', $id)->update([
+            'Status' => 'DEL'
+        ]);
+
+        $pbr = DB::table('penerimaanbarangreturns')->where('KodePenerimaanBarangReturn', $id)->first();
+
+        DB::table('eventlogs')->insert([
+            'KodeUser' => \Auth::user()->name,
+            'Tanggal' => \Carbon\Carbon::now(),
+            'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+            'Keterangan' => 'Hapus return penerimaan barang ' . $pbr->KodePenerimaanBarangReturn,
+            'Tipe' => 'OPN',
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now(),
+        ]);
+
+        return redirect('/returnPenerimaanBarang');
     }
 
     public function confirm($id)
     {
-        $data = penerimaanbarangreturn::where('KodePenerimaanBarangReturn', $id)->first();
-        $data->Status = "CFM";
-        $data->save();
-        $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, k.HargaBeli FROM penerimaanbarangreturndetails a inner join items i on a.KodeItem = i.KodeItem inner join itemkonversis k on i.KodeItem = k.KodeItem inner join satuans s on s.KodeSatuan = k.KodeSatuan where a.KodePenerimaanBarangReturn='" . $data->KodePenerimaanBarangReturn . "' group by a.KodeItem, i.Keterangan, s.NamaSatuan, k.HargaBeli, i.NamaItem ");
+        $pbr = penerimaanbarangreturn::where('KodePenerimaanBarangReturn', $id)->first();
 
-        $last_id = DB::select('SELECT * FROM penerimaanbarangreturns ORDER BY KodePenerimaanBarangReturn DESC LIMIT 1');
+        $checkresult = DB::select("SELECT (a.qty-COALESCE(SUM(pbd.qty),0)-COALESCE(pbdc.qty,0)) as jml
+            FROM penerimaanbarangdetails a 
+            inner join items i on a.KodeItem = i.KodeItem
+            inner join itemkonversis k on i.KodeItem = k.KodeItem
+            inner join satuans s on s.KodeSatuan = k.KodeSatuan
+            left join penerimaanbarangreturns pb on pb.KodePenerimaanBarang = a.KodePenerimaanBarang and pb.Status = 'CFM'
+            left join penerimaanbarangreturndetails pbd on pbd.KodePenerimaanBarangReturn = pb.KodePenerimaanBarangReturn and pbd.KodeItem = a.KodeItem and pbd.KodeSatuan = k.KodeSatuan
+            left join penerimaanbarangreturndetails pbdc on pbdc.KodePenerimaanBarangReturn = '" . $pbr['KodePenerimaanBarangReturn'] . "' and pbdc.KodeItem = a.KodeItem and pbdc.KodeSatuan = k.KodeSatuan
+            where a.KodePenerimaanBarang='" . $pbr['KodePenerimaanBarang'] . "' and a.KodeSatuan = k.KodeSatuan
+            group by a.KodeItem, s.NamaSatuan
+            having jml < 0");
 
-        foreach ($items as $key => $value) {
-            $last_saldo[$key] = DB::table('keluarmasukbarangs')->where('KodeItem', $value->KodeItem)->orderBy('id', 'desc')->limit(1)->pluck('saldo')->toArray();
-        }
-
-        $year_now = date('y');
-        $month_now = date('m');
-        $date_now = date('d');
-
-        if ($last_id == null) {
-            $newID = "RPB-" . $year_now . $month_now . "0001";
-        } else {
-            $string = $last_id[0]->KodePenerimaanBarangReturn;
-            $id = substr($string, -4, 4);
-            $month = substr($string, -6, 2);
-            $year = substr($string, -8, 2);
-
-            if ((int) $year_now > (int) $year) {
-                $newID = "0001";
-            } else if ((int) $month_now > (int) $month) {
-                $newID = "0001";
+        if (empty($checkresult)) {
+            $penerimaanbarangreturn = penerimaanbarangreturn::where('KodePenerimaanBarangReturn', $id)->first();
+            $ppn = $penerimaanbarangreturn->PPN;
+            $diskon = $penerimaanbarangreturn->Diskon;
+            $totalreturn = $penerimaanbarangreturn->Total;
+            if ($ppn == 'ya') {
+                if ($diskon > 0) {
+                    $totalreturn = $totalreturn + (0.1 * $totalreturn) - ($diskon / 100 * $totalreturn);
+                } else {
+                    $totalreturn = $totalreturn + (0.1 * $totalreturn);
+                }
             } else {
-                $newID = $id + 1;
-                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                if ($diskon > 0) {
+                    $totalreturn = $totalreturn - ($diskon / 100 * $totalreturn);
+                }
             }
 
-            $newID = "RPB-" . $year_now . $month_now . $newID;
-        }
-        $tot = 0;
+            $penerimaanbarangreturn->Status = "CFM";
+            $penerimaanbarangreturn->save();
 
-        foreach ($items as $key => $value) {
-            $tot += $value->jml;
-        }
+            $penerimaanbarang = penerimaanbarang::where('KodePenerimaanBarang', $penerimaanbarangreturn->KodePenerimaanBarang)->first();
+            $invoice = invoicehutangdetail::where('KodeLPB', $penerimaanbarangreturn->KodePenerimaanBarang)->first();
+            $hutang = invoicehutang::where('KodeInvoiceHutangShow', $invoice->KodeHutang)->first();
+            if (!empty($invoice)) {
+                // $now = $invoice->Subtotal;
+                // $invoice->Subtotal = $now - $totalreturn;
+                $invoice->TotalReturn += $totalreturn;
+                $invoice->save();
+            }
+            if (!empty($hutang)) {
+                // $now = $hutang->Total;
+                // $hutang->Total = $now - $totalreturn;
+            }
 
-        foreach ($items as $key => $value) {
-            DB::table('keluarmasukbarangs')->insert([
-                'Tanggal' => $data->Tanggal,
-                'KodeLokasi' => $data->KodeLokasi,
-                'KodeItem' => $value->KodeItem,
-                'JenisTransaksi' => 'RPB',
-                'KodeTransaksi' => $data->KodePenerimaanBarangReturn,
-                'Qty' => -$value->jml,
-                'HargaRata' => 0,
-                'KodeUser' => 'Admin',
-                'idx' => 0,
-                'indexmov' => 0,
-                'saldo' => (int) $last_saldo[$key][0] - (int) $value->jml,
+            $checkitem = DB::select("SELECT (a.qty-COALESCE(SUM(pbd.qty),0)) as jml
+            FROM penerimaanbarangdetails a 
+            inner join items i on a.KodeItem = i.KodeItem
+            inner join itemkonversis k on i.KodeItem = k.KodeItem
+            inner join satuans s on s.KodeSatuan = k.KodeSatuan
+            left join penerimaanbarangreturns pb on pb.KodePenerimaanBarang = a.KodePenerimaanBarang
+            left join penerimaanbarangreturndetails pbd on pbd.KodePenerimaanBarangReturn = pb.KodePenerimaanBarangReturn and pbd.KodeItem = a.KodeItem and pbd.KodeSatuan = k.KodeSatuan
+            where a.KodePenerimaanBarang='" . $pbr['KodePenerimaanBarang'] . "' and a.KodeSatuan = k.KodeSatuan and pb.Status = 'CFM'
+            group by a.KodeItem, s.NamaSatuan
+            having jml > 0");
+
+            if (empty($checkitem)) {
+                $penerimaanbarang->Status = "CLS";
+                $penerimaanbarang->save();
+            }
+
+            $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, a.Harga, k.Konversi
+                FROM penerimaanbarangreturndetails a 
+                inner join penerimaanbarangreturns pb on a.KodePenerimaanBarangReturn = pb.KodePenerimaanBarangReturn 
+                inner join items i on a.KodeItem = i.KodeItem 
+                inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan
+                inner join satuans s on s.KodeSatuan = k.KodeSatuan
+                where pb.KodePenerimaanBarangReturn='" . $id . "'
+                group by a.KodeItem, s.NamaSatuan");
+
+            $tot = 0;
+            foreach ($items as $key => $value) {
+                $tot += $value->jml;
+            }
+            $nomer = 0;
+
+            foreach ($items as $key => $value) {
+                if ($value->Konversi > 0) {
+                    $value->jml = $value->jml * $value->Konversi;
+                }
+                $nomer++;
+                DB::table('keluarmasukbarangs')->insert([
+                    'Tanggal' => $penerimaanbarangreturn->Tanggal,
+                    'KodeLokasi' => $penerimaanbarang->KodeLokasi,
+                    'KodeItem' => $value->KodeItem,
+                    'JenisTransaksi' => 'RPB',
+                    'KodeTransaksi' => $penerimaanbarangreturn->KodePenerimaanBarangReturn,
+                    'Qty' => $value->jml,
+                    'HargaRata' => 0,
+                    'KodeUser' => \Auth::user()->name,
+                    'idx' => $nomer,
+                    'indexmov' => 2,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now()
+                ]);
+            }
+
+            DB::table('eventlogs')->insert([
+                'KodeUser' => \Auth::user()->name,
+                'Tanggal' => \Carbon\Carbon::now(),
+                'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+                'Keterangan' => 'Konfirmasi return penerimaan barang ' . $penerimaanbarangreturn->KodePenerimaanBarangReturn,
+                'Tipe' => 'OPN',
                 'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now()
+                'updated_at' => \Carbon\Carbon::now(),
             ]);
+
+            $pesan = 'Return Penerimaan Barang ' . $penerimaanbarangreturn->KodePenerimaanBarangReturn . ' berhasil dikonfirmasi';
+            return redirect('/konfirmasiReturnPenerimaanBarang')->with(['created' => $pesan]);
+        } else {
+            $pesan = 'Return Penerimaan Barang tidak dikonfirmasi karena hasil item menjadi minus, mohon periksa kembali jumlah item pada Penerimaan Barang yang dapat direturn';
+            return redirect('/returnPenerimaanBarang')->with(['error' => $pesan]);
         }
-
-        $lpb = invoicehutangdetail::where('KodeLPB', '=', $data->KodePenerimaanBarang)->first();
-        DB::table('invoicehutangs')
-            ->where('KodeInvoiceHutang', $lpb->KodeInvoiceHutang)
-            ->update(['Status' => "CLS"]);
-
-        DB::table('eventlogs')->insert([
-            'KodeUser' => 'admin',
-            'Tanggal' => \Carbon\Carbon::now(),
-            'Jam' => \Carbon\Carbon::now()->format('h:i:s'),
-            'Keterangan' => 'Konfirmasi return penerimaan barang ' . $id,
-            'Tipe' => 'OPN',
-            'created_at' => \Carbon\Carbon::now(),
-            'updated_at' => \Carbon\Carbon::now(),
-        ]);
-
-        return redirect('/konfirmasiReturnPenerimaanBarang');
-    }
-
-    public function cancel($id)
-    {
-        $data = penerimaanbarangreturn::where('KodePenerimaanBarangReturn', $id)->first();
-        $data->Status = "DEL";
-        $data->save();
-
-        DB::table('eventlogs')->insert([
-            'KodeUser' => 'admin',
-            'Tanggal' => \Carbon\Carbon::now(),
-            'Jam' => \Carbon\Carbon::now()->format('h:i:s'),
-            'Keterangan' => 'Batal return penerimaan barang ' . $id,
-            'Tipe' => 'OPN',
-            'created_at' => \Carbon\Carbon::now(),
-            'updated_at' => \Carbon\Carbon::now(),
-        ]);
-
-        return redirect('/batalReturnPenerimaanBarang');
     }
 
     public function print($id)
     {
-        $data =
-            DB::select("select lpb.*,a.*,b.Keterangan from penerimaanbarangreturns a 
-            left join penerimaanbarangs lpb on lpb.KodePenerimaanBarang = a.KodePenerimaanBarang
-            left join pemesananpembelians b on lpb.KodePO = b.KodePO  where a.KodePenerimaanBarangReturn = '" . $id . "'")[0];
-        $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, k.HargaBeli FROM penerimaanbarangreturndetails a inner join items i on a.KodeItem = i.KodeItem inner join itemkonversis k on i.KodeItem = k.KodeItem inner join satuans s on s.KodeSatuan = k.KodeSatuan where a.KodePenerimaanBarangReturn='" . $data->KodePenerimaanBarangReturn . "' group by a.KodeItem, i.Keterangan, s.NamaSatuan, k.HargaBeli, i.NamaItem ");
-        $lokasi = lokasi::where('KodeLokasi', $data->KodeLokasi)->get();
-        $supplier = supplier::where('KodeSupplier', $data->KodeSupplier)->get();
+        $returnpenerimaanbarang = penerimaanbarangreturn::where('KodePenerimaanBarangReturn', $id)->first();
+        $penerimaanbarang = penerimaanbarang::where('KodePenerimaanBarang', $returnpenerimaanbarang->KodePenerimaanBarang)->first();
+        $sales = karyawan::where('KodeKaryawan', $penerimaanbarang->KodeSales)->first();
+        $matauang = matauang::where('KodeMataUang', $penerimaanbarang->KodeMataUang)->first();
+        $lokasi = lokasi::where('KodeLokasi', $penerimaanbarang->KodeLokasi)->first();
+        $supplier = supplier::where('KodeSupplier', $penerimaanbarang->KodeSupplier)->first();
+
+        $items = DB::select(
+            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga 
+        FROM penerimaanbarangreturndetails a 
+        inner join items i on a.KodeItem = i.KodeItem 
+        inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan 
+        inner join satuans s on s.KodeSatuan = k.KodeSatuan
+        where a.KodePenerimaanBarangReturn='" . $id . "' group by a.KodeItem, s.NamaSatuan"
+        );
+
         $jml = 0;
         foreach ($items as $value) {
-            $jml += $value->jml;
+            $jml += $value->Qty;
         }
-        $data->Tanggal = Carbon::parse($data->Tanggal)->format('d/m/Y');
+        $penerimaanbarang->Tanggal = \Carbon\Carbon::parse($penerimaanbarang->Tanggal)->format('d-m-Y');
 
-        $pdf = PDF::loadview('pembelian.returnPenerimaanBarang.print', compact('data', 'id', 'items', 'jml', 'supplier', 'lokasi'));
+        $pdf = PDF::loadview('pembelian.returnPenerimaanBarang.print', compact('returnpenerimaanbarang', 'penerimaanbarang', 'sales', 'matauang', 'lokasi', 'supplier', 'items', 'jml'));
 
         DB::table('eventlogs')->insert([
-            'KodeUser' => 'admin',
+            'KodeUser' => \Auth::user()->name,
             'Tanggal' => \Carbon\Carbon::now(),
-            'Jam' => \Carbon\Carbon::now()->format('h:i:s'),
-            'Keterangan' => 'Print return penerimaan barang ' . $id,
+            'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+            'Keterangan' => 'Print return penerimaan barang ' . $returnpenerimaanbarang->KodePenerimaanBarangReturn,
             'Tipe' => 'OPN',
             'created_at' => \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now(),
         ]);
 
-        return $pdf->download('pembelian.returnPenerimaanBarang.pdf');
-    }
-
-    public function apiOPN()
-    {
-        $penerimaanbarangreturn = DB::table('penerimaanbarangreturns')
-            ->join('lokasis', 'penerimaanbarangreturns.KodeLokasi', '=', 'lokasis.KodeLokasi')
-            ->join('suppliers', 'penerimaanbarangreturns.KodeSupplier', '=', 'suppliers.KodeSupplier')
-            ->select('penerimaanbarangreturns.*', 'lokasis.NamaLokasi', 'suppliers.NamaSupplier')
-            ->where('penerimaanbarangreturns.Status', 'OPN')
-            ->get();
-
-        return Datatables::of($penerimaanbarangreturn)
-            ->addColumn('action', function ($penerimaanbarangreturn) {
-                return '<a href="/returnPenerimaanBarang/show/' . $penerimaanbarangreturn->KodePenerimaanBarangReturn . '" class="btn btn-primary btn-xs"><i class="glyphicon glyphicon-eye-open"></i></a> ';
-            })->make(true);
-    }
-
-    public function apiCFM()
-    {
-        $penerimaanbarangreturn = DB::table('penerimaanbarangreturns')
-            ->join('lokasis', 'penerimaanbarangreturns.KodeLokasi', '=', 'lokasis.KodeLokasi')
-            ->join('suppliers', 'penerimaanbarangreturns.KodeSupplier', '=', 'suppliers.KodeSupplier')
-            ->select('penerimaanbarangreturns.*', 'lokasis.NamaLokasi', 'suppliers.NamaSupplier')
-            ->where('penerimaanbarangreturns.Status', 'CFM')
-            ->get();
-
-        return Datatables::of($penerimaanbarangreturn)
-            ->addColumn('action', function ($penerimaanbarangreturn) {
-                return '<a href="/returnPenerimaanBarang/lihat/' . $penerimaanbarangreturn->KodePenerimaanBarangReturn . '" class="btn btn-primary btn-xs"><i class="glyphicon glyphicon-eye-open"></i></a> ';
-            })->make(true);
-    }
-
-    public function apiDEL()
-    {
-        $penerimaanbarangreturn = DB::table('penerimaanbarangreturns')
-            ->join('lokasis', 'penerimaanbarangreturns.KodeLokasi', '=', 'lokasis.KodeLokasi')
-            ->join('suppliers', 'penerimaanbarangreturns.KodeSupplier', '=', 'suppliers.KodeSupplier')
-            ->select('penerimaanbarangreturns.*', 'lokasis.NamaLokasi', 'suppliers.NamaSupplier')
-            ->where('penerimaanbarangreturns.Status', 'DEL')
-            ->get();
-
-        return Datatables::of($penerimaanbarangreturn)
-            ->addColumn('action', function ($penerimaanbarangreturn) {
-                return '<a href="/returnPenerimaanBarang/lihat/' . $penerimaanbarangreturn->KodePenerimaanBarangReturn . '" class="btn btn-primary btn-xs"><i class="glyphicon glyphicon-eye-open"></i></a> ';
-            })->make(true);
+        return $pdf->download('ReturnPenerimaanBarang_' . $returnpenerimaanbarang->KodePenerimaanBarangReturn . '.pdf');
     }
 }

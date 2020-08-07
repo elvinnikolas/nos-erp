@@ -120,6 +120,8 @@
         format: 'YYYY-MM-DD'
     });
 
-    $('#table').DataTable();
+    $('#table').DataTable({
+        "order": []
+    });
 </script>
 @endpush

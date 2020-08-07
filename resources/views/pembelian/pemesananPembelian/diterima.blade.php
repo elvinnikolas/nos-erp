@@ -3,73 +3,121 @@
 <div class="container">
   <div class="row">
     <div class="col-md-12">
-      <div class="card">
-        <div class="card-header">
-          <h1>Pemesanan Pembelian Diterima</h1>
+      <div class="x_panel">
+        <div class="x_title">
+          <form action="{{ url('/diterimaPembelian')}}">
+            <button class="btn btn-default" data-toggle="collapse" data-target="#filter" type="button">
+              <h2>Filter</h2>
+            </button>
+            <button class="btn btn-default" type="submit">
+              <h2>Tampilkan semua</h2>
+            </button>
+          </form>
+        </div>
+        <div id="filter" class="collapse">
+          <form action="{{ url('/diterimaPembelian/filter')}}" method="get">
+            <div class="x_content">
+              <div class="col-md-5 col-sm-5">
+                <div class="form-group">
+                  <label for="tanggalpo">Dari :</label>
+                  <div class="input-group date" id="tanggalpo">
+                    <input type="text" class="form-control" name="start" value="{{ Request::get('start')}}" />
+                    <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-5 col-sm-5">
+                <div class="form-group">
+                  <label for="tanggalposampai">Sampai :</label>
+                  <div class="input-group date" id="tanggalposampai">
+                    <input type="text" class="form-control" name="end" value="{{ Request::get('end')}}" />
+                    <span class="input-group-addon">
+                      <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2 col-sm-2">
+                <div class="form-group">
+                  <label for=""> </label>
+                  <div class="input-group">
+                    <button type="submit" class="btn btn-md btn-block btn-success">
+                      <i class="fa fa-search" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="x_panel">
+        <div class="x_title">
+          <div class="row">
+            <div class="col-md-6 col-sm-6">
+              <h3>Pemesanan Pembelian Diterima</h3>
+              <p>Purchase Order<p>
+            </div>
+            <div class="col-md-6 col-sm-6">
+              <br><br>
+            </div>
+          </div>
+        </div>
+        <div class="x_content">
+          <table class="table table-light" id="table">
+            <thead class="thead-light">
+              <tr>
+                <th>Kode PO</th>
+                <th>Tanggal</th>
+                <th>Term</th>
+                <th>Supplier</th>
+                <th>Gudang</th>
+                <th>Total</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            @foreach ($pemesananpenjualan as $p)
+            <tr>
+              <td>{{ $p->KodePO}}</td>
+              <td>{{ \Carbon\Carbon::parse($p->Tanggal)->format('d-m-Y') }}</td>
+              <td>{{ $p->term }} hari</td>
+              <td>{{ $p->NamaSupplier }}</td>
+              <td>{{ $p->NamaLokasi  }}</td>
+              <td>Rp. {{ number_format($p->Total, 0, ',', '.') }},-</td>
+              <td>
+                <a href="{{ url('/popembelian/lihat/'. $p->KodePO )}}" class="btn-xs btn btn-primary">
+                  <i class="fa fa-eye" aria-hidden="true"></i> Lihat
+                </a>
+                <a href="{{ url('/popembelian/destroy/'.$p->KodePO)}}" class="btn-xs btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
+                  <i class="fa fa-trash" aria-hidden="true"></i> Hapus
+                </a>
+              </td>
+            </tr>
+            @endforeach
+          </table>
         </div>
       </div>
     </div>
-    <div class="card-body">
-      <div class="x_panel">
-        <table id="pemesananpembelian" class="table table-light">
-          <thead class="thead-light">
-            <tr>
-              <th>Kode PO</th>
-              <th>Gudang</th>
-              <th>Mata Uang</th>
-              <th>Supplier</th>
-              <th>Tanggal Pemesanan</th>
-              <th>Tanggal Diterima</th>
-              <th>Detail</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
   </div>
-</div>
-</div>
 </div>
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
-  var table = $('#pemesananpembelian').DataTable({
-    processing: true,
-    serverSide: true,
-    ajax: "{{ route('api.popembelianCLS') }}",
-    columns: [{
-        data: 'KodePO',
-        name: 'KodePO'
-      },
-      {
-        data: 'NamaLokasi',
-        name: 'NamaLokasi'
-      },
-      {
-        data: 'NamaMataUang',
-        name: 'NamaMataUang'
-      },
-      {
-        data: 'NamaSupplier',
-        name: 'NamaSupplier'
-      },
-      {
-        data: 'Tanggal',
-        name: 'Tanggal'
-      },
-      {
-        data: 'TanggalDiterima',
-        name: 'TanggalDiterima'
-      },
-      {
-        data: 'action',
-        name: 'action',
-        orderable: false,
-        searchable: false
-      }
-    ]
+  $('#tanggalpo').datetimepicker({
+    format: 'YYYY-MM-DD'
+  });
+
+  $('#tanggalposampai').datetimepicker({
+    defaultDate: new Date(),
+    format: 'YYYY-MM-DD'
+  });
+
+  $('#table').DataTable({
+    "order": []
   });
 </script>
 @endpush

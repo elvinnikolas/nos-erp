@@ -13,11 +13,12 @@ class InvoicePiutangController extends Controller
 {
     public function piutang()
     {
-        $invoice = DB::select('SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, i.NoFaktur, i.Term, p.NamaPelanggan, i.Tanggal, d.KodeSuratJalan, d.Subtotal, COALESCE(sum(pp.Jumlah),0) as bayar
+        $invoice = DB::select('SELECT i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, i.NoFaktur, i.Term, p.NamaPelanggan, i.Tanggal, d.KodeSuratJalan, d.Subtotal, d.TotalReturn, sj.PPN, COALESCE(sum(pp.Jumlah),0) as bayar
                     FROM invoicepiutangs i
                     inner join invoicepiutangdetails d on i.KodeInvoicePiutang = d.KodeInvoicePiutang
                     inner join pelanggans p on p.KodePelanggan = i.KodePelanggan
                     left join pelunasanpiutangs pp on pp.KodeInvoice = i.KodeInvoicePiutang
+                    left join suratjalans sj on sj.KodeSuratJalan = d.KodeSuratJalan
                     GROUP by i.KodeInvoicePiutangShow, i.KodeInvoicePiutang, p.NamaPelanggan, i.Tanggal, d.Subtotal, i.Term');
         return view('piutang.invoice.index', compact('invoice'));
     }
@@ -77,7 +78,7 @@ class InvoicePiutangController extends Controller
         $suratjalan = suratjalan::where('KodeSuratJalan', $inv->KodeSuratJalan)->first();
         $driver = karyawan::where('KodeKaryawan', $suratjalan->KodeSopir)->first();
         $items = DB::select(
-            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, k.HargaJual 
+            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga as HargaJual
             FROM suratjalandetails a 
             inner join items i on a.KodeItem = i.KodeItem 
             inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan 

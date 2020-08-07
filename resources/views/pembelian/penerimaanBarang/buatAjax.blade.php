@@ -1,34 +1,22 @@
-<form action="{{ url('/suratJalan/store',$id)}}" method="post" class="formsub">
+<form action="{{ url('/penerimaanBarang/store',$id)}}" method="post" class="formsub">
   @csrf
 
   <div class="form-row">
     <!-- column 1 -->
     <div class="form-group col-md-3">
-      <input type="hidden" name="KodeSO" value="{{$so->KodeSO}}">
-      <input type="hidden" name="KodePelanggan" value="{{$so->KodePelanggan}}">
+      <input type="hidden" name="KodePO" value="{{$po->KodePO}}">
+      <input type="hidden" name="KodeSupplier" value="{{$po->KodeSupplier}}">
       <div class="form-group">
         <label for="inputDate">Tanggal</label>
         <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
       </div>
       <div class="form-group">
-        <label for="inputBerlaku">Alamat</label>
-        <select name="AlamatPelanggan" class="form-control" id="alamat">
-          @foreach($alamat as $dalamat)
-          <option selected="selected" value="{{$dalamat->Alamat}}">{{$dalamat->Alamat}}</option>
-          @endforeach
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="inputTerm">Sopir</label>
-        <select name="KodeSopir" class="form-control" id="sopir">
-          @foreach($drivers as $data)
+        <label for="inputTerm">Sales</label>
+        <select name="KodeSales" class="form-control" id="sales">
+          @foreach($sales as $data)
           <option selected="selected" value="{{$data->KodeKaryawan}}">{{$data->Nama}}</option>
           @endforeach
         </select>
-      </div>
-      <div class="form-group">
-        <label for="inputPO">No Polisi</label>
-        <input type="text" class="form-control" name="nopol" required="required">
       </div>
     </div>
     <!-- pembatas -->
@@ -52,20 +40,12 @@
         </select>
       </div>
       <!-- <div class="form-group">
-        <label for="inputPelanggan">Pelanggan</label>
-        <select readonly="readonly " class="form-control" name="KodePelanggan" id="inputPelanggan">
-          @foreach($pelanggans as $pel)
-          <option value="{{$pel->KodePelanggan}}">{{$pel->NamaPelanggan}}</option>
-          @endforeach
-        </select>
-      </div> -->
-      <!-- <div class="form-group">
         <label for="inputPelanggan">Diskon</label> -->
-      <input type="hidden" step=0.01 readonly="readonly" class="form-control diskon" name="diskon" value="{{$so->Diskon}}">
+      <input type="hidden" step=0.01 readonly="readonly" class="form-control diskon" name="diskon" value="{{$po->Diskon}}">
       <!-- </div>
       <div class="form-group">
         <label for="inputPelanggan">PPN</label> -->
-      <input type="hidden" readonly="readonly" class="form-control ppn" name="ppn" value="{{$so->PPN}}">
+      <input type="hidden" readonly="readonly" class="form-control ppn" name="ppn" value="{{$po->PPN}}">
       <!-- </div> -->
     </div>
     <!-- pembatas -->
@@ -102,13 +82,13 @@
             <input type="text" class="form-control" readonly value="{{$data->NamaSatuan}}">
           </td>
           <td>
-          <input readonly="" type="text" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
+            <input readonly="" type="text" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
           </td>
           <td>
             <input type="text" class="form-control" readonly name="keterangan[]" value="{{$data->Keterangan}}">
           </td>
           <td>
-          <input readonly type="text" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
+            <input readonly type="text" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
           </td>
         </tr>
         @endforeach
@@ -134,7 +114,7 @@
 
 <script type="text/javascript">
   $('#alamat').select2()
-  $('#sopir').select2()
+  $('#sales').select2()
   $('#gudang').select2()
   $('#matauang').select2()
 </script>
