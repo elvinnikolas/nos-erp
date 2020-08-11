@@ -167,6 +167,22 @@ class PelunasanHutangController extends Controller
         $pp->updated_at = \Carbon\Carbon::now();
         $pp->save();
 
+        //update status jika sudah lunas
+        $payments = pelunasanhutang::where('KodeInvoice', $id)->get();
+        $hutang = invoicehutangdetail::where('KodeInvoiceHutang', $id)->first();
+
+        $tot = 0;
+        foreach ($payments as $bill) {
+            $tot += $bill->Jumlah;
+        }
+
+        $sisa = $hutang->Subtotal - $tot - $hutang->TotalReturn;
+        if ($sisa <= 0) {
+            DB::table('invoicehutangs')->where('KodeInvoiceHutang', $id)->update([
+                'Status' => 'CLS'
+            ]);
+        }
+
         DB::table('eventlogs')->insert([
             'KodeUser' => \Auth::user()->name,
             'Tanggal' => \Carbon\Carbon::now(),

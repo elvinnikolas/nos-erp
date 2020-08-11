@@ -119,9 +119,6 @@
                 <a href="{{ url('/sopenjualan/lihat/'. $p->KodeSO )}}" class="btn-xs btn btn-primary">
                   <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                 </a>
-                <a href="{{ url('/sopenjualan/destroy/'.$p->KodeSO)}}" class="btn-xs btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
-                  <i class="fa fa-trash" aria-hidden="true"></i> Hapus
-                </a>
               </td>
             </tr>
             @endforeach

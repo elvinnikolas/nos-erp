@@ -60,8 +60,15 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputDate">Tanggal</label>
-                                    <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                    <div class="form-group">
+                                        <label for="inputDate">Tanggal</label>
+                                        <div class="input-group date" id="inputDate">
+                                            <input type="text" class="form-control" name="Tanggal" id="inputDate" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <!-- pembatas -->
@@ -130,13 +137,15 @@
                                             <input type="text" class="form-control" readonly value="{{$data->NamaSatuan}}">
                                         </td>
                                         <td>
-                                            <input readonly="" type="text" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
+                                            <input readonly="" type="hidden" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
+                                            <input readonly type="text" class="form-control" value="Rp. {{number_format($data->Harga)}},-">
                                         </td>
                                         <td>
                                             <input type="text" class="form-control" readonly name="keterangan[]" value="{{$data->Keterangan}}" />
                                         </td>
                                         <td>
-                                            <input readonly type="text" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
+                                            <input readonly type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
+                                            <input readonly type="text" class="form-control showtotal{{$key+1}}" value="Rp. {{number_format($data->Harga * $data->jml)}},-">
                                         </td>
                                     </tr>
                                     @endforeach
@@ -148,13 +157,17 @@
                                 <div class="col-md-3">
                                     <input type="hidden" value="{{sizeof($items)}}" class="tot">
                                     <label for="subtotal">Subtotal</label>
-                                    <input type="text" name="total" readonly class="form-control befDis">
+                                    <input type="hidden" name="total" readonly class="form-control befDis">
+                                    <input type="text" readonly="" class="form-control showbefDis" value="Rp 0,-">
                                     <label for="ppn">Nilai PPN</label>
-                                    <input type="text" readonly name="ppnval" class="ppnval form-control">
+                                    <input type="hidden" readonly name="ppnval" class="ppnval form-control">
+                                    <input type="text" readonly="" class="form-control showppnval" value="Rp 0,-">
                                     <label for="diskon">Nilai Diskon</label>
-                                    <input type="text" readonly name="diskonval" class="diskonval form-control">
+                                    <input type="hidden" readonly name="diskonval" class="diskonval form-control">
+                                    <input type="text" readonly="" class="form-control showdiskonval" value="Rp 0,-">
                                     <label for="total">Total</label>
-                                    <input type="text" readonly class="form-control subtotal" name="subtotal">
+                                    <input type="hidden" readonly class="form-control subtotal" name="subtotal">
+                                    <input type="text" readonly="" class="form-control showsubtotal" value="Rp 0,-">
                                 </div>
                             </div>
                         </div>
@@ -169,6 +182,11 @@
 @push('scripts')
 <script type="text/javascript">
     $('#KodePB').select2();
+
+    $('#inputDate').datetimepicker({
+        defaultDate: new Date(),
+        format: 'YYYY-MM-DD'
+    });
 
     function refresh(val) {
         var base = "{{ url('/') }}" + "/returnPenerimaanBarang/create/" + val.value;
@@ -202,6 +220,16 @@
         $(".diskonval").val(diskon);
         $(".befDis").val(parseInt($(".subtotal").val()));
         $(".subtotal").val(parseInt($(".subtotal").val()) + ppn - diskon);
+
+        hasiltotal = parseInt(befDis) + ppn - diskon;
+        formatppn = 'Rp ' + number_format(ppn);
+        formatbef = 'Rp ' + number_format(befDis);
+        formatdisc = 'Rp ' + number_format(diskon);
+        formattotal = 'Rp ' + number_format(hasiltotal);
+        $(".showppnval").val(formatppn);
+        $(".showdiskonval").val(formatdisc);
+        $(".showbefDis").val(formatbef);
+        $(".showsubtotal").val(formattotal);
     }
 
     function qty(int) {
@@ -213,6 +241,8 @@
         var qty = $(".qty" + int).val();
         var price = $(".price" + int).val();
         $(".total" + int).val(price * qty);
+        var formattotal = 'Rp ' + number_format(price * qty) + ',-';
+        $(".showtotal" + int).val(formattotal);
         var count = $(".tot").val();
         updatePrice(count);
     }
@@ -222,12 +252,38 @@
         for (var i = 1; i <= tot; i++) {
             if (typeof $(".qty" + i).val() === 'undefined') {}
             // else {
-            //     if ($(".qty" + i).val() == 0) {
-            //         event.preventDefault();
-            //         $(".qty" + i).focus();
-            //     }
+            //   if ($(".qty" + i).val() == 0) {
+            //     event.preventDefault();
+            //     $(".qty" + i).focus();
+            //   }
             // }
         }
     });
+
+    function number_format(number, decimals, decPoint, thousandsSep) {
+        number = (number + '').replace(/[^0-9+\-Ee.]/g, '')
+        var n = !isFinite(+number) ? 0 : +number
+        var prec = !isFinite(+decimals) ? 0 : Math.abs(decimals)
+        var sep = (typeof thousandsSep === 'undefined') ? '.' : thousandsSep
+        var dec = (typeof decPoint === 'undefined') ? ',' : decPoint
+        var s = ''
+
+        var toFixedFix = function(n, prec) {
+            var k = Math.pow(10, prec)
+            return '' + (Math.round(n * k) / k)
+                .toFixed(prec)
+        }
+
+        s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.')
+        if (s[0].length > 3) {
+            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep)
+        }
+        if ((s[1] || '').length < prec) {
+            s[1] = s[1] || ''
+            s[1] += new Array(prec - s[1].length + 1).join('0')
+        }
+
+        return s.join(dec)
+    }
 </script>
 @endpush

@@ -46,7 +46,7 @@
                             <div class="form-group col-md-4">
                                 <div class="form-group">
                                     <label for="inputDate">Kode Invoice</label>
-                                    <input type="text" class="form-control" name="kode" value="{{$invoice->KodeInvoiceHutangShow}}" readonly="" id="inputDate">
+                                    <input type="text" class="form-control" name="kode" value="{{$invoice->KodeInvoiceHutangShow}}" readonly="">
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Mata Uang</label>
@@ -69,7 +69,12 @@
 
                                 <div class="form-group">
                                     <label for="inputDate">Tanggal Pembayaran</label>
-                                    <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                    <div class="input-group date" id="inputDate">
+                                        <input type="text" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Metode Pembayaran</label>
@@ -104,6 +109,11 @@
 
 @push('scripts')
 <script type="text/javascript">
+    $('#inputDate').datetimepicker({
+        defaultDate: new Date(),
+        format: 'YYYY-MM-DD'
+    });
+
     $(".jml").change(function() {
         if (parseFloat($(".jml").val()) > parseFloat($(".jmlshow").val())) {
             $(".jml").val($(".jmlshow").val());

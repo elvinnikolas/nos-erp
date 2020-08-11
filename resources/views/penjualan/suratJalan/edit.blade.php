@@ -55,8 +55,12 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Tanggal</label>
-                                    <!-- <input type="date" class="form-control" name="Tanggal" id="inputDate" readonly="readonly" value="{{\Carbon\Carbon::parse($suratjalan->Tanggal)->format('d-m-Y')}}"> -->
-                                    <input type="date" class="form-control" name="Tanggal" id="inputDate" value="{{$suratjalan->Tanggal}}">
+                                    <div class="input-group date" id="inputDate">
+                                        <input type="text" class="form-control" name="Tanggal" id="inputDate" value="{{$suratjalan->Tanggal}}">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
                                 </div>
                                 @if($suratjalan->PPN == "ya")
                                 <div class="form-group">
@@ -214,6 +218,11 @@
     $('#sopir').select2()
     $('#gudang').select2()
     $('#matauang').select2()
+
+    $('#inputDate').datetimepicker({
+        defaultDate: new Date(),
+        format: 'YYYY-MM-DD'
+    });
 
     function refresh(val) {
         var base = "{{ url('/') }}" + "/suratJalan/create/" + val.value;

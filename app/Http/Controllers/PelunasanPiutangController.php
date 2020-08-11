@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Model\invoicehutangdetail;
 use Illuminate\Http\Request;
 use DB;
 use App\Model\invoicepiutang;
@@ -71,7 +72,6 @@ class PelunasanPiutangController extends Controller
 
     public function addpaymentpost($id, Request $request)
     {
-        $jml = $request->jml;
         $keterangan = $request->keterangan;
         $metode = $request->metode;
         $matauang = $request->matauang;
@@ -79,6 +79,7 @@ class PelunasanPiutangController extends Controller
         $invoice = invoicepiutang::where('KodeInvoicePiutang', $id)->first();
         $last_id = DB::select('SELECT * FROM kasbanks ORDER BY KodeKasBankID DESC LIMIT 1');
 
+        //insert tabel kasbank
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
@@ -122,6 +123,7 @@ class PelunasanPiutangController extends Controller
         $kas->Total = $request->jml;
         $kas->save();
 
+        //insert table pelunasanpiutang
         $last_id = DB::select('SELECT * FROM pelunasanpiutangs ORDER BY KodePelunasanPiutangID DESC LIMIT 1');
 
         $year_now = date('y');
@@ -166,6 +168,23 @@ class PelunasanPiutangController extends Controller
         $pp->updated_at = \Carbon\Carbon::now();
         $pp->save();
 
+        //update status jika sudah lunas
+        $payments = pelunasanpiutang::where('KodeInvoice', $id)->get();
+        $piutang = invoicepiutangdetail::where('KodeInvoicePiutang', $id)->first();
+
+        $tot = 0;
+        foreach ($payments as $bill) {
+            $tot += $bill->Jumlah;
+        }
+
+        $sisa = $piutang->Subtotal - $tot - $piutang->TotalReturn;
+        if ($sisa <= 0) {
+            DB::table('invoicepiutangs')->where('KodeInvoicePiutang', $id)->update([
+                'Status' => 'CLS'
+            ]);
+        }
+
+        //update eventlog
         DB::table('eventlogs')->insert([
             'KodeUser' => \Auth::user()->name,
             'Tanggal' => \Carbon\Carbon::now(),

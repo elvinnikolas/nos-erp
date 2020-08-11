@@ -27,10 +27,20 @@
                                 <form action="{{ url('/kartustok/filter') }}" method="post">
                                     @csrf
                                     <div class="col-md-3">
-                                        <label>Tanggal mulai</label>
-                                        <input type="date" class="form-control" name="start" required="">
-                                        <label>Tanggal selesai</label>
-                                        <input type="date" class="form-control" name="finish" required="">
+                                        <label for="inputDate">Mulai</label>
+                                        <div class="input-group date" id="inputDate">
+                                            <input type="text" class="form-control" name="start" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                        <label for="inputDate">Sampai</label>
+                                        <div class="input-group date" id="inputDate2">
+                                            <input type="text" class="form-control" name="finish" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
                                     </div>
                                     <div class="col-md-3">
                                         <label>Gudang</label>
@@ -127,6 +137,16 @@
     });
     $('#satuan').select2({
         width: '100%'
+    });
+
+    $('#inputDate').datetimepicker({
+        defaultDate: new Date(),
+        format: 'YYYY-MM-DD'
+    });
+
+    $('#inputDate2').datetimepicker({
+        defaultDate: new Date(),
+        format: 'YYYY-MM-DD'
     });
 </script>
 @endpush

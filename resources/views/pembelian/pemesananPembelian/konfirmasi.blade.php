@@ -120,9 +120,6 @@
                 <a href="{{ url('/popembelian/lihat/'. $p->KodePO )}}" class="btn-xs btn btn-primary">
                   <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                 </a>
-                <a href="{{ url('/popembelian/destroy/'.$p->KodePO)}}" class="btn-xs btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
-                  <i class="fa fa-trash" aria-hidden="true"></i> Hapus
-                </a>
               </td>
             </tr>
             @endforeach

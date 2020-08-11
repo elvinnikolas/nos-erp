@@ -58,8 +58,13 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label for="">Tanggal</label>
-                                        <input type="date" name="Tanggal" class="form-control" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                        <label for="inputDate">Tanggal</label>
+                                        <div class="input-group date" id="inputDate">
+                                            <input type="text" class="form-control" name="Tanggal" id="inputDate" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -132,6 +137,12 @@
 @push('scripts')
 <script type="text/javascript">
     $('#gudang').select2();
+
+    $('#inputDate').datetimepicker({
+        defaultDate: new Date(),
+        format: 'YYYY-MM-DD'
+    });
+
     var item = $(".item" + 1).val();
     var ket = $("#" + item + "Ket").val();
     $(".keterangan" + 1).val(ket);

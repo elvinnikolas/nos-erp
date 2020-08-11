@@ -13,6 +13,7 @@ use App\Model\pelanggan;
 use Carbon\Carbon;
 use App\Model\suratjalanreturn;
 use App\Model\invoicepiutang;
+use App\Model\pelunasanpiutang;
 use App\Model\invoicepiutangdetail;
 use PDF;
 
@@ -34,6 +35,8 @@ class ReturnSuratJalanController extends Controller
             inner join itemkonversis k on i.KodeItem = k.KodeItem
             inner join satuans s on s.KodeSatuan = k.KodeSatuan
             inner join suratjalans sj on sj.KodeSuratJalan = a.KodeSuratJalan and sj.Status='CFM'
+    		inner join invoicepiutangdetails ipd on ipd.KodeSuratJalan = sj.KodeSuratJalan
+    		inner join invoicepiutangs ip on ip.KodeInvoicePiutang = ipd.KodeInvoicePiutang and ip.Status='OPN'
             left join suratjalanreturns sjr on sjr.KodeSuratJalanID = sj.KodeSuratJalanID
             left join suratjalanreturndetails sjrd on sjrd.KodeSuratJalanReturn = sjr.KodeSuratJalanReturn and sjrd.KodeItem = a.KodeItem and sjrd.KodeSatuan = k.KodeSatuan
             where sj.Status = 'CFM' and a.KodeSatuan = k.KodeSatuan
@@ -192,10 +195,11 @@ class ReturnSuratJalanController extends Controller
         return view('penjualan.returnSuratJalan.show', compact('id', 'suratjalanreturn', 'driver', 'matauang', 'lokasi', 'pelanggan', 'items', 'suratjalan'));
     }
 
-    public function confirm(Request $request, $id)
+    public function confirm($id)
     {
         $sjr = suratjalanreturn::where('KodeSuratJalanReturnID', $id)->first();
 
+        //cek apakah item yg direturn tidak melebihi jumlah awal
         $checkresult = DB::select("SELECT (a.qty-COALESCE(SUM(sjd.qty),0)-COALESCE(sjdc.qty,0)) as jml
             FROM suratjalandetails a 
             inner join items i on a.KodeItem = i.KodeItem
@@ -225,40 +229,57 @@ class ReturnSuratJalanController extends Controller
                 }
             }
 
-            $suratjalanreturn->Status = "CFM";
-            $suratjalanreturn->save();
-
+            //update invoicepiutang
             $suratjalan = suratjalan::where('KodeSuratJalanID', $suratjalanreturn->KodeSuratJalanID)->first();
             $invoice = invoicepiutangdetail::where('KodeSuratJalan', $suratjalanreturn->KodeSuratJalan)->first();
             $piutang = invoicepiutang::where('KodeInvoicePiutangShow', $invoice->KodePiutang)->first();
-            if (!empty($invoice)) {
-                // $now = $invoice->Subtotal;
-                // $invoice->Subtotal = $now - $totalreturn;
-                $invoice->TotalReturn += $totalreturn;
-                $invoice->save();
-            }
-            if (!empty($piutang)) {
-                // $now = $piutang->Total;
-                // $piutang->Total = $now - $totalreturn;
+            $payments = pelunasanpiutang::where('KodeInvoice', $piutang->KodeInvoicePiutang)->get();
+
+            $tot = 0;
+            foreach ($payments as $bill) {
+                $tot += $bill->Jumlah;
             }
 
-            $checkitem = DB::select("SELECT (a.qty-COALESCE(SUM(sjd.qty),0)) as jml
-            FROM suratjalandetails a 
-            inner join items i on a.KodeItem = i.KodeItem
-            inner join itemkonversis k on i.KodeItem = k.KodeItem
-            inner join satuans s on s.KodeSatuan = k.KodeSatuan
-            left join suratjalanreturns sj on sj.KodeSuratJalan = a.KodeSuratJalan
-            left join suratjalanreturndetails sjd on sjd.KodeSuratJalanReturn = sj.KodeSuratJalanReturn and sjd.KodeItem = a.KodeItem and sjd.KodeSatuan = k.KodeSatuan
-            where a.KodeSuratJalan='" . $sjr['KodeSuratJalan'] . "' and a.KodeSatuan = k.KodeSatuan and sj.Status = 'CFM'
-            group by a.KodeItem, s.NamaSatuan
-            having jml > 0");
+            $sisa = $invoice->Subtotal - $tot - $invoice->TotalReturn - $totalreturn;
+            if ($sisa < 0) {
+                $pesan = 'Return Surat Jalan tidak dikonfirmasi karena hasil Invoive menjadi minus, mohon periksa kembali jumlah item pada Surat Jalan yang dapat direturn';
+                return redirect('/returnSuratJalan')->with(['error' => $pesan]);
+            } else {
+                if (!empty($invoice)) {
+                    $invoice->TotalReturn += $totalreturn;
+                    $invoice->save();
+                }
 
-            if (empty($checkitem)) {
-                $suratjalan->Status = "CLS";
-                $suratjalan->save();
-            }
+                //update status jika sudah lunas
+                if ($sisa == 0) {
+                    DB::table('invoicepiutangs')->where('KodeInvoicePiutang', $piutang->KodeInvoicePiutang)->update([
+                        'Status' => 'CLS'
+                    ]);
+                }
 
-            $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, a.Harga, k.Konversi
+                //update status suratjalan
+                $suratjalanreturn->Status = "CFM";
+                $suratjalanreturn->save();
+
+                //cek apakah semua item sudah direturn
+                $checkitem = DB::select("SELECT (a.qty-COALESCE(SUM(sjd.qty),0)) as jml
+                    FROM suratjalandetails a 
+                    inner join items i on a.KodeItem = i.KodeItem
+                    inner join itemkonversis k on i.KodeItem = k.KodeItem
+                    inner join satuans s on s.KodeSatuan = k.KodeSatuan
+                    left join suratjalanreturns sj on sj.KodeSuratJalan = a.KodeSuratJalan
+                    left join suratjalanreturndetails sjd on sjd.KodeSuratJalanReturn = sj.KodeSuratJalanReturn and sjd.KodeItem = a.KodeItem and sjd.KodeSatuan = k.KodeSatuan
+                    where a.KodeSuratJalan='" . $sjr['KodeSuratJalan'] . "' and a.KodeSatuan = k.KodeSatuan and sj.Status = 'CFM'
+                    group by a.KodeItem, s.NamaSatuan
+                    having jml > 0");
+
+                if (empty($checkitem)) {
+                    $suratjalan->Status = "CLS";
+                    $suratjalan->save();
+                }
+
+                //update kartustok
+                $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, a.Harga, k.Konversi
                 FROM suratjalanreturndetails a 
                 inner join suratjalanreturns sj on a.KodeSuratJalanReturn = sj.KodeSuratJalanReturn 
                 inner join items i on a.KodeItem = i.KodeItem 
@@ -267,45 +288,47 @@ class ReturnSuratJalanController extends Controller
                 where sj.KodeSuratJalanReturnID='" . $id . "'
                 group by a.KodeItem, s.NamaSatuan");
 
-            $tot = 0;
-            foreach ($items as $key => $value) {
-                $tot += $value->jml;
-            }
-            $nomer = 0;
-
-            foreach ($items as $key => $value) {
-                if ($value->Konversi > 0) {
-                    $value->jml = $value->jml * $value->Konversi;
+                $tot = 0;
+                foreach ($items as $key => $value) {
+                    $tot += $value->jml;
                 }
-                $nomer++;
-                DB::table('keluarmasukbarangs')->insert([
-                    'Tanggal' => $suratjalanreturn->Tanggal,
-                    'KodeLokasi' => $suratjalan->KodeLokasi,
-                    'KodeItem' => $value->KodeItem,
-                    'JenisTransaksi' => 'RJB',
-                    'KodeTransaksi' => $suratjalanreturn->KodeSuratJalanReturn,
-                    'Qty' => $value->jml,
-                    'HargaRata' => 0,
+                $nomer = 0;
+
+                foreach ($items as $key => $value) {
+                    if ($value->Konversi > 0) {
+                        $value->jml = $value->jml * $value->Konversi;
+                    }
+                    $nomer++;
+                    DB::table('keluarmasukbarangs')->insert([
+                        'Tanggal' => $suratjalanreturn->Tanggal,
+                        'KodeLokasi' => $suratjalan->KodeLokasi,
+                        'KodeItem' => $value->KodeItem,
+                        'JenisTransaksi' => 'RJB',
+                        'KodeTransaksi' => $suratjalanreturn->KodeSuratJalanReturn,
+                        'Qty' => $value->jml,
+                        'HargaRata' => 0,
+                        'KodeUser' => \Auth::user()->name,
+                        'idx' => $nomer,
+                        'indexmov' => 2,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now()
+                    ]);
+                }
+
+                //update eventlogs
+                DB::table('eventlogs')->insert([
                     'KodeUser' => \Auth::user()->name,
-                    'idx' => $nomer,
-                    'indexmov' => 2,
+                    'Tanggal' => \Carbon\Carbon::now(),
+                    'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+                    'Keterangan' => 'Konfirmasi return surat jalan ' . $suratjalanreturn->KodeSuratJalanReturn,
+                    'Tipe' => 'OPN',
                     'created_at' => \Carbon\Carbon::now(),
-                    'updated_at' => \Carbon\Carbon::now()
+                    'updated_at' => \Carbon\Carbon::now(),
                 ]);
+
+                $pesan = 'Return Surat Jalan ' . $suratjalanreturn->KodeSuratJalanReturn . ' berhasil dikonfirmasi';
+                return redirect('/konfirmasiReturnSuratJalan')->with(['created' => $pesan]);
             }
-
-            DB::table('eventlogs')->insert([
-                'KodeUser' => \Auth::user()->name,
-                'Tanggal' => \Carbon\Carbon::now(),
-                'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
-                'Keterangan' => 'Konfirmasi return surat jalan ' . $suratjalanreturn->KodeSuratJalanReturn,
-                'Tipe' => 'OPN',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ]);
-
-            $pesan = 'Return Surat Jalan ' . $suratjalanreturn->KodeSuratJalanReturn . ' berhasil dikonfirmasi';
-            return redirect('/konfirmasiReturnSuratJalan')->with(['created' => $pesan]);
         } else {
             $pesan = 'Return Surat Jalan tidak dikonfirmasi karena hasil item menjadi minus, mohon periksa kembali jumlah item pada Surat Jalan yang dapat direturn';
             return redirect('/returnSuratJalan')->with(['error' => $pesan]);

@@ -15,6 +15,7 @@ use App\Model\karyawan;
 use App\Model\matauang;
 use App\Model\invoicehutang;
 use App\Model\invoicehutangdetail;
+use App\Model\pelunasanhutang;
 
 class ReturnPenerimaanBarangController extends Controller
 {
@@ -69,6 +70,8 @@ class ReturnPenerimaanBarangController extends Controller
             inner join itemkonversis k on i.KodeItem = k.KodeItem
             inner join satuans s on s.KodeSatuan = k.KodeSatuan
             inner join penerimaanbarangs pb on pb.KodePenerimaanBarang = a.KodePenerimaanBarang and pb.Status='CFM'
+            inner join invoicehutangdetails ihd on ihd.KodeLPB = pb.KodePenerimaanBarang
+    		inner join invoicehutangs ih on ih.KodeInvoiceHutang = ihd.KodeInvoiceHutang and ih.Status='OPN'
             left join penerimaanbarangreturns pbr on pbr.KodePenerimaanBarang = pb.KodePenerimaanBarang
             left join penerimaanbarangreturndetails pbrd on pbrd.KodePenerimaanBarangReturn = pbr.KodePenerimaanBarangReturn and pbrd.KodeItem = a.KodeItem and pbrd.KodeSatuan = k.KodeSatuan
             where pb.Status = 'CFM' and a.KodeSatuan = k.KodeSatuan
@@ -318,87 +321,106 @@ class ReturnPenerimaanBarangController extends Controller
                 }
             }
 
-            $penerimaanbarangreturn->Status = "CFM";
-            $penerimaanbarangreturn->save();
-
+            //cek hasil invoice apakah setelah return menjadi minus
             $penerimaanbarang = penerimaanbarang::where('KodePenerimaanBarang', $penerimaanbarangreturn->KodePenerimaanBarang)->first();
             $invoice = invoicehutangdetail::where('KodeLPB', $penerimaanbarangreturn->KodePenerimaanBarang)->first();
             $hutang = invoicehutang::where('KodeInvoiceHutangShow', $invoice->KodeHutang)->first();
-            if (!empty($invoice)) {
-                // $now = $invoice->Subtotal;
-                // $invoice->Subtotal = $now - $totalreturn;
-                $invoice->TotalReturn += $totalreturn;
-                $invoice->save();
-            }
-            if (!empty($hutang)) {
-                // $now = $hutang->Total;
-                // $hutang->Total = $now - $totalreturn;
-            }
-
-            $checkitem = DB::select("SELECT (a.qty-COALESCE(SUM(pbd.qty),0)) as jml
-            FROM penerimaanbarangdetails a 
-            inner join items i on a.KodeItem = i.KodeItem
-            inner join itemkonversis k on i.KodeItem = k.KodeItem
-            inner join satuans s on s.KodeSatuan = k.KodeSatuan
-            left join penerimaanbarangreturns pb on pb.KodePenerimaanBarang = a.KodePenerimaanBarang
-            left join penerimaanbarangreturndetails pbd on pbd.KodePenerimaanBarangReturn = pb.KodePenerimaanBarangReturn and pbd.KodeItem = a.KodeItem and pbd.KodeSatuan = k.KodeSatuan
-            where a.KodePenerimaanBarang='" . $pbr['KodePenerimaanBarang'] . "' and a.KodeSatuan = k.KodeSatuan and pb.Status = 'CFM'
-            group by a.KodeItem, s.NamaSatuan
-            having jml > 0");
-
-            if (empty($checkitem)) {
-                $penerimaanbarang->Status = "CLS";
-                $penerimaanbarang->save();
-            }
-
-            $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, a.Harga, k.Konversi
-                FROM penerimaanbarangreturndetails a 
-                inner join penerimaanbarangreturns pb on a.KodePenerimaanBarangReturn = pb.KodePenerimaanBarangReturn 
-                inner join items i on a.KodeItem = i.KodeItem 
-                inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan
-                inner join satuans s on s.KodeSatuan = k.KodeSatuan
-                where pb.KodePenerimaanBarangReturn='" . $id . "'
-                group by a.KodeItem, s.NamaSatuan");
+            $payments = pelunasanhutang::where('KodeInvoice', $hutang->KodeInvoiceHutang)->get();
 
             $tot = 0;
-            foreach ($items as $key => $value) {
-                $tot += $value->jml;
+            foreach ($payments as $bill) {
+                $tot += $bill->Jumlah;
             }
-            $nomer = 0;
 
-            foreach ($items as $key => $value) {
-                if ($value->Konversi > 0) {
-                    $value->jml = $value->jml * $value->Konversi;
+            $sisa = $invoice->Subtotal - $tot - $invoice->TotalReturn - $totalreturn;
+            if ($sisa < 0) {
+                $pesan = 'Return Penerimaan Barang tidak dikonfirmasi karena hasil Invoive menjadi minus, mohon periksa kembali jumlah item pada Penerimaan Barang yang dapat direturn';
+                return redirect('/returnPenerimaanBarang')->with(['error' => $pesan]);
+            } else {
+                //update totalreturn
+                if (!empty($invoice)) {
+                    $invoice->TotalReturn += $totalreturn;
+                    $invoice->save();
                 }
-                $nomer++;
-                DB::table('keluarmasukbarangs')->insert([
-                    'Tanggal' => $penerimaanbarangreturn->Tanggal,
-                    'KodeLokasi' => $penerimaanbarang->KodeLokasi,
-                    'KodeItem' => $value->KodeItem,
-                    'JenisTransaksi' => 'RPB',
-                    'KodeTransaksi' => $penerimaanbarangreturn->KodePenerimaanBarangReturn,
-                    'Qty' => $value->jml,
-                    'HargaRata' => 0,
+
+                //update status jika sudah lunas
+                if ($sisa == 0) {
+                    DB::table('invoicehutangs')->where('KodeInvoiceHutang', $hutang->KodeInvoiceHutang)->update([
+                        'Status' => 'CLS'
+                    ]);
+                }
+
+                //update status penerimaanbarangreturn
+                $penerimaanbarangreturn->Status = "CFM";
+                $penerimaanbarangreturn->save();
+
+                //cek apakah semua item sudah direturn
+                $checkitem = DB::select("SELECT (a.qty-COALESCE(SUM(pbd.qty),0)) as jml
+                FROM penerimaanbarangdetails a 
+                inner join items i on a.KodeItem = i.KodeItem
+                inner join itemkonversis k on i.KodeItem = k.KodeItem
+                inner join satuans s on s.KodeSatuan = k.KodeSatuan
+                left join penerimaanbarangreturns pb on pb.KodePenerimaanBarang = a.KodePenerimaanBarang
+                left join penerimaanbarangreturndetails pbd on pbd.KodePenerimaanBarangReturn = pb.KodePenerimaanBarangReturn and pbd.KodeItem = a.KodeItem and pbd.KodeSatuan = k.KodeSatuan
+                where a.KodePenerimaanBarang='" . $pbr['KodePenerimaanBarang'] . "' and a.KodeSatuan = k.KodeSatuan and pb.Status = 'CFM'
+                group by a.KodeItem, s.NamaSatuan
+                having jml > 0");
+
+                if (empty($checkitem)) {
+                    $penerimaanbarang->Status = "CLS";
+                    $penerimaanbarang->save();
+                }
+
+                //update kartustok
+                $items = DB::select("SELECT a.KodeItem,i.NamaItem, SUM(a.Qty) as jml, i.Keterangan, s.NamaSatuan, a.Harga, k.Konversi
+                    FROM penerimaanbarangreturndetails a 
+                    inner join penerimaanbarangreturns pb on a.KodePenerimaanBarangReturn = pb.KodePenerimaanBarangReturn 
+                    inner join items i on a.KodeItem = i.KodeItem 
+                    inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan
+                    inner join satuans s on s.KodeSatuan = k.KodeSatuan
+                    where pb.KodePenerimaanBarangReturn='" . $id . "'
+                    group by a.KodeItem, s.NamaSatuan");
+
+                $tot = 0;
+                foreach ($items as $key => $value) {
+                    $tot += $value->jml;
+                }
+                $nomer = 0;
+
+                foreach ($items as $key => $value) {
+                    if ($value->Konversi > 0) {
+                        $value->jml = $value->jml * $value->Konversi;
+                    }
+                    $nomer++;
+                    DB::table('keluarmasukbarangs')->insert([
+                        'Tanggal' => $penerimaanbarangreturn->Tanggal,
+                        'KodeLokasi' => $penerimaanbarang->KodeLokasi,
+                        'KodeItem' => $value->KodeItem,
+                        'JenisTransaksi' => 'RPB',
+                        'KodeTransaksi' => $penerimaanbarangreturn->KodePenerimaanBarangReturn,
+                        'Qty' => $value->jml,
+                        'HargaRata' => 0,
+                        'KodeUser' => \Auth::user()->name,
+                        'idx' => $nomer,
+                        'indexmov' => 2,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now()
+                    ]);
+                }
+
+                DB::table('eventlogs')->insert([
                     'KodeUser' => \Auth::user()->name,
-                    'idx' => $nomer,
-                    'indexmov' => 2,
+                    'Tanggal' => \Carbon\Carbon::now(),
+                    'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+                    'Keterangan' => 'Konfirmasi return penerimaan barang ' . $penerimaanbarangreturn->KodePenerimaanBarangReturn,
+                    'Tipe' => 'OPN',
                     'created_at' => \Carbon\Carbon::now(),
-                    'updated_at' => \Carbon\Carbon::now()
+                    'updated_at' => \Carbon\Carbon::now(),
                 ]);
+
+                $pesan = 'Return Penerimaan Barang ' . $penerimaanbarangreturn->KodePenerimaanBarangReturn . ' berhasil dikonfirmasi';
+                return redirect('/konfirmasiReturnPenerimaanBarang')->with(['created' => $pesan]);
             }
-
-            DB::table('eventlogs')->insert([
-                'KodeUser' => \Auth::user()->name,
-                'Tanggal' => \Carbon\Carbon::now(),
-                'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
-                'Keterangan' => 'Konfirmasi return penerimaan barang ' . $penerimaanbarangreturn->KodePenerimaanBarangReturn,
-                'Tipe' => 'OPN',
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ]);
-
-            $pesan = 'Return Penerimaan Barang ' . $penerimaanbarangreturn->KodePenerimaanBarangReturn . ' berhasil dikonfirmasi';
-            return redirect('/konfirmasiReturnPenerimaanBarang')->with(['created' => $pesan]);
         } else {
             $pesan = 'Return Penerimaan Barang tidak dikonfirmasi karena hasil item menjadi minus, mohon periksa kembali jumlah item pada Penerimaan Barang yang dapat direturn';
             return redirect('/returnPenerimaanBarang')->with(['error' => $pesan]);

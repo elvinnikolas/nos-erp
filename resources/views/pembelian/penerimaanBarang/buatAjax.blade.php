@@ -8,7 +8,12 @@
       <input type="hidden" name="KodeSupplier" value="{{$po->KodeSupplier}}">
       <div class="form-group">
         <label for="inputDate">Tanggal</label>
-        <input type="date" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+        <div class="input-group date" id="inputDate">
+          <input type="text" class="form-control" name="Tanggal" id="inputDate" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
+        </div>
       </div>
       <div class="form-group">
         <label for="inputTerm">Sales</label>
@@ -82,13 +87,15 @@
             <input type="text" class="form-control" readonly value="{{$data->NamaSatuan}}">
           </td>
           <td>
-            <input readonly="" type="text" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
+            <input readonly="" type="hidden" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$data->Harga}}">
+            <input readonly type="text" class="form-control" value="Rp. {{number_format($data->Harga)}},-">
           </td>
           <td>
             <input type="text" class="form-control" readonly name="keterangan[]" value="{{$data->Keterangan}}">
           </td>
           <td>
-            <input readonly type="text" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
+            <input readonly type="hidden" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$data->Harga * $data->jml}}">
+            <input readonly type="text" class="form-control showtotal{{$key+1}}" value="Rp. {{number_format($data->Harga * $data->jml)}},-">
           </td>
         </tr>
         @endforeach
@@ -100,13 +107,17 @@
       <div class="col-md-3">
         <input type="hidden" value="{{sizeof($items)}}" class="tot">
         <label for="subtotal">Subtotal</label>
-        <input type="text" name="total" readonly class="form-control befDis">
+        <input type="hidden" name="total" readonly class="form-control befDis">
+        <input type="text" readonly="" class="form-control showbefDis" value="Rp 0,-">
         <label for="ppn">Nilai PPN</label>
-        <input type="text" readonly name="ppnval" class="ppnval form-control">
+        <input type="hidden" readonly name="ppnval" class="ppnval form-control">
+        <input type="text" readonly="" class="form-control showppnval" value="Rp 0,-">
         <label for="diskon">Nilai Diskon</label>
-        <input type="text" readonly name="diskonval" class="diskonval form-control">
+        <input type="hidden" readonly name="diskonval" class="diskonval form-control">
+        <input type="text" readonly="" class="form-control showdiskonval" value="Rp 0,-">
         <label for="total">Total</label>
-        <input type="text" readonly class="form-control subtotal" name="subtotal">
+        <input type="hidden" readonly class="form-control subtotal" name="subtotal">
+        <input type="text" readonly="" class="form-control showsubtotal" value="Rp 0,-">
       </div>
     </div>
   </div>
@@ -117,4 +128,9 @@
   $('#sales').select2()
   $('#gudang').select2()
   $('#matauang').select2()
+
+  $('#inputDate').datetimepicker({
+    defaultDate: new Date(),
+    format: 'YYYY-MM-DD'
+  });
 </script>

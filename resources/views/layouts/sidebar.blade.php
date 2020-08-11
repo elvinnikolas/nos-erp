@@ -38,7 +38,7 @@
                         <ul class="nav child_menu">
                             <li><a href="{{ url('/returnSuratJalan/add/0') }}">Buat Return Surat Jalan </a></li>
                             <li><a href="{{ url('/returnSuratJalan') }}">Return Surat Jalan </a></li>
-                            <li><a href="{{ url('/konfirmasiReturnSuratJalan') }}">Return Surat Jalan Konfirmasi</a></li>
+                            <li><a href="{{ url('/konfirmasiReturnSuratJalan') }}">Return Surat Jalan Konfirmasi </a></li>
                         </ul>
                     </li>
                     <!-- <li><a>Penjualan Langsung<span class="fa fa-chevron-down"></span></a>
@@ -91,12 +91,19 @@
             </li>
 
             <li>
-                <a><i class="fa fa-list"></i> Stok <span class="fa fa-chevron-down"></span></a>
+                <a><i class="fa fa-cube"></i> Stok <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li><a href="{{ url('/kartustok') }}">Kartu Stok</a></li>
                     <li><a href="{{ url('/stokmasuk') }}">Stok Masuk</a></li>
                     <li><a href="{{ url('/stokkeluar') }}">Stok Keluar</a></li>
                     <li><a href="{{ url('/pengeluarantambahan') }}">Pengeluaran Tambahan</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a><i class="fa fa-book"></i> Laporan <span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="{{ url('/kartustok') }}">Kartu Stok</a></li>
+                    <li><a href="{{ url('/kartustok') }}">Buku Kas</a></li>
                 </ul>
             </li>
 

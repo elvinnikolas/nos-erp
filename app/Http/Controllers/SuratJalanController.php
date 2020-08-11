@@ -21,7 +21,7 @@ class SuratJalanController extends Controller
   {
     $suratjalans = suratjalan::join('lokasis', 'lokasis.KodeLokasi', '=', 'suratjalans.KodeLokasi')
       ->join('pelanggans', 'pelanggans.KodePelanggan', '=', 'suratjalans.KodePelanggan')
-      ->select('suratjalans.KodeSuratJalanID', 'suratjalans.KodeSO', 'suratjalans.Status', 'suratjalans.Tanggal', 'lokasis.NamaLokasi', 'pelanggans.NamaPelanggan', 'suratjalans.KodeSuratJalan')
+      ->select('suratjalans.*', 'lokasis.NamaLokasi', 'pelanggans.NamaPelanggan')
       ->orderBy('suratjalans.KodeSuratJalanID', 'desc')
       ->get();
     $suratjalans = $suratjalans->where('Status', 'OPN');
