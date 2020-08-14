@@ -17,6 +17,7 @@
                     <table class="table table-light" id="table">
                         <thead class="thead-light">
                             <tr>
+                                <th>Kode Pelunasan</th>
                                 <th>Tanggal Bayar</th>
                                 <th>Total Bayar</th>
                                 <th>Metode</th>
@@ -26,6 +27,7 @@
                         <tbody>
                             @foreach ($payments as $payment)
                             <tr>
+                                <td>{{ $payment->KodePelunasanHutang }}</td>
                                 <td>{{ \Carbon\Carbon::parse($payment->Tanggal)->format('d-m-Y') }}</td>
                                 <td>Rp. {{ number_format($payment->Jumlah, 0, ',', '.') }},-</td>
                                 <td>{{ $payment->TipeBayar }}</td>

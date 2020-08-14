@@ -68,9 +68,8 @@ class PemesananPembelianController extends Controller
         $supplier = DB::table('suppliers')->where('Status', 'OPN')->get();
         $item = DB::select("SELECT i.KodeItem, i.NamaItem, i.Keterangan 
             FROM items i
-            where i.jenisitem = 'bahanbaku'
-            GROUP BY i.NamaItem
-            ");
+            where i.jenisitem = 'bahanbaku' and i.Status = 'OPN'
+            order by i.NamaItem ");
         $satuan = DB::table('satuans')->where('Status', 'OPN')->get();
         $last_id = DB::select('SELECT * FROM pemesananpembelians ORDER BY KodePO DESC LIMIT 1');
         // $last_id_tax = DB::select('SELECT * FROM pemesananpembelians WHERE KodePO LIKE "%POT-%"  ORDER BY KodePO DESC LIMIT 1');

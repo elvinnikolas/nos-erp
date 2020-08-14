@@ -1,5 +1,10 @@
 @extends('index')
 @section('content')
+<style type="text/css">
+    #black {
+        color: black;
+    }
+</style>
 <div class="container">
     <div class="row">
         <div class="col-md-12">
@@ -65,25 +70,25 @@
             @if(session()->get('created'))
             <div class="alert alert-success alert-dismissible fade-show">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ session()->get('created') }}
+                <b>{{ session()->get('created') }}</b>
             </div>
 
             @elseif(session()->get('edited'))
             <div class="alert alert-info alert-dismissible fade-show">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ session()->get('edited') }}
+                <b>{{ session()->get('edited') }}</b>
             </div>
 
             @elseif(session()->get('deleted'))
             <div class="alert alert-danger alert-dismissible fade-show">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ session()->get('deleted') }}
+                <b>{{ session()->get('deleted') }}</b>
             </div>
 
             @elseif(session()->get('error'))
             <div class="alert alert-warning alert-dismissible fade-show">
                 <button type="button" class="close" data-dismiss="alert">&times;</button>
-                {{ session()->get('error') }}
+                <b id="black">{{ session()->get('error') }}</b>
             </div>
             @endif
 
@@ -126,6 +131,9 @@
                             <td>{{ $p->NamaLokasi  }}</td>
                             <td>Rp. {{ number_format($p->Total, 0, ',', '.') }},-</td>
                             <td>
+                                <a href="{{ url('/sopenjualan/confirm/'.$p->KodeSO)}}" class="btn-xs btn btn-info" onclick="return confirm('Konfirmasi data ini?')">
+                                    <i class="fa fa-check" aria-hidden="true"></i>
+                                </a>
                                 <a href="{{ url('/sopenjualan/show/'. $p->KodeSO )}}" class="btn-xs btn btn-primary">
                                     <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                                 </a>

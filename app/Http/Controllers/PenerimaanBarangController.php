@@ -528,10 +528,19 @@ class PenerimaanBarangController extends Controller
                 'updated_at' => \Carbon\Carbon::now(),
             ]);
 
+            foreach ($items as $key => $value) {
+                $last_saldo[$key] = DB::table('keluarmasukbarangs')->where('KodeItem', $value->KodeItem)->orderBy('id', 'desc')->limit(1)->pluck('saldo')->toArray();
+            }
+
             $nomer = 0;
             foreach ($items as $key => $value) {
                 if ($value->Konversi > 0) {
                     $value->jml = $value->jml * $value->Konversi;
+                }
+                if (isset($last_saldo[$key][0])) {
+                    $saldo = (float) $last_saldo[$key][0] + (float) $value->jml;
+                } else {
+                    $saldo = 0 + (float) $value->jml;
                 }
                 $nomer++;
                 DB::table('keluarmasukbarangs')->insert([
@@ -543,8 +552,9 @@ class PenerimaanBarangController extends Controller
                     'Qty' => $value->jml,
                     'HargaRata' => 0,
                     'KodeUser' => \Auth::user()->name,
-                    'idx' => 0,
+                    'idx' => $nomer,
                     'indexmov' => $nomer,
+                    'saldo' => $saldo,
                     'created_at' => \Carbon\Carbon::now(),
                     'updated_at' => \Carbon\Carbon::now()
                 ]);

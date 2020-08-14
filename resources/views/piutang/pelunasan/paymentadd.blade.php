@@ -58,9 +58,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Status</label>
-                                    <select class="form-control" name="status">
+                                    <select readonly class="form-control" name="status">
                                         <option value="AR">Piutang (AR)</option>
-                                        <option value="AP">Hutang (AP)</option>
                                     </select>
                                 </div>
                             </div>

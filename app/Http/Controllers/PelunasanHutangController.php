@@ -187,7 +187,7 @@ class PelunasanHutangController extends Controller
             'KodeUser' => \Auth::user()->name,
             'Tanggal' => \Carbon\Carbon::now(),
             'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
-            'Keterangan' => 'Tambah pelunasan hutang ' . $invoice->KodeInvoiceHutangShow,
+            'Keterangan' => 'Tambah pelunasan hutang ' . $newID . ' pada invoice ' . $invoice->KodeInvoiceHutangShow,
             'Tipe' => 'OPN',
             'created_at' => \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now(),

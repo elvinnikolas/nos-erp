@@ -9,68 +9,72 @@
     <div class="row">
         <div class="col-md-12">
             <div class="x_panel">
-                <div class="x_title">
-                    <h1 id="header">Kartu Stok</h1><br>
-                    <form action="{{ url('/kartustok/show') }}" method="get" style="display:inline-block;">
-                        <input type="submit" value="Tampilkan Semua Stok" class="btn btn-default">
-                    </form>
-                    <form style="display:inline-block;">
-                        <button class="btn btn-default" data-toggle="collapse" data-target="#filteritem" type="button">
-                            Filter Item
-                        </button>
-                    </form>
-                    <br>
-                    <div id="filteritem" class="collapse">
-                        <br>
-                        <div class="alert alert-success" role="alert">
-                            <div class="row">
-                                <form action="{{ url('/kartustok/filter') }}" method="post">
-                                    @csrf
-                                    <div class="col-md-3">
-                                        <label for="inputDate">Mulai</label>
-                                        <div class="input-group date" id="inputDate">
-                                            <input type="text" class="form-control" name="start" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
-                                        </div>
-                                        <label for="inputDate">Sampai</label>
-                                        <div class="input-group date" id="inputDate2">
-                                            <input type="text" class="form-control" name="finish" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
-                                        </div>
+                <!-- <div class="x_title"> -->
+                <h1 id="header">Kartu Stok</h1><br>
+                <form action="{{ url('/kartustok/show') }}" method="get" style="display:inline-block;">
+                    <button class="btn btn-default" type="submit">
+                        Tampilkan Semua Stok
+                    </button>
+                </form>
+                <form style="display:inline-block;">
+                    <button class="btn btn-default" data-toggle="collapse" data-target="#filteritem" type="button">
+                        Filter Item
+                    </button>
+                </form>
+                <br>
+                <div id="filteritem" class="collapse">
+                    <div class="x_content">
+                        <div class="row">
+                            <form action="{{ url('/kartustok/filter') }}" method="post">
+                                @csrf
+                                <div class="col-md-3">
+                                    <label for="inputDate">Mulai</label>
+                                    <div class="input-group date" id="inputDate">
+                                        <input type="text" class="form-control" name="start" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label>Gudang</label>
-                                        <select class="form-control" name="lokasi" id="lokasi">
-                                            @foreach($store as $l)
-                                            <option value="{{$l->KodeLokasi}}">{{$l->NamaLokasi}}</option>
-                                            @endforeach
-                                        </select>
-                                        <label>Item</label>
-                                        <select class="form-control" name="item" id="item">
-                                            @foreach($item as $l)
-                                            <option value="{{$l->KodeItem}}">{{$l->NamaItem}}</option>
-                                            @endforeach
-                                        </select>
+                                    <label for="inputDate">Sampai</label>
+                                    <div class="input-group date" id="inputDate2">
+                                        <input type="text" class="form-control" name="finish" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label>Satuan</label>
-                                        <select class="form-control" name="satuan" id="satuan">
-                                            @foreach($satuan as $l)
-                                            <option value="{{$l->KodeSatuan}}">{{$l->NamaSatuan}}</option>
-                                            @endforeach
-                                        </select>
-                                        <label></label>
-                                        <input type="submit" class="form-control btn btn-primary" value="Filter" name="">
-                                    </div>
-                                </form>
-                            </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Gudang</label>
+                                    <select class="form-control" name="lokasi" id="lokasi">
+                                        @foreach($store as $l)
+                                        <option value="{{$l->KodeLokasi}}">{{$l->NamaLokasi}}</option>
+                                        @endforeach
+                                    </select>
+                                    <label>Item</label>
+                                    <select class="form-control" name="item" id="item">
+                                        @foreach($item as $l)
+                                        <option value="{{$l->KodeItem}}">{{$l->NamaItem}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Satuan</label>
+                                    <select class="form-control" name="satuan" id="satuan">
+                                        @foreach($satuan as $l)
+                                        <option value="{{$l->KodeSatuan}}">{{$l->NamaSatuan}}</option>
+                                        @endforeach
+                                    </select>
+                                    <label></label>
+                                    <input type="submit" class="form-control btn btn-primary" value="Filter" name="">
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
+                <!-- </div> -->
+            </div>
+
+            <div class="x_panel">
                 <div class="x_body">
                     @if($filter == true)
                     <!-- <form action="{{ url('/kartustok/print') }}" method="post"> -->

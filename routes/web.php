@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/popembelian/edit/{id}', 'PemesananPembelianController@edit');
     Route::post('/popembelian/update/{id}', 'PemesananPembelianController@update');
     Route::get('/popembelian/destroy/{id}', 'PemesananPembelianController@destroy');
+    Route::get('/popembelian/confirm/{id}', 'PemesananPembelianController@confirm');
     Route::post('/popembelian/confirm/{id}', 'PemesananPembelianController@confirm');
     Route::post('/popembelian/cancel/{id}', 'PemesananPembelianController@cancel');
     Route::post('/popembelian/print/{id}', 'PemesananPembelianController@print');
@@ -87,6 +88,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/penerimaanBarang/show/{id}', 'PenerimaanBarangController@show');
     Route::get('/penerimaanBarang/lihat/{id}', 'PenerimaanBarangController@lihat');
     Route::get('/penerimaanBarang/destroy/{id}', 'PenerimaanBarangController@destroy');
+    Route::get('/penerimaanBarang/confirm/{id}', 'PenerimaanBarangController@confirm');
     Route::post('/penerimaanBarang/confirm/{id}', 'PenerimaanBarangController@confirm');
     Route::post('/penerimaanBarang/cancel/{id}', 'PenerimaanBarangController@cancel');
     Route::post('/penerimaanBarang/print/{id}', 'PenerimaanBarangController@print');
@@ -120,6 +122,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/sopenjualan/edit/{id}', 'PemesananPenjualanController@edit');
     Route::post('/sopenjualan/update/{id}', 'PemesananPenjualanController@update');
     Route::get('/sopenjualan/destroy/{id}', 'PemesananPenjualanController@destroy');
+    Route::get('/sopenjualan/confirm/{id}', 'PemesananPenjualanController@confirm');
     Route::post('/sopenjualan/confirm/{id}', 'PemesananPenjualanController@confirm');
     Route::get('/sopenjualan/cancel/{id}', 'PemesananPenjualanController@cancel');
     Route::get('/sopenjualan/print/{id}', 'PemesananPenjualanController@print');
@@ -146,6 +149,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/suratJalan/show/{id}', 'SuratJalanController@show');
     Route::get('/suratJalan/view/{id}', 'SuratJalanController@view');
     Route::get('/suratJalan/print/{id}', 'SuratJalanController@print');
+    Route::get('/suratJalan/confirm/{id}', 'SuratJalanController@confirm');
     Route::post('/suratJalan/confirm/{id}', 'SuratJalanController@confirm');
     Route::get('/konfirmasiSuratJalan/cari', 'SuratJalanController@filterKonfirmasiSuratJalan');
     Route::get('/konfirmasiSuratJalan', 'SuratJalanController@konfirmasiSuratJalan');
@@ -191,7 +195,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/kartustok', 'KartuStokController@index');
     Route::get('/kartustok/show', 'KartuStokController@show');
     Route::post('/kartustok/filter', 'KartuStokController@filter');
-    Route::post('/kartustok/print', 'KartuStokController@print');
+
+    //route buku kas
+    Route::get('/bukukasbesar', 'BukuKasBesarController@index');
+    Route::get('/bukukasbesar/show', 'BukuKasBesarController@show');
+    Route::post('/bukukasbesar/filter', 'BukuKasBesarController@filter');
 
     //route pengeluaran tambahan
     Route::get('/pengeluarantambahan', 'PengeluaranTambahanController@index');

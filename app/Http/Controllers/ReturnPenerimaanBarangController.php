@@ -383,6 +383,7 @@ class ReturnPenerimaanBarangController extends Controller
 
                 $tot = 0;
                 foreach ($items as $key => $value) {
+                    $last_saldo[$key] = DB::table('keluarmasukbarangs')->where('KodeItem', $value->KodeItem)->orderBy('id', 'desc')->limit(1)->pluck('saldo')->toArray();
                     $tot += $value->jml;
                 }
                 $nomer = 0;
@@ -391,6 +392,11 @@ class ReturnPenerimaanBarangController extends Controller
                     if ($value->Konversi > 0) {
                         $value->jml = $value->jml * $value->Konversi;
                     }
+                    if (isset($last_saldo[$key][0])) {
+                        $saldo = (float) $last_saldo[$key][0] - (float) $value->jml;
+                    } else {
+                        $saldo = 0 - (float) $value->jml;
+                    }
                     $nomer++;
                     DB::table('keluarmasukbarangs')->insert([
                         'Tanggal' => $penerimaanbarangreturn->Tanggal,
@@ -398,11 +404,12 @@ class ReturnPenerimaanBarangController extends Controller
                         'KodeItem' => $value->KodeItem,
                         'JenisTransaksi' => 'RPB',
                         'KodeTransaksi' => $penerimaanbarangreturn->KodePenerimaanBarangReturn,
-                        'Qty' => $value->jml,
+                        'Qty' => -$value->jml,
                         'HargaRata' => 0,
                         'KodeUser' => \Auth::user()->name,
                         'idx' => $nomer,
-                        'indexmov' => 2,
+                        'indexmov' => $nomer,
+                        'saldo' => $saldo,
                         'created_at' => \Carbon\Carbon::now(),
                         'updated_at' => \Carbon\Carbon::now()
                     ]);

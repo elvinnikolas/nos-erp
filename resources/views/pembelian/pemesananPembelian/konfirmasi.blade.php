@@ -58,7 +58,7 @@
       @if(session()->get('created'))
       <div class="alert alert-success alert-dismissible fade-show">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
-        {{ session()->get('created') }}
+        <b>{{ session()->get('created') }}</b>
       </div>
 
       @elseif(session()->get('edited'))

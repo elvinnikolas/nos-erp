@@ -290,6 +290,7 @@ class ReturnSuratJalanController extends Controller
 
                 $tot = 0;
                 foreach ($items as $key => $value) {
+                    $last_saldo[$key] = DB::table('keluarmasukbarangs')->where('KodeItem', $value->KodeItem)->orderBy('id', 'desc')->limit(1)->pluck('saldo')->toArray();
                     $tot += $value->jml;
                 }
                 $nomer = 0;
@@ -297,6 +298,9 @@ class ReturnSuratJalanController extends Controller
                 foreach ($items as $key => $value) {
                     if ($value->Konversi > 0) {
                         $value->jml = $value->jml * $value->Konversi;
+                    }
+                    if (isset($last_saldo[$key][0])) {
+                        $saldo = (float) $last_saldo[$key][0] + (float) $value->jml;
                     }
                     $nomer++;
                     DB::table('keluarmasukbarangs')->insert([
@@ -309,7 +313,8 @@ class ReturnSuratJalanController extends Controller
                         'HargaRata' => 0,
                         'KodeUser' => \Auth::user()->name,
                         'idx' => $nomer,
-                        'indexmov' => 2,
+                        'indexmov' => $nomer,
+                        'saldo' => $saldo,
                         'created_at' => \Carbon\Carbon::now(),
                         'updated_at' => \Carbon\Carbon::now()
                     ]);

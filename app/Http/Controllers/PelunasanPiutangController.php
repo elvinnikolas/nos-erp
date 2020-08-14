@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Model\invoicehutangdetail;
 use Illuminate\Http\Request;
 use DB;
 use App\Model\invoicepiutang;
@@ -189,7 +188,7 @@ class PelunasanPiutangController extends Controller
             'KodeUser' => \Auth::user()->name,
             'Tanggal' => \Carbon\Carbon::now(),
             'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
-            'Keterangan' => 'Tambah pelunasan piutang ' . $invoice->KodeInvoicePiutangShow,
+            'Keterangan' => 'Tambah pelunasan piutang ' . $newID . ' pada invoice ' . $invoice->KodeInvoicePiutangShow,
             'Tipe' => 'OPN',
             'created_at' => \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now(),

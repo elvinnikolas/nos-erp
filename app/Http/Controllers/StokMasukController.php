@@ -20,8 +20,8 @@ class StokMasukController extends Controller
     {
         $item = DB::select("SELECT s.KodeItem, s.NamaItem, s.Keterangan 
             FROM items s 
-            where s.Status='OPN' 
-            GROUP BY s.NamaItem 
+            where s.Status='OPN'
+            ORDER BY s.NamaItem
         ");
         $satuan = DB::table('satuans')->where('Status', 'OPN')->get();
         $lokasi = DB::table('lokasis')->where('Status', 'OPN')->get();

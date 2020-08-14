@@ -91,11 +91,17 @@
             </li>
 
             <li>
+                <a><i class="fa fa-cart-plus"></i> Operasional <span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="{{ url('/pengeluarantambahan') }}">Biaya Operasional</a></li>
+                </ul>
+            </li>
+
+            <li>
                 <a><i class="fa fa-cube"></i> Stok <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                     <li><a href="{{ url('/stokmasuk') }}">Stok Masuk</a></li>
                     <li><a href="{{ url('/stokkeluar') }}">Stok Keluar</a></li>
-                    <li><a href="{{ url('/pengeluarantambahan') }}">Pengeluaran Tambahan</a></li>
                 </ul>
             </li>
 
@@ -103,7 +109,8 @@
                 <a><i class="fa fa-book"></i> Laporan <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                     <li><a href="{{ url('/kartustok') }}">Kartu Stok</a></li>
-                    <li><a href="{{ url('/kartustok') }}">Buku Kas</a></li>
+                    <li><a href="{{ url('/bukukasbesar') }}">Kas Besar</a></li>
+                    <li><a href="{{ url('/bukukaskecil') }}">Kas Kecil</a></li>
                 </ul>
             </li>
 

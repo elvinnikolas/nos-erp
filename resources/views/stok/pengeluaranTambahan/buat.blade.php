@@ -29,14 +29,14 @@
             <div class="card uper">
                 <div class="x_panel">
                     <div class="x_title">
-                        <h1>Tambah Data Pengeluaran</h1>
+                        <h1>Tambah Biaya Operasional</h1>
                     </div>
                     <div class="x_content">
                         <form action="{{ url('/pengeluarantambahan/store') }}" method="post" style="display:inline-block;">
                             @csrf
                             @method('POST')
                             <div class="form-group">
-                                <label>Nama Pengeluaran:</label>
+                                <label>Nama:</label>
                                 <input type="text" required="required" name="Nama" class="form-control">
                             </div>
                             <div class="form-group">
@@ -60,7 +60,7 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>Total Pengeluaran:</label>
+                                <label>Total:</label>
                                 <input type="number" required="required" name="Total" class="form-control">
                             </div>
                             <div class="form-group">
