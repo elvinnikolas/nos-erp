@@ -164,7 +164,7 @@
                                     </tr>
                                     <tr class="rowinput">
                                         <td>
-                                            <select name="item[]" onchange="barang(this,1);" class="form-control item1" id="item1">
+                                            <select name="item[]" onchange="barang(this,1);" class="form-control item1" id="item-select1">
                                                 @foreach($item as $itemData)
                                                 <option value="{{$itemData->KodeItem}}">{{$itemData->NamaItem}}</option>
                                                 @endforeach
@@ -174,7 +174,7 @@
                                             <input type="number" step=0.01 onchange="qty(1)" name="qty[]" class="form-control qty1" value="0" required="">
                                         </td>
                                         <td>
-                                            <select name="satuan[]" onchange="satuan(this,1);" class="form-control satuan1" id="satuan1">
+                                            <select name="satuan[]" onchange="satuan(this,1);" class="form-control satuan1" id="satuan-select1">
                                                 @foreach($satuan as $satuanData)
                                                 <option value="{{$satuanData->KodeSatuan}}">{{$satuanData->NamaSatuan}}</option>
                                                 @endforeach
@@ -232,7 +232,8 @@
         defaultDate: new Date(),
         format: 'YYYY-MM-DD'
     });
-    $('#item').select2();
+    $('#item-select1').select2();
+    $('#satuan-select1').select2();
     $('#pelanggan').select2();
     var item = $(".item" + 1).val();
     var ket = $("#" + item + "Ket").val();
@@ -280,12 +281,15 @@
     }
 
     function addrow() {
+        $('#item-select1').select2('destroy');
+        $('#satuan-select1').select2('destroy');
         $("#totalItem").val(parseInt($("#totalItem").val()) + 1);
         var count = $("#totalItem").val();
         var markup = $(".rowinput").html();
         var res = "<tr class='tambah" + count + "'>" + markup + "</tr>";
         res = res.replace("qty1", "qty" + count);
         res = res.replace("item1", "item" + count);
+        res = res.replace("item-select1", "item-select" + count);
         res = res.replace("price1", "price" + count);
         res = res.replace("total1", "total" + count);
         res = res.replace("showtotal1", "showtotal" + count);
@@ -294,10 +298,23 @@
         res = res.replace("barang(this,1", "barang(this," + count);
         res = res.replace("satuan(this,1", "satuan(this," + count);
         res = res.replace("satuan1", "satuan" + count);
+        res = res.replace("satuan-select1", "satuan-select" + count);
         res = res.replace("keterangan1", "keterangan" + count);
         res = res.replace("<td></td>", '<td><button type="button" onclick="del(' + count + ')" class="btn btn-danger"><i class="fa fa-trash"></i></button></td>');
 
         $("#items tbody").append(res);
+        $('#item-select' + count).select2({
+            width: '100%'
+        });
+        $('#item-select1').select2({
+            width: '100%'
+        });
+        $('#satuan-select' + count).select2({
+            width: '100%'
+        });
+        $('#satuan-select1').select2({
+            width: '100%'
+        });
         var item = $(".item" + count).val();
         var ket = $("#" + item + "Ket").val();
         $(".keterangan" + count).val(ket);
