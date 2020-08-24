@@ -47,9 +47,12 @@
                         <table class="table table-light" id="table">
                             <thead class="thead-light">
                                 <tr>
+                                    <th>Kode</th>
                                     <th>Tanggal</th>
                                     <th>Gudang</th>
+                                    <th>Karyawan</th>
                                     <th>Nama</th>
+                                    <th>Metode</th>
                                     <th>Keterangan</th>
                                     <th>Total</th>
                                     <th>Aksi</th>
@@ -57,9 +60,12 @@
                             </thead>
                             @foreach ($pengeluarantambahan as $p)
                             <tr>
+                                <td>{{ $p->KodePengeluaran }}</td>
                                 <td>{{ \Carbon\Carbon::parse($p->Tanggal)->format('d-m-Y') }}</td>
                                 <td>{{ $p->NamaLokasi }}</td>
+                                <td>{{ $p->Karyawan}}</td>
                                 <td>{{ $p->Nama}}</td>
+                                <td>{{ $p->Metode}}</td>
                                 <td>{{ $p->Keterangan }}</td>
                                 <td>Rp.{{ number_format($p->Total, 0, ',', '.') }},-</td>
                                 <td>

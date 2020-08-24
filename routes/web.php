@@ -201,6 +201,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/bukukasbesar/show', 'BukuKasBesarController@show');
     Route::post('/bukukasbesar/filter', 'BukuKasBesarController@filter');
 
+    Route::get('/bukukaskecil', 'BukuKasKecilController@index');
+    Route::get('/bukukaskecil/show', 'BukuKasKecilController@show');
+    Route::post('/bukukaskecil/filter', 'BukuKasKecilController@filter');
+
     //route pengeluaran tambahan
     Route::get('/pengeluarantambahan', 'PengeluaranTambahanController@index');
     Route::get('/pengeluarantambahan/create', 'PengeluaranTambahanController@create');

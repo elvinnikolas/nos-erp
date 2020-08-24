@@ -35,39 +35,57 @@
                         <form action="{{ url('/pengeluarantambahan/store') }}" method="post" style="display:inline-block;">
                             @csrf
                             @method('POST')
-                            <div class="form-group">
-                                <label>Nama:</label>
-                                <input type="text" required="required" name="Nama" class="form-control">
+                            <div class="form-group col-md-4">
+                                <div class="form-group">
+                                    <label>Nama:</label>
+                                    <input type="text" required="required" name="Nama" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Karyawan:</label>
+                                    <input type="text" required="required" name="Karyawan" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tanggal:</label>
+                                    <div class="input-group date" id="inputDate">
+                                        <input type="text" class="form-control" name="Tanggal" id="inputDate" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Gudang:</label>
+                                    <select name="KodeLokasi" class="form-control">
+                                        @foreach($lokasi as $lok)
+                                        <option value="{{$lok->KodeLokasi}}">{{$lok->NamaLokasi}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Mata Uang:</label>
+                                    <select name="KodeMataUang" class="form-control">
+                                        @foreach($matauang as $mu)
+                                        <option value="{{$mu->KodeMataUang}}">{{$mu->NamaMataUang}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Metode Pembayaran:</label>
+                                    <select name="Metode" class="form-control">
+                                        <option value="Cash">Cash</option>
+                                        <option value="Transfer">Transfer</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Total:</label>
+                                    <input type="number" required="required" name="Total" class="form-control">
+                                </div>
+                                <div class="form-group">
+                                    <label>Keterangan:</label>
+                                    <textarea id="Keterangan" name="Keterangan" class="form-control"></textarea>
+                                </div>
+                                <button class="btn btn-success" style="width:120px;">Simpan</button>
                             </div>
-                            <div class="form-group">
-                                <label>Tanggal:</label>
-                                <input type="date" required="required" name="Tanggal" class="form-control" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
-                            </div>
-                            <div class="form-group">
-                                <label>Gudang:</label>
-                                <select name="KodeLokasi" class="form-control">
-                                    @foreach($lokasi as $lok)
-                                    <option value="{{$lok->KodeLokasi}}">{{$lok->NamaLokasi}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Mata Uang:</label>
-                                <select name="KodeMataUang" class="form-control">
-                                    @foreach($matauang as $mu)
-                                    <option value="{{$mu->KodeMataUang}}">{{$mu->NamaMataUang}}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Total:</label>
-                                <input type="number" required="required" name="Total" class="form-control">
-                            </div>
-                            <div class="form-group">
-                                <label>Keterangan:</label>
-                                <textarea id="Keterangan" name="Keterangan" class="form-control"></textarea>
-                            </div>
-                            <button class="btn btn-success" style="width:120px;">Simpan</button>
                         </form>
                     </div>
                 </div>
@@ -76,3 +94,12 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script type="text/javascript">
+    $('#inputDate').datetimepicker({
+        defaultDate: new Date(),
+        format: 'YYYY-MM-DD'
+    });
+</script>
+@endpush

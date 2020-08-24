@@ -97,7 +97,7 @@
                                     </tr>
                                     <tr class="rowinput">
                                         <td>
-                                            <select name="item[]" onchange="barang(this,1);" class="form-control item1" id="item1">
+                                            <select name="item[]" onchange="barang(this,1);" class="form-control item-select" id="item1">
                                                 @foreach($item as $itemData)
                                                 <option value="{{$itemData->KodeItem}}">{{$itemData->NamaItem}}</option>
                                                 @endforeach
@@ -137,6 +137,7 @@
 @push('scripts')
 <script type="text/javascript">
     $('#gudang').select2();
+    $('#item1').select2();
 
     $('#inputDate').datetimepicker({
         defaultDate: new Date(),
@@ -155,6 +156,7 @@
     }
 
     function addrow() {
+        $('#item1').select2('destroy');
         $("#totalItem").val(parseInt($("#totalItem").val()) + 1);
         var count = $("#totalItem").val();
         var markup = $(".rowinput").html();
@@ -169,6 +171,12 @@
         res = res.replace("<td></td>", '<td><button type="button" onclick="del(' + count + ')" class="btn btn-danger"><i class="fa fa-trash"></i></button></td>');
 
         $("#items tbody").append(res);
+        $('#item' + count).select2({
+            width: '100%'
+        });
+        $('#item1').select2({
+            width: '100%'
+        });
         var item = $(".item" + count).val();
         var ket = $("#" + item + "Ket").val();
         $(".keterangan" + count).val(ket);
