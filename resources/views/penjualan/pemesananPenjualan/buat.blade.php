@@ -155,8 +155,8 @@
                                 <table id="items" class="table">
                                     <tr>
                                         <td id="header" style="width:18%;">Nama Barang</td>
-                                        <td id="header" style="width:9%;">Qty</td>
                                         <td id="header" style="width:12%;">Satuan</td>
+                                        <td id="header" style="width:9%;">Qty</td>
                                         <td id="header" style="width:18%;">Harga Satuan</td>
                                         <td id="header" style="width:20%;">Keterangan</td>
                                         <td id="header">Total</td>
@@ -171,14 +171,14 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" step=0.01 onchange="qty(1)" name="qty[]" class="form-control qty1" value="0" required="">
-                                        </td>
-                                        <td>
                                             <select name="satuan[]" onchange="satuan(this,1);" class="form-control satuan1" id="satuan-select1">
                                                 @foreach($satuan as $satuanData)
                                                 <option value="{{$satuanData->KodeSatuan}}">{{$satuanData->NamaSatuan}}</option>
                                                 @endforeach
                                             </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" step=0.01 onchange="qty(1)" name="qty[]" class="form-control qty1" value="0" required="">
                                         </td>
                                         <td>
                                             <input type="text" onchange="price(1)" name="price[]" class="form-control price1" required="" value="0">

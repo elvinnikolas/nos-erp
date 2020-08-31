@@ -10,8 +10,8 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1 id="header">Kas Kecil</h1><br>
-                    <form action="{{ url('/bukukaskecil/show') }}" method="get" style="display:inline-block;">
+                    <h1 id="header">Kas Besar</h1><br>
+                    <form action="{{ url('/bukukasbesar/show') }}" method="get" style="display:inline-block;">
                         <input type="submit" value="Tampilkan Setahun" class="btn btn-default">
                     </form>
                     <form style="display:inline-block;">
@@ -22,7 +22,7 @@
                     <br>
                     <div id="filteritem" class="collapse">
                         <div class="row">
-                            <form action="{{ url('/bukukaskecil/filter') }}" method="post">
+                            <form action="{{ url('/bukukasbesar/filter') }}" method="post">
                                 @csrf
                                 <div class="x_content">
                                     <div class="col-md-3 col-sm-3">
@@ -69,15 +69,19 @@
                 </div>
                 <div class="x_body">
                     @if($filter == true)
-                    <!-- <form action="{{ url('/bukukaskecil/print') }}" method="post"> -->
+                    <!-- <form action="{{ url('/bukukasbesar/print') }}" method="post"> -->
                     @csrf
                     <div class="col-md-4">
                         <label>Total Pengeluaran</label>
-                        <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format(($total), 0, ',', '.') .",-"}}">
+                        <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format(($hutang), 0, ',', '.') .",-"}}">
                     </div>
                     <div class="col-md-4">
+                        <label>Total Pemasukan</label>
+                        <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format(($piutang), 0, ',', '.') .",-"}}">
                     </div>
                     <div class="col-md-4">
+                        <label>Saldo Akhir</label>
+                        <input type="text" readonly class="form-control subtotal" value="{{$string_total = "Rp. " . number_format(($piutang-$hutang), 0, ',', '.') .",-"}}">
                     </div>
                     <br><br><br><br><br>
                     <table class="table table-light table-striped" id="table">
@@ -86,23 +90,35 @@
                                 <th>No</th>
                                 <th>Tanggal</th>
                                 <th>Kode Kas</th>
-                                <th>Kode Pengeluaran</th>
-                                <th>Nama Pengeluaran</th>
+                                <th>Kode Invoice</th>
+                                <th>Tipe</th>
                                 <th>Metode</th>
                                 <th>Total</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($kas as $k)
-                            <tr>
+                            @if ($k->Tipe == 'AR')
+                            <tr class="success">
                                 <td>{{ $no++ }}</td>
                                 <td>{{ $k->Tanggal }}</td>
                                 <td>{{ $k->KodeKasBank }}</td>
                                 <td>{{ $k->KodeInvoice }}</td>
-                                <td>{{ $k->Nama }}</td>
+                                <td>Piutang</td>
                                 <td>{{ $k->KodeBayar }}</td>
                                 <td>Rp. {{ number_format($k->Total, 0, ',', '.') }},-</td>
                             </tr>
+                            @elseif ($k->Tipe == 'AP')
+                            <tr class="danger">
+                                <td>{{ $no++ }}</td>
+                                <td>{{ $k->Tanggal }}</td>
+                                <td>{{ $k->KodeKasBank }}</td>
+                                <td>{{ $k->KodeInvoice }}</td>
+                                <td>Hutang</td>
+                                <td>{{ $k->KodeBayar }}</td>
+                                <td>Rp. {{ number_format($k->Total, 0, ',', '.') }},-</td>
+                            </tr>
+                            @endif
                             @endforeach
                         </tbody>
                     </table>

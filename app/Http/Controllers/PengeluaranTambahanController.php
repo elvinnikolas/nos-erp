@@ -22,7 +22,7 @@ class PengeluaranTambahanController extends Controller
             ->orderBy('pengeluarantambahans.id', 'desc')
             ->where('pengeluarantambahans.Status', 'OPN')
             ->get();
-        return view('stok.pengeluaranTambahan.index', compact('pengeluarantambahan'));
+        return view('operasional.pengeluaranTambahan.index', compact('pengeluarantambahan'));
     }
 
     /**
@@ -35,7 +35,7 @@ class PengeluaranTambahanController extends Controller
         $matauang = DB::table('matauangs')->where('Status', 'OPN')->get();
         $lokasi = DB::table('lokasis')->where('Status', 'OPN')->get();
 
-        return view('stok.pengeluaranTambahan.buat', [
+        return view('operasional.pengeluaranTambahan.buat', [
             'matauang' => $matauang,
             'lokasi' => $lokasi
         ]);
@@ -49,7 +49,7 @@ class PengeluaranTambahanController extends Controller
      */
     public function store(Request $request)
     {
-        $last_id = DB::select('SELECT * FROM pengeluarantambahans ORDER BY id DESC LIMIT 1');
+        $last_id = DB::select('SELECT * FROM pengeluarantambahans WHERE KodePengeluaran LIKE "BO%" ORDER BY id DESC LIMIT 1');
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
@@ -74,78 +74,387 @@ class PengeluaranTambahanController extends Controller
             $newID_bo = $pref . "-" . $year_now . $month_now . $newID;
         }
 
-        DB::table('pengeluarantambahans')->insert([
-            'KodePengeluaran' => $newID_bo,
-            'Nama' => $request->Nama,
-            'Karyawan' => $request->Karyawan,
-            'Tanggal' => $request->Tanggal,
-            'KodeLokasi' => $request->KodeLokasi,
-            'KodeMataUang' => $request->KodeMataUang,
-            'Keterangan' => $request->Keterangan,
-            'Metode' => $request->Metode,
-            'Status' => 'OPN',
-            'KodeUser' => \Auth::user()->name,
-            'Total' => $request->Total,
-            'created_at' => \Carbon\Carbon::now(),
-            'updated_at' => \Carbon\Carbon::now(),
-        ]);
+        $sisasaldo = true;
+        $saldoakhir = DB::table('saldos')
+            ->orderBy('saldos.id', 'desc')
+            ->first();
 
-        $last_id = DB::select('SELECT * FROM kasbanks ORDER BY KodeKasBankID DESC LIMIT 1');
-        $year_now = date('y');
-        $month_now = date('m');
-        $date_now = date('d');
-        $pref = "KK";
-        if ($last_id == null) {
-            $newID = $pref . "-" . $year_now . $month_now . "0001";
-        } else {
-            $string = $last_id[0]->KodeKasBank;
-            $ids = substr($string, -4, 4);
-            $month = substr($string, -6, 2);
-            $year = substr($string, -8, 2);
+        // if ($request->Metode == 'Cash') {
+        //     $jenissaldo = "SaldoCash";
+        // } else if ($request->Metode == 'Transfer') {
+        //     $jenissaldo = "SaldoRekening";
+        // }
 
-            if ((int) $year_now > (int) $year) {
-                $newID = "0001";
-            } else if ((int) $month_now > (int) $month) {
-                $newID = "0001";
-            } else {
-                $newID = $ids + 1;
-                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+        if ($request->Transaksi == 'Keluar') {
+            $tipe = "BOK";
+            $pref = "KK";
+
+            if ($request->Metode == 'Cash') {
+                if (($saldoakhir->SaldoCash - $request->Total) < 0) {
+                    $sisasaldo = false;
+                } else {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => $newID_bo,
+                        'Transaksi' => $newID_bo,
+                        'Jumlah' => $request->Total,
+                        'Tanggal' => $request->Tanggal,
+                        'Tipe' => $request->Metode,
+                        'SaldoCash' => $saldoakhir->SaldoCash - $request->Total,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                }
+            } else if ($request->Metode == 'Transfer') {
+                if (($saldoakhir->SaldoRekening - $request->Total) < 0) {
+                    $sisasaldo = false;
+                } else {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => $newID_bo,
+                        'Transaksi' => $newID_bo,
+                        'Jumlah' => $request->Total,
+                        'Tanggal' => $request->Tanggal,
+                        'Tipe' => $request->Metode,
+                        'SaldoCash' => $saldoakhir->SaldoCash,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening - $request->Total,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                }
             }
+        } else if ($request->Transaksi == 'Masuk') {
+            $tipe = "BOM";
+            $pref = "KM";
 
-            $newID = $pref . "-" . $year_now . $month_now . $newID;
+            if ($request->Metode == 'Cash') {
+                DB::table('saldos')->insert([
+                    'KodeTransaksi' => $newID_bo,
+                    'Transaksi' => $newID_bo,
+                    'Jumlah' => $request->Total,
+                    'Tanggal' => $request->Tanggal,
+                    'Tipe' => $request->Metode,
+                    'SaldoCash' => $saldoakhir->SaldoCash + $request->Total,
+                    'SaldoRekening' => $saldoakhir->SaldoRekening,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
+                ]);
+            } else if ($request->Metode == 'Transfer') {
+                DB::table('saldos')->insert([
+                    'KodeTransaksi' => $newID_bo,
+                    'Transaksi' => $newID_bo,
+                    'Jumlah' => $request->Total,
+                    'Tanggal' => $request->Tanggal,
+                    'Tipe' => $request->Metode,
+                    'SaldoCash' => $saldoakhir->SaldoCash,
+                    'SaldoRekening' => $saldoakhir->SaldoRekening + $request->Total,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
+                ]);
+            }
         }
 
-        DB::table('kasbanks')->insert([
-            'KodeKasBank' => $newID,
-            'Tanggal' => $request->Tanggal,
-            'TanggalCheque' => $request->Tanggal,
-            'KodeBayar' => $request->Metode,
-            'TipeBayar' => '',
-            'NoLink' => '',
-            'KodeInvoice' => $newID_bo,
-            'BayarDari' => '',
-            'Untuk' => $request->Karyawan,
-            'Keterangan' => $request->Keterangan,
-            'Tipe' => 'BO',
-            'Status' => 'CFM',
-            'KodeUser' => \Auth::user()->name,
-            'Total' => $request->Total,
-            'created_at' => \Carbon\Carbon::now(),
-            'updated_at' => \Carbon\Carbon::now(),
-        ]);
+        if ($sisasaldo) {
+            DB::table('pengeluarantambahans')->insert([
+                'KodePengeluaran' => $newID_bo,
+                'Nama' => $request->Nama,
+                'Karyawan' => $request->Karyawan,
+                'Tanggal' => $request->Tanggal,
+                'KodeLokasi' => $request->KodeLokasi,
+                'KodeMataUang' => $request->KodeMataUang,
+                'Keterangan' => $request->Keterangan,
+                'Metode' => $request->Metode,
+                'Transaksi' => $request->Transaksi,
+                'Status' => 'OPN',
+                'KodeUser' => \Auth::user()->name,
+                'Total' => $request->Total,
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
 
-        DB::table('eventlogs')->insert([
-            'KodeUser' => \Auth::user()->name,
-            'Tanggal' => \Carbon\Carbon::now(),
-            'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
-            'Keterangan' => 'Tambah biaya operasional ' . $request->Nama,
-            'Tipe' => 'OPN',
-            'created_at' => \Carbon\Carbon::now(),
-            'updated_at' => \Carbon\Carbon::now(),
-        ]);
+            $last_id = DB::select('SELECT * FROM kasbanks ORDER BY KodeKasBankID DESC LIMIT 1');
+            $year_now = date('y');
+            $month_now = date('m');
+            $date_now = date('d');
+            if ($last_id == null) {
+                $newID = $pref . "-" . $year_now . $month_now . "0001";
+            } else {
+                $string = $last_id[0]->KodeKasBank;
+                $ids = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
 
-        $pesan = 'Biaya operasional ' . $request->Name . ' berhasil ditambahkan';
-        return redirect('/pengeluarantambahan')->with(['created' => $pesan]);
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $ids + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+
+                $newID = $pref . "-" . $year_now . $month_now . $newID;
+            }
+
+            DB::table('kasbanks')->insert([
+                'KodeKasBank' => $newID,
+                'Tanggal' => $request->Tanggal,
+                'TanggalCheque' => $request->Tanggal,
+                'KodeBayar' => $request->Metode,
+                'TipeBayar' => '',
+                'NoLink' => '',
+                'KodeInvoice' => $newID_bo,
+                'BayarDari' => '',
+                'Untuk' => $request->Karyawan,
+                'Keterangan' => $request->Keterangan,
+                'Tipe' => $tipe,
+                'Status' => 'CFM',
+                'KodeUser' => \Auth::user()->name,
+                'Total' => $request->Total,
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
+
+            DB::table('eventlogs')->insert([
+                'KodeUser' => \Auth::user()->name,
+                'Tanggal' => \Carbon\Carbon::now(),
+                'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+                'Keterangan' => 'Tambah biaya operasional ' . $newID_bo,
+                'Tipe' => 'OPN',
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
+
+            $pesan = 'Biaya operasional ' . $newID_bo . ' berhasil ditambahkan';
+            return redirect('/pengeluarantambahan')->with(['created' => $pesan]);
+        }
+        // 
+        else {
+            $pesan = 'Biaya operasional tidak disimpan karena saldo tidak mencukupi, mohon periksa kembali jumlah saldo atau menambah saldo terlebih dahulu';
+            return redirect('/pengeluarantambahan')->with(['error' => $pesan]);
+        }
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function edit($id)
+    {
+        $pt = DB::table('pengeluarantambahans')->where('KodePengeluaran', $id)->first();
+        $matauang = DB::table('matauangs')->where('Status', 'OPN')->get();
+        $lokasi = DB::table('lokasis')->where('Status', 'OPN')->get();
+
+        return view('operasional.pengeluaranTambahan.edit', compact('id', 'pt', 'matauang', 'lokasi'));
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $id)
+    {
+        $sisasaldo = true;
+        $saldoakhir = DB::table('saldos')
+            ->orderBy('saldos.id', 'desc')
+            ->first();
+        $pt = DB::table('pengeluarantambahans')->where('KodePengeluaran', $id)->first();
+        $saldo = DB::table('saldos')->where('KodeTransaksi', $id)->first();
+        $kas = DB::table('kasbanks')->where('KodeInvoice', $id)->first();
+        $kode = substr($kas->KodeKasBank, -8, 8);
+        $totalbefore = $pt->Total;
+
+        if ($request->Transaksi == 'Keluar') {
+            if ($request->Metode == 'Cash') {
+                if (($saldoakhir->SaldoCash + $totalbefore - $request->Total) < 0) {
+                    $sisasaldo = false;
+                }
+            } else if ($request->Metode == 'Transfer') {
+                if (($saldoakhir->SaldoRekening + $totalbefore - $request->Total) < 0) {
+                    $sisasaldo = false;
+                }
+            }
+        }
+
+        if ($pt->Transaksi == 'Keluar') {
+            if ($pt->Metode == 'Cash') {
+                DB::table('saldos')->insert([
+                    'KodeTransaksi' => 'DEL',
+                    'Transaksi' => $saldo->KodeTransaksi,
+                    'Jumlah' => $pt->Total,
+                    'Tanggal' => $pt->Tanggal,
+                    'Tipe' => $pt->Metode,
+                    'SaldoCash' => $saldoakhir->SaldoCash + $pt->Total,
+                    'SaldoRekening' => $saldoakhir->SaldoRekening,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
+                ]);
+            } else if ($pt->Metode == 'Transfer') {
+                DB::table('saldos')->insert([
+                    'KodeTransaksi' => 'DEL',
+                    'Transaksi' => $saldo->KodeTransaksi,
+                    'Jumlah' => $pt->Total,
+                    'Tanggal' => $pt->Tanggal,
+                    'Tipe' => $pt->Metode,
+                    'SaldoCash' => $saldoakhir->SaldoCash,
+                    'SaldoRekening' => $saldoakhir->SaldoRekening + $pt->Total,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
+                ]);
+            }
+        } else if ($pt->Transaksi == 'Masuk') {
+            if ($pt->Metode == 'Cash') {
+                if (($saldoakhir->SaldoCash - $pt->Total < 0)) {
+                    $sisasaldo = false;
+                } else {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => 'DEL',
+                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Jumlah' => $pt->Total,
+                        'Tanggal' => $pt->Tanggal,
+                        'Tipe' => $pt->Metode,
+                        'SaldoCash' => $saldoakhir->SaldoCash - $pt->Total,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                }
+            } else if ($pt->Metode == 'Transfer') {
+                if (($saldoakhir->SaldoRekening - $pt->Total < 0)) {
+                    $sisasaldo = false;
+                } else {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => 'DEL',
+                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Jumlah' => $pt->Total,
+                        'Tanggal' => $pt->Tanggal,
+                        'Tipe' => $pt->Metode,
+                        'SaldoCash' => $saldoakhir->SaldoCash,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening - $pt->Total,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                }
+            }
+        }
+
+        if ($sisasaldo) {
+            $saldoakhir = DB::table('saldos')
+                ->orderBy('saldos.id', 'desc')
+                ->first();
+
+            if ($request->Transaksi == 'Keluar') {
+                $tipe = "BOK";
+                $pref = "KK";
+                $newID = $pref . "-" . $kode;
+
+                if ($request->Metode == 'Cash') {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => 'EDT',
+                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Jumlah' => $request->Total,
+                        'Tanggal' => $request->Tanggal,
+                        'Tipe' => $request->Metode,
+                        'SaldoCash' => $saldoakhir->SaldoCash - $request->Total,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                } else if ($request->Metode == 'Transfer') {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => 'EDT',
+                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Jumlah' => $request->Total,
+                        'Tanggal' => $request->Tanggal,
+                        'Tipe' => $request->Metode,
+                        'SaldoCash' => $saldoakhir->SaldoCash,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening - $request->Total,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                }
+            } else if ($request->Transaksi == 'Masuk') {
+                $tipe = "BOM";
+                $pref = "KM";
+                $newID = $pref . "-" . $kode;
+
+                if ($request->Metode == 'Cash') {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => 'EDT',
+                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Jumlah' => $request->Total,
+                        'Tanggal' => $request->Tanggal,
+                        'Tipe' => $request->Metode,
+                        'SaldoCash' => $saldoakhir->SaldoCash + $request->Total,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                } else if ($request->Metode == 'Transfer') {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => 'EDT',
+                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Jumlah' => $request->Total,
+                        'Tanggal' => $request->Tanggal,
+                        'Tipe' => $request->Metode,
+                        'SaldoCash' => $saldoakhir->SaldoCash,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening + $request->Total,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                }
+            }
+
+            DB::table('pengeluarantambahans')->where('KodePengeluaran', $id)->update([
+                'Nama' => $request->Nama,
+                'Karyawan' => $request->Karyawan,
+                'Tanggal' => $request->Tanggal,
+                'KodeLokasi' => $request->KodeLokasi,
+                'KodeMataUang' => $request->KodeMataUang,
+                'Keterangan' => $request->Keterangan,
+                'Metode' => $request->Metode,
+                'Transaksi' => $request->Transaksi,
+                'KodeUser' => \Auth::user()->name,
+                'Total' => $request->Total,
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
+
+            DB::table('kasbanks')->where('KodeInvoice', $id)->update([
+                'KodeKasBank' => $newID,
+                'Tanggal' => $request->Tanggal,
+                'TanggalCheque' => $request->Tanggal,
+                'KodeBayar' => $request->Metode,
+                'Untuk' => $request->Karyawan,
+                'Keterangan' => $request->Keterangan,
+                'Tipe' => $tipe,
+                'Status' => 'CFM',
+                'KodeUser' => \Auth::user()->name,
+                'Total' => $request->Total,
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
+
+            DB::table('eventlogs')->insert([
+                'KodeUser' => \Auth::user()->name,
+                'Tanggal' => \Carbon\Carbon::now(),
+                'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+                'Keterangan' => 'Update biaya operasional ' . $id,
+                'Tipe' => 'OPN',
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
+
+            $pesan = 'Biaya operasional ' . $id . ' berhasil diupdate';
+            return redirect('/pengeluarantambahan')->with(['edited' => $pesan]);
+        }
+        // 
+        else {
+            $pesan = 'Biaya operasional tidak diupdate karena sisa saldo akan menjadi minus, mohon periksa kembali atau menambah saldo terlebih dahulu';
+            return redirect('/pengeluarantambahan')->with(['error' => $pesan]);
+        }
     }
 
     /**
@@ -156,26 +465,101 @@ class PengeluaranTambahanController extends Controller
      */
     public function destroy($id)
     {
-        DB::table('pengeluarantambahans')->where('id', $id)->update([
-            'Status' => 'DEL'
-        ]);
-
         $pt = DB::table('pengeluarantambahans')->where('id', $id)->first();
+        $saldo = DB::table('saldos')->where('KodeTransaksi', $pt->KodePengeluaran)->first();
+        $saldoakhir = DB::table('saldos')
+            ->orderBy('saldos.id', 'desc')
+            ->first();
+        $sisasaldo = true;
 
-        DB::table('kasbanks')->where('KodeInvoice', $pt->KodePengeluaran)->update([
-            'Status' => 'DEL'
-        ]);
+        if ($pt->Transaksi == 'Keluar') {
+            if ($pt->Metode == 'Cash') {
+                DB::table('saldos')->insert([
+                    'KodeTransaksi' => 'DEL',
+                    'Transaksi' => $saldo->KodeTransaksi,
+                    'Jumlah' => $saldo->Jumlah,
+                    'Tanggal' => $saldo->Tanggal,
+                    'Tipe' => $saldo->Tipe,
+                    'SaldoCash' => $saldoakhir->SaldoCash + $saldo->Jumlah,
+                    'SaldoRekening' => $saldoakhir->SaldoRekening,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
+                ]);
+            } else if ($pt->Metode == 'Transfer') {
+                DB::table('saldos')->insert([
+                    'KodeTransaksi' => 'DEL',
+                    'Transaksi' => $saldo->KodeTransaksi,
+                    'Jumlah' => $saldo->Jumlah,
+                    'Tanggal' => $saldo->Tanggal,
+                    'Tipe' => $saldo->Tipe,
+                    'SaldoCash' => $saldoakhir->SaldoCash,
+                    'SaldoRekening' => $saldoakhir->SaldoRekening + $saldo->Jumlah,
+                    'created_at' => \Carbon\Carbon::now(),
+                    'updated_at' => \Carbon\Carbon::now(),
+                ]);
+            }
+        } else if ($pt->Transaksi == 'Masuk') {
+            if ($pt->Metode == 'Cash') {
+                if (($saldoakhir->SaldoCash - $saldo->Jumlah < 0)) {
+                    $sisasaldo = false;
+                } else {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => 'DEL',
+                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Jumlah' => $saldo->Jumlah,
+                        'Tanggal' => $saldo->Tanggal,
+                        'Tipe' => $saldo->Tipe,
+                        'SaldoCash' => $saldoakhir->SaldoCash - $saldo->Jumlah,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                }
+            } else if ($pt->Metode == 'Transfer') {
+                if (($saldoakhir->SaldoRekening - $saldo->Jumlah < 0)) {
+                    $sisasaldo = false;
+                } else {
+                    DB::table('saldos')->insert([
+                        'KodeTransaksi' => 'DEL',
+                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Jumlah' => $saldo->Jumlah,
+                        'Tanggal' => $saldo->Tanggal,
+                        'Tipe' => $saldo->Tipe,
+                        'SaldoCash' => $saldoakhir->SaldoCash,
+                        'SaldoRekening' => $saldoakhir->SaldoRekening - $saldo->Jumlah,
+                        'created_at' => \Carbon\Carbon::now(),
+                        'updated_at' => \Carbon\Carbon::now(),
+                    ]);
+                }
+            }
+        }
 
-        DB::table('eventlogs')->insert([
-            'KodeUser' => \Auth::user()->name,
-            'Tanggal' => \Carbon\Carbon::now(),
-            'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
-            'Keterangan' => 'Hapus biaya operasional ' . $pt->Nama,
-            'Tipe' => 'OPN',
-            'created_at' => \Carbon\Carbon::now(),
-            'updated_at' => \Carbon\Carbon::now(),
-        ]);
+        if ($sisasaldo) {
+            DB::table('pengeluarantambahans')->where('id', $id)->update([
+                'Status' => 'DEL'
+            ]);
 
-        return redirect('/pengeluarantambahan');
+            DB::table('kasbanks')->where('KodeInvoice', $pt->KodePengeluaran)->update([
+                'Status' => 'DEL'
+            ]);
+
+            DB::table('eventlogs')->insert([
+                'KodeUser' => \Auth::user()->name,
+                'Tanggal' => \Carbon\Carbon::now(),
+                'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+                'Keterangan' => 'Hapus biaya operasional ' . $pt->KodePengeluaran,
+                'Tipe' => 'OPN',
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
+
+            $pesan = 'Biaya operasional ' . $pt->KodePengeluaran . ' berhasil dihapus';
+            return redirect('/pengeluarantambahan')->with(['deleted' => $pesan]);
+        }
+        //
+        else {
+            $pesan = 'Biaya operasional tidak dihapus karena sisa saldo akan menjadi minus, mohon periksa kembali atau menambah saldo terlebih dahulu';
+            return redirect('/pengeluarantambahan')->with(['error' => $pesan]);
+        }
     }
 }

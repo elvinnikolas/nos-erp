@@ -129,10 +129,10 @@
                                     <label for="inputPelanggan">PPN</label>
                                     @if($so->PPN == "ya")
                                     <input type="text" class="form-control" placeholder="" value="Ya" readonly>
-                                    <input type="hidden" class="form-control" name="ppn" placeholder="" value="ya" readonly>
+                                    <input type="hidden" class="form-control ppn" name="ppn" placeholder="" value="ya" readonly>
                                     @else
                                     <input type="text" class="form-control" placeholder="" value="Tidak" readonly>
-                                    <input type="hidden" class="form-control" name="ppn" placeholder="" value="tidak" readonly>
+                                    <input type="hidden" class="form-control ppn" name="ppn" placeholder="" value="tidak" readonly>
                                     @endif
                                 </div>
                                 <div class="form-group">
@@ -172,8 +172,8 @@
                                 <table id="items" class="table">
                                     <tr>
                                         <td id="header" style="width:18%;">Nama Barang</td>
-                                        <td id="header" style="width:9%;">Qty</td>
                                         <td id="header" style="width:12%;">Satuan</td>
+                                        <td id="header" style="width:9%;">Qty</td>
                                         <td id="header" style="width:18%;">Harga Satuan</td>
                                         <td id="header" style="width:20%;">Keterangan</td>
                                         <td id="header">Total</td>
@@ -193,9 +193,6 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" step=0.01 onchange="qty({{$key+1}})" name="qty[]" class="form-control qty{{$key+1}}" value="{{$item->Qty}}">
-                                        </td>
-                                        <td>
                                             <select name="satuan[]" onchange="satuan(this,{{$key+1}});" class="form-control satuan{{$key+1}}" id="satuan{{$key+1}}">
                                                 @foreach($satuan as $satuanData)
                                                 @if($satuanData->KodeSatuan == $item->KodeSatuan)
@@ -205,6 +202,9 @@
                                                 @endif
                                                 @endforeach
                                             </select>
+                                        </td>
+                                        <td>
+                                            <input type="number" step=0.01 onchange="qty({{$key+1}})" name="qty[]" class="form-control qty{{$key+1}}" value="{{$item->Qty}}">
                                         </td>
                                         <td>
                                             <input type="text" onchange="price({{$key+1}})" name="price[]" class="form-control price{{$key+1}}" required="" value="{{$item->Harga}}">

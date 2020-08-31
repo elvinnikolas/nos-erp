@@ -209,7 +209,16 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/pengeluarantambahan', 'PengeluaranTambahanController@index');
     Route::get('/pengeluarantambahan/create', 'PengeluaranTambahanController@create');
     Route::post('/pengeluarantambahan/store', 'PengeluaranTambahanController@store');
+    Route::get('/pengeluarantambahan/edit/{id}', 'PengeluaranTambahanController@edit');
+    Route::post('/pengeluarantambahan/update/{id}', 'PengeluaranTambahanController@update');
     Route::get('/pengeluarantambahan/destroy/{id}', 'PengeluaranTambahanController@destroy');
+
+    //route saldo
+    Route::get('/saldo', 'SaldoController@index');
+    Route::get('/saldo/showkonversi', 'SaldoController@showkonversi');
+    Route::get('/saldo/history', 'SaldoController@history');
+    Route::post('/saldo/history/filter', 'SaldoController@filter');
+    Route::post('/saldo/storekonversi', 'SaldoController@storekonversi');
 
     //ROUTE HUTANG
     //route pelunasan hutang

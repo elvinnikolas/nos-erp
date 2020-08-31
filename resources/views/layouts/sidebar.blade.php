@@ -94,6 +94,7 @@
                 <a><i class="fa fa-cart-plus"></i> Operasional <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
                     <li><a href="{{ url('/pengeluarantambahan') }}">Biaya Operasional</a></li>
+                    <li><a href="{{ url('/saldo') }}">Saldo</a></li>
                 </ul>
             </li>
 
