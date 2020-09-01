@@ -26,7 +26,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Alamat: </label>
-                                <input type="text" required="required" name="Alamat" placeholder="Alamat" class="form-control">
+                                <textarea class="form-control" name="Alamat" placeholder="Alamat" required></textarea>
                             </div>
                             <div class="form-group">
                                 <label>Kota: </label>

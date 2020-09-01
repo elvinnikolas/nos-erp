@@ -26,7 +26,7 @@
                         </div>
                         <div class="form-group">
                             <label>Alamat: </label>
-                            <input type="text" required="required" name="Alamat" value="{{ $sup->Alamat }}" placeholder="Alamat" class="form-control">
+                            <textarea class="form-control" name="Alamat" placeholder="Alamat" required>{{ $sup->Alamat }}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Kota: </label>

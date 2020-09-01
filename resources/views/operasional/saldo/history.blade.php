@@ -35,9 +35,17 @@
                                 @endif
                                 <td>{{ $s->Transaksi}}</td>
                                 <td>{{ $s->Nama}}</td>
+                                @if($s->Tipe == 'RC' || $s->Tipe == 'CR')
+                                <td>-</td>
+                                @else
                                 <td>{{ $s->Karyawan}}</td>
+                                @endif
                                 <td>Rp.{{ number_format($s->Jumlah, 0, ',', '.') }},-</td>
-                                <td>{{ $s->Tipe}} - {{ $s->trans}}</td>
+                                @if($s->Tipe == 'RC' || $s->Tipe == 'CR')
+                                <td>-</td>
+                                @else
+                                <td>{{ $s->Tipe }} - {{ $s->trans}}</td>
+                                @endif
                                 <td>Rp.{{ number_format($s->SaldoCash, 0, ',', '.') }},-</td>
                                 <td>Rp.{{ number_format($s->SaldoRekening, 0, ',', '.') }},-</td>
                             </tr>

@@ -120,7 +120,7 @@
                                     </tr>
                                 </table>
                                 <div class="col-md-9">
-                                    <button type="submit" class="btn btn-success">Simpan</button>
+                                    <button type="submit" class="btn btn-success" onclick="return confirm('Simpan data ini?')">Simpan</button>
                                     <!-- <button type="submit" class="btn btn-danger">Batal</button> -->
                                 </div>
                                 <div class="col-md-3">

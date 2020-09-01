@@ -195,4 +195,84 @@ class PelunasanHutangController extends Controller
 
         return redirect('/pelunasanhutang/payment/' . $id);
     }
+
+    public function edit($id)
+    {
+        $pelunasan = pelunasanhutang::where('KodePelunasanHutangID', $id)->first();
+        $invoice = invoicehutang::where('KodeInvoiceHutang', $pelunasan->KodeInvoice)->first();
+        $payments = pelunasanhutang::where('KodeInvoice', $pelunasan->KodeInvoice)->get();
+        $detail = invoicehutangdetail::where('KodeInvoiceHutang', $pelunasan->KodeInvoice)->first();
+        $matauang = matauang::all();
+
+        $tot = 0;
+        foreach ($payments as $bill) {
+            $tot += $bill->Jumlah;
+        }
+
+        $sub = $detail->Subtotal;
+        $return = $detail->TotalReturn;
+        $sisa = $sub - $tot - $return + $pelunasan->Jumlah;
+
+        return view('hutang.pelunasan.edit', compact('pelunasan', 'invoice', 'payments', 'matauang', 'sub', 'sisa'));
+    }
+
+    public function update($id, Request $request)
+    {
+        $invoice = invoicehutang::where('KodeInvoiceHutang', $id)->first();
+        $pelunasan = pelunasanhutang::where('KodePelunasanHutangID', $request->KodePelunasan)->first();
+
+        DB::table('kasbanks')
+            ->where('KodeKasBank', $pelunasan->KodeKasBank)
+            ->update([
+                'Tanggal' => $request->Tanggal,
+                'TanggalCheque' => $request->Tanggal,
+                'KodeBayar' => $request->metode,
+                'Keterangan' => $request->keterangan,
+                'Tipe' => $request->status,
+                'Total' => $request->jml,
+                'KodeUser' =>  \Auth::user()->name,
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
+
+        DB::table('pelunasanhutangs')
+            ->where('KodePelunasanHutangID', $request->KodePelunasan)
+            ->update([
+                'Tanggal' => $request->Tanggal,
+                'KodeBayar' => $request->metode,
+                'TipeBayar' => $request->metode,
+                'Keterangan' => $request->keterangan,
+                'KodeMataUang' => $request->matauang,
+                'Jumlah' => $request->jml,
+                'KodeUser' =>  \Auth::user()->name,
+                'updated_at' => \Carbon\Carbon::now(),
+            ]);
+
+        //update status jika sudah lunas
+        $payments = pelunasanhutang::where('KodeInvoice', $id)->get();
+        $hutang = invoicehutangdetail::where('KodeInvoiceHutang', $id)->first();
+
+        $tot = 0;
+        foreach ($payments as $bill) {
+            $tot += $bill->Jumlah;
+        }
+
+        $sisa = $hutang->Subtotal - $tot - $hutang->TotalReturn;
+        if ($sisa <= 0) {
+            DB::table('invoicehutangs')->where('KodeInvoiceHutang', $id)->update([
+                'Status' => 'CLS'
+            ]);
+        }
+
+        DB::table('eventlogs')->insert([
+            'KodeUser' => \Auth::user()->name,
+            'Tanggal' => \Carbon\Carbon::now(),
+            'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+            'Keterangan' => 'Update pelunasan hutang ' . $pelunasan->KodePelunasanHutang . ' pada invoice ' . $invoice->KodeInvoiceHutangShow,
+            'Tipe' => 'OPN',
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now(),
+        ]);
+
+        return redirect('/pelunasanhutang/payment/' . $id);
+    }
 }

@@ -146,7 +146,7 @@
 
                                 </table>
                                 <div class="col-md-9">
-                                    <button type="submit" class="btn btn-success">Konfirmasi</button>
+                                    <button type="submit" class="btn btn-success" onclick="return confirm('Konfirmasi data ini?')">Konfirmasi</button>
                                 </div>
                                 <div class="col-md-3">
                                     <input type="hidden" value="{{sizeof($items)}}" class="tot">

@@ -18,7 +18,7 @@
                             <input type="text" name="NoFaktur" value="{{ $inv->NoFaktur }}" placeholder="No Faktur" class="form-control">
                         </div>
                         <br>
-                        <button class="btn btn-success" style="width:120px;">Simpan</button>
+                        <button class="btn btn-success" style="width:120px;" onclick="return confirm('Simpan data ini?')">Simpan</button>
                     </form>
                     @endforeach
                 </div>

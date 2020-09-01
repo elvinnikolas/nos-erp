@@ -159,10 +159,10 @@
                                     </table>
                                     <div class="col-md-9">
                                         @if($OPN == true)
-                                        <button type="submit" class="btn btn-success" formaction="{{ url('/sopenjualan/confirm/'.$id) }}">Konfirmasi</button>
-                                        <button type="submit" class="btn btn-danger" formaction="{{ url('/sopenjualan/cancel/'.$id) }}" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">Hapus</button>
+                                        <button type="submit" class="btn btn-success" formaction="{{ url('/sopenjualan/confirm/'.$id) }}" onclick="return confirm('Konfirmasi data ini?')">Konfirmasi</button>
+                                        <!-- <button type="submit" class="btn btn-danger" formaction="{{ url('/sopenjualan/cancel/'.$id) }}" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">Hapus</button> -->
                                         @elseif($OPN == false)
-                                        <button type="submit" class="btn btn-primary" formaction="{{ url('/sopenjualan/print/'.$id) }}">Print</button>
+                                        <button type="submit" class="btn btn-primary" formaction="{{ url('/sopenjualan/print/'.$id) }}" onclick="return confirm('Print data ini?')">Print</button>
                                         @endif
                                     </div>
                                     <div class="col-md-3">

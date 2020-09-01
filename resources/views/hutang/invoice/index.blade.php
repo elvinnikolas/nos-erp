@@ -42,7 +42,7 @@
                                     <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
                                     <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                     <td>
-                                        <a href="{{url('invoicehutang/print/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-primary">Print</a>
+                                        <a href="{{url('invoicehutang/print/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-primary" onclick="return confirm('Print invoice ini?')">Print</a>
                                         @if($inv->PPN == "ya")
                                         <a href="{{url('invoicehutang/edit/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-success">
                                             <i class="fa fa-plus" aria-hidden="true"></i>
@@ -62,7 +62,7 @@
                                     <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
                                     <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                     <td>
-                                        <a href="{{url('invoicehutang/print/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-primary">Print</a>
+                                        <a href="{{url('invoicehutang/print/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-primary" onclick="return confirm('Print invoice ini?')">Print</a>
                                         @if($inv->PPN == "ya")
                                         <a href="{{url('invoicehutang/edit/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-success">
                                             <i class="fa fa-plus" aria-hidden="true"></i>
@@ -82,7 +82,7 @@
                                     <td>Rp. {{ number_format($inv->TotalReturn, 0, ',', '.') }},-</td>
                                     <td>Rp. {{ number_format($inv->Subtotal - $inv->bayar - $inv->TotalReturn, 0, ',', '.')}},-</td>
                                     <td>
-                                        <a href="{{url('invoicehutang/print/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-primary">Print</a>
+                                        <a href="{{url('invoicehutang/print/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-primary" onclick="return confirm('Print invoice ini?')">Print</a>
                                         @if($inv->PPN == "ya")
                                         <a href="{{url('invoicehutang/edit/'.$inv->KodeInvoiceHutangShow)}}" class="btn btn-xs btn-success">
                                             <i class="fa fa-plus" aria-hidden="true"></i>
@@ -106,7 +106,8 @@
     $('#table').DataTable({
         "order": [
             [0, "desc"]
-        ]
+        ],
+        "pageLength": 25
     });
 </script>
 @endpush

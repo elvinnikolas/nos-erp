@@ -97,7 +97,8 @@
                                     <textarea class="form-control" name="keterangan" required></textarea>
                                 </div>
                             </div>
-                            <input type="submit" name="" value="Simpan" class="btn btn-primary pull-right">
+                            <input type="submit" name="" value="Simpan" class="btn btn-primary pull-right" onclick="return confirm('Simpan data ini?')">
+                        </div>
                     </form>
                 </div>
             </div>

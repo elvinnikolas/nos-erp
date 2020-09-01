@@ -140,7 +140,7 @@
 
                                 </table>
                                 <div class="col-md-9">
-                                    <button type="submit" class="btn btn-primary">Print</button>
+                                    <button type="submit" class="btn btn-primary" onclick="return confirm('Print data ini?')">Print</button>
                                 </div>
                                 <div class="col-md-3">
                                     <input type="hidden" value="{{sizeof($items)}}" class="tot">

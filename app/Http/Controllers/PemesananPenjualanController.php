@@ -140,7 +140,7 @@ class PemesananPenjualanController extends Controller
 
         if ($last_id == null) {
             if ($checkppn == 'ya') {
-                $newIDP = "SOT-" . $year_now . $month_now . "0001";
+                $newID = "SOT-" . $year_now . $month_now . "0001";
             } else {
                 $newID = "SO-" . $year_now . $month_now . "0001";
             }

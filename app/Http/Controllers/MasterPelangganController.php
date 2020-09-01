@@ -142,6 +142,7 @@ class MasterPelangganController extends Controller
             'NamaPelanggan' => $request->NamaPelanggan,
             'Kontak' => $request->Kontak,
             'NIK' => $request->NIK,
+            'NPWP' => $request->NPWP,
             'KodeUser' => \Auth::user()->name,
             'Status' => 'OPN',
             'updated_at' => \Carbon\Carbon::now()
@@ -151,28 +152,42 @@ class MasterPelangganController extends Controller
         $kotas = $request->kota;
         $noindeks = 0;
 
+        // foreach ($alamats as $key => $value) {
+        //     $noindeks++;
+        //     $checkalamat = DB::table('alamatpelanggans')->where('KodePelanggan', $request->KodePelanggan)->where('NoIndeks', $noindeks)->first();
+
+        //     if (!empty($checkalamat)) {
+        //         DB::table('alamatpelanggans')->where('KodePelanggan', $request->KodePelanggan)->where('NoIndeks', $noindeks)->update([
+        //             'KodePelanggan' => $request->KodePelanggan,
+        //             'Alamat' => $alamats[$key],
+        //             'Kota' => $kotas[$key],
+        //             'NoIndeks' => $noindeks,
+        //             'updated_at' => \Carbon\Carbon::now()
+        //         ]);
+        //     } else {
+        //         DB::table('alamatpelanggans')->insert([
+        //             'KodePelanggan' => $request->KodePelanggan,
+        //             'Alamat' => $alamats[$key],
+        //             'Kota' => $kotas[$key],
+        //             'NoIndeks' => $noindeks,
+        //             'created_at' => \Carbon\Carbon::now(),
+        //             'updated_at' => \Carbon\Carbon::now()
+        //         ]);
+        //     }
+        // }
+
+        DB::table('alamatpelanggans')->where('KodePelanggan', $request->KodePelanggan)->delete();
+
         foreach ($alamats as $key => $value) {
             $noindeks++;
-            $checkalamat = DB::table('alamatpelanggans')->where('KodePelanggan', $request->KodePelanggan)->where('NoIndeks', $noindeks)->first();
-
-            if (!empty($checkalamat)) {
-                DB::table('alamatpelanggans')->where('KodePelanggan', $request->KodePelanggan)->where('NoIndeks', $noindeks)->update([
-                    'KodePelanggan' => $request->KodePelanggan,
-                    'Alamat' => $alamats[$key],
-                    'Kota' => $kotas[$key],
-                    'NoIndeks' => $noindeks,
-                    'updated_at' => \Carbon\Carbon::now()
-                ]);
-            } else {
-                DB::table('alamatpelanggans')->insert([
-                    'KodePelanggan' => $request->KodePelanggan,
-                    'Alamat' => $alamats[$key],
-                    'Kota' => $kotas[$key],
-                    'NoIndeks' => $noindeks,
-                    'created_at' => \Carbon\Carbon::now(),
-                    'updated_at' => \Carbon\Carbon::now()
-                ]);
-            }
+            DB::table('alamatpelanggans')->insert([
+                'KodePelanggan' => $request->KodePelanggan,
+                'Alamat' => $alamats[$key],
+                'Kota' => $kotas[$key],
+                'NoIndeks' => $noindeks,
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now()
+            ]);
         }
 
         DB::table('eventlogs')->insert([

@@ -33,10 +33,10 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1>Pelunasan Piutang</h1>
+                    <h1>Edit Pelunasan Hutang</h1>
                 </div>
                 <div class="x_content">
-                    <form action="{{ url('/pelunasanpiutang/payment/'.$invoice->KodeInvoicePiutang.'/add')}}" method="post" class="formsub">
+                    <form action="{{ url('/pelunasanhutang/payment/'.$invoice->KodeInvoiceHutang.'/update')}}" method="post" class="formsub">
                         @csrf
 
                         <!-- Contents -->
@@ -44,22 +44,27 @@
                         <div class="form-row">
                             <!-- column 1 -->
                             <div class="form-group col-md-4">
+                                <input type="hidden" class="form-control" name="KodePelunasan" value="{{$pelunasan->KodePelunasanHutangID}}" readonly="">
                                 <div class="form-group">
                                     <label for="inputDate">Kode Invoice</label>
-                                    <input type="text" class="form-control" name="kode" value="{{$invoice->KodeInvoicePiutangShow}}" readonly="">
+                                    <input type="text" class="form-control" name="kode" value="{{$invoice->KodeInvoiceHutangShow}}" readonly="">
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Mata Uang</label>
                                     <select class="form-control" name="matauang">
                                         @foreach($matauang as $m)
+                                        @if($pelunasan->KodeMataUang == $m->KodeMataUang)
+                                        <option value="{{$m->KodeMataUang}}" selected>{{$m->NamaMataUang}}</option>
+                                        @else
                                         <option value="{{$m->KodeMataUang}}">{{$m->NamaMataUang}}</option>
+                                        @endif
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Status</label>
                                     <select readonly class="form-control" name="status">
-                                        <option value="AR">Piutang (AR)</option>
+                                        <option value="AP">Hutang (AP)</option>
                                     </select>
                                 </div>
                             </div>
@@ -69,7 +74,7 @@
                                 <div class="form-group">
                                     <label for="inputDate">Tanggal Pembayaran</label>
                                     <div class="input-group date" id="inputDate">
-                                        <input type="text" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{\Carbon\Carbon::now()->format('Y-m-d')}}">
+                                        <input type="text" class="form-control" name="Tanggal" id="inputDate" required="required" value="{{$pelunasan->Tanggal}}">
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -78,9 +83,19 @@
                                 <div class="form-group">
                                     <label for="inputDate">Metode Pembayaran</label>
                                     <select class="form-control" name="metode">
-                                        <option value="Cash">Cash</option>
+                                        @if($pelunasan->TipeBayar == 'Cash')
+                                        <option value="Cash" selected>Cash</option>
                                         <option value="Transfer">Transfer</option>
                                         <option value="Giro">Giro</option>
+                                        @elseif($pelunasan->TipeBayar == 'Transfer')
+                                        <option value="Cash">Cash</option>
+                                        <option value="Transfer" selected>Transfer</option>
+                                        <option value="Giro">Giro</option>
+                                        @elseif($pelunasan->TipeBayar == 'Giro')
+                                        <option value="Cash">Cash</option>
+                                        <option value="Transfer">Transfer</option>
+                                        <option value="Giro" selected>Giro</option>
+                                        @endif
                                     </select>
                                 </div>
                             </div>
@@ -88,13 +103,17 @@
                             <div class="form-group col-md-4">
                                 <div class="form-group">
                                     <label for="inputDate">Jumlah</label>
-                                    <input type="number" class="form-control jml" name="jml" placeholder="{{$sisa}}" required="required" pattern="[0-9]+([\.,][0-9]+)?" step="0.01">
-                                    <input readonly type="text" class="form-control jmlformat" value="Rp 0">
+                                    @if($invoice->Status == 'CLS')
+                                    <input type="hidden" class="form-control jml" name="jml" placeholder="{{$sisa}}" value="{{$pelunasan->Jumlah}}" required="required" pattern="[0-9]+([\.,][0-9]+)?" step="0.01">
+                                    @else
+                                    <input type="number" class="form-control jml" name="jml" placeholder="{{$sisa}}" value="{{$pelunasan->Jumlah}}" required="required" pattern="[0-9]+([\.,][0-9]+)?" step="0.01">
+                                    @endif
+                                    <input readonly type="text" class="form-control jmlformat" value="{{$pelunasan->Jumlah}}">
                                     <input type="hidden" class="form-control jmlshow" name="jmlshow" value="{{$sisa}}">
                                 </div>
                                 <div class="form-group">
                                     <label for="inputDate">Keterangan</label>
-                                    <textarea class="form-control" name="keterangan" required></textarea>
+                                    <textarea class="form-control" name="keterangan" required>{{$pelunasan->Keterangan}}</textarea>
                                 </div>
                             </div>
                             <input type="submit" name="" value="Simpan" class="btn btn-primary pull-right" onclick="return confirm('Simpan data ini?')">
@@ -113,6 +132,10 @@
         defaultDate: new Date(),
         format: 'YYYY-MM-DD'
     });
+
+    var jml = $(".jmlformat").val();
+    var format = 'Rp ' + number_format(jml);
+    $(".jmlformat").val(format);
 
     $(".jml").change(function() {
         if (parseFloat($(".jml").val()) > parseFloat($(".jmlshow").val())) {

@@ -191,6 +191,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/stokkeluar/view/{id}', 'StokKeluarController@view');
     Route::post('/stokkeluar/store', 'StokKeluarController@store');
 
+    //ROUTE LAPORAN
     //route kartu stok
     Route::get('/kartustok', 'KartuStokController@index');
     Route::get('/kartustok/show', 'KartuStokController@show');
@@ -205,6 +206,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/bukukaskecil/show', 'BukuKasKecilController@show');
     Route::post('/bukukaskecil/filter', 'BukuKasKecilController@filter');
 
+    //ROUTE OPERASIONAL
     //route pengeluaran tambahan
     Route::get('/pengeluarantambahan', 'PengeluaranTambahanController@index');
     Route::get('/pengeluarantambahan/create', 'PengeluaranTambahanController@create');
@@ -227,6 +229,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/pelunasanhutang/payment/{id}', 'PelunasanHutangController@payment');
     Route::get('/pelunasanhutang/payment/{id}/add', 'PelunasanHutangController@addpayment');
     Route::post('/pelunasanhutang/payment/{id}/add', 'PelunasanHutangController@addpaymentpost');
+    Route::get('/pelunasanhutang/payment/{id}/edit', 'PelunasanHutangController@edit');
+    Route::post('/pelunasanhutang/payment/{id}/update', 'PelunasanHutangController@update');
 
     //route invoice hutang
     Route::get('/invoicehutang', 'InvoiceHutangController@hutang');
@@ -249,6 +253,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/pelunasanpiutang/payment/{id}', 'PelunasanPiutangController@payment');
     Route::get('/pelunasanpiutang/payment/{id}/add', 'PelunasanPiutangController@addpayment');
     Route::post('/pelunasanpiutang/payment/{id}/add', 'PelunasanPiutangController@addpaymentpost');
+    Route::get('/pelunasanpiutang/payment/{id}/edit', 'PelunasanPiutangController@edit');
+    Route::post('/pelunasanpiutang/payment/{id}/update', 'PelunasanPiutangController@update');
 
     //ROUTE EVENTLOG
     Route::get('/eventlog', 'EventlogController@index');

@@ -41,7 +41,7 @@
                                 <input type="password" required="required" name="password_confirmation" placeholder="Password" class="form-control">
                             </div>
                             <br>
-                            <button class="btn btn-success" style="width:120px;">Simpan</button>
+                            <button class="btn btn-success" style="width:120px;" onclick="return confirm('Simpan data ini?')">Simpan</button>
                         </form>
                         <form action="{{ url('/user') }}" method="get">
                             <button class="btn btn-danger" style="width:120px;">Batal</button>

@@ -22,6 +22,7 @@
                                 <th>Total Bayar</th>
                                 <th>Metode</th>
                                 <th>Keterangan</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -32,6 +33,11 @@
                                 <td>Rp. {{ number_format($payment->Jumlah, 0, ',', '.') }},-</td>
                                 <td>{{ $payment->TipeBayar }}</td>
                                 <td>{{ $payment->Keterangan}}</td>
+                                <td>
+                                    <a href="{{ url('/pelunasanpiutang/payment/'.$payment->KodePelunasanPiutangID.'/edit')}}" class="btn-xs btn btn-success">
+                                        <i class="fa fa-pencil" aria-hidden="true"></i> Ubah
+                                    </a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>

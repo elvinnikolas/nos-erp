@@ -23,19 +23,29 @@
                         <div class="form-group">
                             <label>Jabatan: </label>
                             <select name="Jabatan" value="{{ $kar->Jabatan }}" id="Jabatan" class="form-control">
-                                <option value="Driver">Driver</option>
+                                @if($kar->Jabatan == "Driver")
+                                <option value="Driver" selected>Driver</option>
                                 <option value="Sales">Sales</option>
+                                @elseif($kar->Jabatan == "Sales")
+                                <option value="Driver">Driver</option>
+                                <option value="Sales" selected>Sales</option>
+                                @endif
                             </select>
                         </div>
                         <div class="form-group">
                             <label>Alamat: </label>
-                            <input type="text" required="required" name="Alamat" value="{{ $kar->Alamat }}" class="form-control">
+                            <textarea class="form-control" name="Alamat" placeholder="Alamat" required>{{ $kar->Alamat }}</textarea>
                         </div>
                         <div class="form-group">
                             <label for="">Jenis kelamin</label>
                             <select name="JenisKelamin" value="{{ $kar->JenisKelamin }}" id="JenisKelamin" class="form-control">
-                                <option value="Laki-laki">Laki-laki</option>
+                                @if($kar->JenisKelamin == "Laki-laki")
+                                <option value="Laki-laki" selected>Laki-laki</option>
                                 <option value="Perempuan">Perempuan</option>
+                                @elseif($kar->JenisKelamin == "Perempuan")
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan" selected>Perempuan</option>
+                                @endif
                             </select>
                         </div>
                         <div class="form-group">

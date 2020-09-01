@@ -39,6 +39,7 @@
                     <table class="table table-striped" id="table-karyawan">
                         <thead class="thead-light">
                             <tr>
+                                <th>Kode Karyawan</th>
                                 <th>Nama</th>
                                 <th>Jenis Kelamin</th>
                                 <th>Jabatan</th>
@@ -67,6 +68,10 @@
             serverSide: true,
             ajax: "{!! route('api.masterkaryawan') !!}",
             columns: [{
+                    data: 'KodeKaryawan',
+                    name: 'KodeKaryawan'
+                },
+                {
                     data: 'Nama',
                     name: 'Nama'
                 },

@@ -136,7 +136,11 @@ class PemesananPembelianController extends Controller
         $date_now = date('d');
 
         if ($last_id == null) {
-            $newID = "PO-" . $year_now . $month_now . "0001";
+            if ($checkppn == 'ya') {
+                $newID = "POT-" . $year_now . $month_now . "0001";
+            } else {
+                $newID = "PO-" . $year_now . $month_now . "0001";
+            }
         } else {
             $string = $last_id[0]->KodePO;
             $id = substr($string, -4, 4);
