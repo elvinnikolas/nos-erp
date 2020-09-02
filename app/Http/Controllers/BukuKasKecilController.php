@@ -32,9 +32,9 @@ class BukuKasKecilController extends Controller
 
         $total_pengeluaran = DB::table('kasbanks')->where('Tipe', 'BOK')->where('Status', 'CFM')->whereYear('Tanggal', $year_now)->select(DB::raw('SUM(Total) as total_biaya'))->first()->total_biaya;
         $total_pemasukan = DB::table('kasbanks')->where('Tipe', 'BOM')->where('Status', 'CFM')->whereYear('Tanggal', $year_now)->select(DB::raw('SUM(Total) as total_biaya'))->first()->total_biaya;
-        $saldoawal_cash = DB::table('saldos')->whereYear('Tanggal', $year_now)->select('SaldoCash')->orderBy('id', 'asc')->first();
+        $saldoawal_cash = DB::table('saldos')->whereYear('Tanggal', $year_now - 1)->select('SaldoCash')->orderBy('id', 'desc')->first();
         $saldoakhir_cash = DB::table('saldos')->whereYear('Tanggal', $year_now)->select('SaldoCash')->orderBy('id', 'desc')->first();
-        $saldoawal_rekening = DB::table('saldos')->whereYear('Tanggal', $year_now)->select('SaldoRekening')->orderBy('id', 'asc')->first();
+        $saldoawal_rekening = DB::table('saldos')->whereYear('Tanggal', $year_now - 1)->select('SaldoRekening')->orderBy('id', 'desc')->first();
         $saldoakhir_rekening = DB::table('saldos')->whereYear('Tanggal', $year_now)->select('SaldoRekening')->orderBy('id', 'desc')->first();
 
         if ($saldoawal_cash != null) $saldoawal_cash = $saldoawal_cash->SaldoCash;
@@ -61,10 +61,17 @@ class BukuKasKecilController extends Controller
 
         $total_pengeluaran = DB::table('kasbanks')->where('Tipe', 'BOK')->where('Status', 'CFM')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select(DB::raw('SUM(Total) as total_biaya'))->first()->total_biaya;
         $total_pemasukan = DB::table('kasbanks')->where('Tipe', 'BOM')->where('Status', 'CFM')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select(DB::raw('SUM(Total) as total_biaya'))->first()->total_biaya;
-        $saldoawal_cash = DB::table('saldos')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select('SaldoCash')->orderBy('id', 'asc')->first();
-        $saldoakhir_cash = DB::table('saldos')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select('SaldoCash')->orderBy('id', 'desc')->first();
-        $saldoawal_rekening = DB::table('saldos')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select('SaldoRekening')->orderBy('id', 'asc')->first();
-        $saldoakhir_rekening = DB::table('saldos')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select('SaldoRekening')->orderBy('id', 'desc')->first();
+        if ($request->month == 1) {
+            $saldoawal_cash = DB::table('saldos')->whereMonth('Tanggal', 12)->whereYear('Tanggal', $request->year - 1)->select('SaldoCash')->orderBy('id', 'desc')->first();
+            $saldoakhir_cash = DB::table('saldos')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select('SaldoCash')->orderBy('id', 'desc')->first();
+            $saldoawal_rekening = DB::table('saldos')->whereMonth('Tanggal', 12)->whereYear('Tanggal', $request->year - 1)->select('SaldoRekening')->orderBy('id', 'desc')->first();
+            $saldoakhir_rekening = DB::table('saldos')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select('SaldoRekening')->orderBy('id', 'desc')->first();
+        } else {
+            $saldoawal_cash = DB::table('saldos')->whereMonth('Tanggal', $request->month - 1)->whereYear('Tanggal', $request->year)->select('SaldoCash')->orderBy('id', 'desc')->first();
+            $saldoakhir_cash = DB::table('saldos')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select('SaldoCash')->orderBy('id', 'desc')->first();
+            $saldoawal_rekening = DB::table('saldos')->whereMonth('Tanggal', $request->month - 1)->whereYear('Tanggal', $request->year)->select('SaldoRekening')->orderBy('id', 'desc')->first();
+            $saldoakhir_rekening = DB::table('saldos')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select('SaldoRekening')->orderBy('id', 'desc')->first();
+        }
 
         if ($saldoawal_cash != null) $saldoawal_cash = $saldoawal_cash->SaldoCash;
         if ($saldoakhir_cash != null) $saldoakhir_cash = $saldoakhir_cash->SaldoCash;

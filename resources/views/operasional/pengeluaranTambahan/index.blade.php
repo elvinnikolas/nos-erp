@@ -50,8 +50,8 @@
                                     <th>Kode</th>
                                     <th>Tanggal</th>
                                     <!-- <th>Gudang</th> -->
-                                    <th>Nama Biaya</th>
                                     <th>Karyawan</th>
+                                    <th>Nama Biaya</th>
                                     <th>Keterangan</th>
                                     <th>Metode</th>
                                     <th>Total</th>
@@ -63,8 +63,8 @@
                                 <td>{{ $p->KodePengeluaran }}</td>
                                 <td>{{ \Carbon\Carbon::parse($p->Tanggal)->format('d-m-Y') }}</td>
                                 <!-- <td>{{ $p->NamaLokasi }}</td> -->
-                                <td>{{ $p->Nama}}</td>
                                 <td>{{ $p->Karyawan}}</td>
+                                <td>{{ $p->Nama}}</td>
                                 <td>{{ $p->Keterangan }}</td>
                                 <td>{{ $p->Metode}}</td>
                                 <td>Rp.{{ number_format($p->Total, 0, ',', '.') }},-</td>

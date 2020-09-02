@@ -14,8 +14,8 @@
                                 <th>Tanggal</th>
                                 <th>Status</th>
                                 <th>Kode Transaksi</th>
-                                <th>Keterangan</th>
                                 <th>Karyawan</th>
+                                <th>Keterangan</th>
                                 <th>Jumlah</th>
                                 <th>Transaksi</th>
                                 <th>Saldo Cash</th>
@@ -34,12 +34,12 @@
                                 <td>Tambah</td>
                                 @endif
                                 <td>{{ $s->Transaksi}}</td>
-                                <td>{{ $s->Nama}}</td>
                                 @if($s->Tipe == 'RC' || $s->Tipe == 'CR')
                                 <td>-</td>
                                 @else
                                 <td>{{ $s->Karyawan}}</td>
                                 @endif
+                                <td>{{ $s->Nama}}</td>
                                 <td>Rp.{{ number_format($s->Jumlah, 0, ',', '.') }},-</td>
                                 @if($s->Tipe == 'RC' || $s->Tipe == 'CR')
                                 <td>-</td>

@@ -466,7 +466,7 @@ class PengeluaranTambahanController extends Controller
     public function destroy($id)
     {
         $pt = DB::table('pengeluarantambahans')->where('id', $id)->first();
-        $saldo = DB::table('saldos')->where('KodeTransaksi', $pt->KodePengeluaran)->first();
+        $saldo = DB::table('saldos')->where('Transaksi', $pt->KodePengeluaran)->orderBy('saldos.id', 'desc')->first();
         $saldoakhir = DB::table('saldos')
             ->orderBy('saldos.id', 'desc')
             ->first();
@@ -476,7 +476,7 @@ class PengeluaranTambahanController extends Controller
             if ($pt->Metode == 'Cash') {
                 DB::table('saldos')->insert([
                     'KodeTransaksi' => 'DEL',
-                    'Transaksi' => $saldo->KodeTransaksi,
+                    'Transaksi' => $saldo->Transaksi,
                     'Jumlah' => $saldo->Jumlah,
                     'Tanggal' => $saldo->Tanggal,
                     'Tipe' => $saldo->Tipe,
@@ -488,7 +488,7 @@ class PengeluaranTambahanController extends Controller
             } else if ($pt->Metode == 'Transfer') {
                 DB::table('saldos')->insert([
                     'KodeTransaksi' => 'DEL',
-                    'Transaksi' => $saldo->KodeTransaksi,
+                    'Transaksi' => $saldo->Transaksi,
                     'Jumlah' => $saldo->Jumlah,
                     'Tanggal' => $saldo->Tanggal,
                     'Tipe' => $saldo->Tipe,
@@ -505,7 +505,7 @@ class PengeluaranTambahanController extends Controller
                 } else {
                     DB::table('saldos')->insert([
                         'KodeTransaksi' => 'DEL',
-                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Transaksi' => $saldo->Transaksi,
                         'Jumlah' => $saldo->Jumlah,
                         'Tanggal' => $saldo->Tanggal,
                         'Tipe' => $saldo->Tipe,
@@ -521,7 +521,7 @@ class PengeluaranTambahanController extends Controller
                 } else {
                     DB::table('saldos')->insert([
                         'KodeTransaksi' => 'DEL',
-                        'Transaksi' => $saldo->KodeTransaksi,
+                        'Transaksi' => $saldo->Transaksi,
                         'Jumlah' => $saldo->Jumlah,
                         'Tanggal' => $saldo->Tanggal,
                         'Tipe' => $saldo->Tipe,

@@ -168,8 +168,8 @@
                                 <th>Tanggal</th>
                                 <th>Kode Kas</th>
                                 <th>Kode Transaksi</th>
-                                <th>Keterangan</th>
                                 <th>Karyawan</th>
+                                <th>Keterangan</th>
                                 <th>Metode</th>
                                 <th>Total</th>
                                 <!-- <th>Saldo Cash</th>
@@ -184,8 +184,8 @@
                                 <td>{{ $k->Tanggal }}</td>
                                 <td>{{ $k->KodeKasBank }}</td>
                                 <td>{{ $k->KodeInvoice }}</td>
-                                <td>{{ $k->Nama }}</td>
                                 <td>{{ $k->Karyawan }}</td>
+                                <td>{{ $k->Nama }}</td>
                                 <td>{{ $k->KodeBayar }}</td>
                                 <td>Rp. {{ number_format($k->Total, 0, ',', '.') }},-</td>
                                 <!-- <td>Rp. {{ number_format($k->SaldoCash, 0, ',', '.') }},-</td>
@@ -197,8 +197,8 @@
                                 <td>{{ $k->Tanggal }}</td>
                                 <td>{{ $k->KodeKasBank }}</td>
                                 <td>{{ $k->KodeInvoice }}</td>
-                                <td>{{ $k->Nama }}</td>
                                 <td>{{ $k->Karyawan }}</td>
+                                <td>{{ $k->Nama }}</td>
                                 <td>{{ $k->KodeBayar }}</td>
                                 <td>Rp. {{ number_format($k->Total, 0, ',', '.') }},-</td>
                                 <!-- <td>Rp. {{ number_format($k->SaldoCash, 0, ',', '.') }},-</td>
@@ -210,8 +210,8 @@
                                 <td>{{ $k->Tanggal }}</td>
                                 <td>{{ $k->KodeKasBank }}</td>
                                 <td>{{ $k->KodeInvoice }}</td>
-                                <td>{{ $k->Nama }}</td>
                                 <td>{{ $k->Karyawan }}</td>
+                                <td>{{ $k->Nama }}</td>
                                 <td>{{ $k->KodeBayar }}</td>
                                 <td>Rp. {{ number_format($k->Total, 0, ',', '.') }},-</td>
                                 <!-- <td>Rp. {{ number_format($k->SaldoCash, 0, ',', '.') }},-</td>
