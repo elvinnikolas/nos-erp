@@ -22,13 +22,13 @@
         <div id="filter" class="collapse">
           <form action="{{ url('/popembelian/cari')}}" method="get">
             <div class="x_content">
-              <div class="col-md-8 col-sm-8">
+              <div class="col-md-5 col-sm-5">
                 <div class="form-group">
                   <label>Cari:</label>
                   <input type="text" class="form-control" name="name" value="{{Request::get('name')}}" placeholder="Kode PO / Nama Supplier" />
                 </div>
               </div>
-              <div class="col-md-5 col-sm-5">
+              <div class="col-md-3 col-sm-3">
                 <div class="form-group">
                   <label for="tanggalpo">Dari :</label>
                   <div class="input-group date" id="tanggalpo">
@@ -39,7 +39,7 @@
                   </div>
                 </div>
               </div>
-              <div class="col-md-5 col-sm-5">
+              <div class="col-md-3 col-sm-3">
                 <div class="form-group">
                   <label for="tanggalposampai">Sampai :</label>
                   <div class="input-group date" id="tanggalposampai">
@@ -164,7 +164,8 @@
   });
 
   $('#table').DataTable({
-    "order": []
+    "order": [],
+    "pageLength": 25
   });
 </script>
 @endpush

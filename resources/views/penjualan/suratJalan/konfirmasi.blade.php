@@ -15,13 +15,13 @@
         <div id="filter" class="collapse">
             <form action="{{ url('/konfirmasiSuratJalan/cari')}}" method="get">
                 <div class="x_content">
-                    <div class="col-md-8 col-sm-8">
+                    <div class="col-md-5 col-sm-5">
                         <div class="form-group">
                             <label for="tanggalpo">Cari:</label>
                             <input type="text" class="form-control" name="name" value="{{Request::get('name')}}" placeholder="Nomor SO / Nomor SJ / Nama Pelanggan" />
                         </div>
                     </div>
-                    <div class="col-md-5 col-sm-5">
+                    <div class="col-md-3 col-sm-3">
                         <div class="form-group">
                             <label for="tanggalpo">Dari:</label>
                             <div class="input-group date" id="start">
@@ -32,7 +32,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-5 col-sm-5">
+                    <div class="col-md-3 col-sm-3">
                         <div class="form-group">
                             <label for="tanggalpo">Sampai:</label>
                             <div class="input-group date" id="end">
@@ -114,6 +114,9 @@
                             <a href="{{ url('/suratJalan/view/'.$suratjalan->KodeSuratJalanID ) }}" class="btn-xs btn btn-primary">
                                 <i class="fa fa-eye" aria-hidden="true"></i> Lihat
                             </a>
+                            <a href="{{ url('/suratJalan/editKonfirmasi/'.$suratjalan->KodeSuratJalanID ) }}" class="btn-xs btn btn-success">
+                                <i class="fa fa-pencil" aria-hidden="true"></i> Ubah
+                            </a>
                         </td>
                     </tr>
                     @endforeach
@@ -136,7 +139,8 @@
     });
 
     $('#table').DataTable({
-        "order": []
+        "order": [],
+        "pageLength": 25
     });
 </script>
 @endpush

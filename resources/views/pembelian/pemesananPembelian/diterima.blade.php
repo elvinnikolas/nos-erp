@@ -114,7 +114,8 @@
   });
 
   $('#table').DataTable({
-    "order": []
+    "order": [],
+    "pageLength": 25
   });
 </script>
 @endpush

@@ -6,8 +6,8 @@
     <style>
         p,
         tr {
-            font-size: 12px;
-            margin: 0;
+            font-size: 15px;
+            margin: 2;
         }
 
         form {
@@ -63,6 +63,11 @@
         #marginless {
             margin: 0;
         }
+
+        #borderless {
+            border-collapse: collapse;
+            border: none;
+        }
     </style>
 </head>
 
@@ -75,47 +80,87 @@
                         @csrf
                         <!-- Contents -->
                         <div class="form-row">
-                            <div class="column">
-                                <p>No. Inv&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {{$invoice->KodeInvoiceHutangShow}}</p>
-                                <p>No. SJ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: {{$penerimaanbarang->KodePenerimaanBarang}}</p>
-                                <p>Jatuh Tempo&nbsp;: {{\Carbon\Carbon::parse($invoice->Tanggal)->addDays($invoice->Term)->format('d-m-Y')}}</p>
+                            <p id="center"><b>INVOICE</b></p>
+                        </div>
+                        <br>
+                        <div class="form-row">
+                            <div style="width: 50%; float:left">
+                                <table id="borderless">
+                                    <tr id="borderless">
+                                        <td width="25%" id="borderless">
+                                            <p>Kepada yth.</p>
+                                        </td>
+                                        <td width="75%" id="borderless">
+                                            <p>:&nbsp; {{$invoice->NamaSupplier}}</p>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
-                            <div class="column">
-                                <p id="center">Invoice Hutang</p>
-                                <p id="center">{{$invoice->TanggalFormat}}</p>
-                            </div>
-                            <div class="column">
-                                <p id="right">Kepada yth.</p>
-                                <p id="right">Supplier/Toko : {{$invoice->NamaSupplier}}</p>
+                            <div style="width: 50%; float:right">
+                                <table id="borderless">
+                                    <tr id="borderless">
+                                        <td width="70%" id="borderless">
+                                            <p id="right">No Invoice :</p>
+                                        </td>
+                                        <td width="30%" id="borderless">
+                                            <p>{{$invoice->KodeInvoiceHutangShow}}</p>
+                                        </td>
+                                    </tr>
+                                    <tr id="borderless">
+                                        <td width="70%" id="borderless">
+                                            <p id="right">No PB :</p>
+                                        </td>
+                                        <td width="30%" id="borderless">
+                                            <p>{{$penerimaanbarang->KodePenerimaanBarang}}</p>
+                                        </td>
+                                    </tr>
+                                    <tr id="borderless">
+                                        <td width="70%" id="borderless">
+                                            <p id="right">Tanggal :</p>
+                                        </td>
+                                        <td width="30%" id="borderless">
+                                            <p>{{$invoice->TanggalFormat}}</p>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                        <br><br><br><br>
+                        <br><br><br><br><br>
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <table id="items">
                                     <tr>
-                                        <td id="center"><b>Kode Barang</b></td>
+                                        <td id="center"><b>No</b></td>
+                                        <!-- <td id="center"><b>Kode Barang</b></td> -->
                                         <td id="center"><b>Nama Barang</b></td>
-                                        <td id="center"><b>Jumlah</b></td>
+                                        <td id="center"><b>Qty</b></td>
+                                        <td id="center"><b>Satuan</b></td>
                                         <td id="center"><b>Harga</b></td>
-                                        <td id="center"><b>Total</b></td>
+                                        <td id="center"><b>Subtotal</b></td>
                                     </tr>
+                                    {{$no = 1}}
                                     @foreach($items as $item)
                                     <tr class="rowinput">
                                         <td>
-                                            &nbsp;&nbsp;&nbsp;{{$item->KodeItem}}
+                                            &nbsp;&nbsp;&nbsp;{{$no++}}
                                         </td>
+                                        <!-- <td>
+                                            &nbsp;&nbsp;&nbsp;{{$item->KodeItem}}
+                                        </td> -->
                                         <td>
                                             &nbsp;&nbsp;&nbsp;{{$item->NamaItem}}
                                         </td>
                                         <td id="right">
-                                            {{$item->Qty}} &nbsp; {{$item->NamaSatuan}}&nbsp;&nbsp;&nbsp;
+                                            {{$item->Qty}}&nbsp;&nbsp;&nbsp;
                                         </td>
                                         <td id="right">
-                                            Rp. {{number_format($item->HargaJual)}},-&nbsp;&nbsp;&nbsp;
+                                            {{$item->NamaSatuan}}&nbsp;&nbsp;&nbsp;
                                         </td>
                                         <td id="right">
-                                            Rp. {{number_format($item->HargaJual*$item->Qty)}},-&nbsp;&nbsp;&nbsp;
+                                            Rp. {{number_format(($item->HargaJual), 0, ',', '.')}},-&nbsp;&nbsp;&nbsp;
+                                        </td>
+                                        <td id="right">
+                                            Rp. {{number_format(($item->HargaJual*$item->Qty), 0, ',', '.')}},-&nbsp;&nbsp;&nbsp;
                                         </td>
                                     </tr>
                                     @endforeach
@@ -123,17 +168,47 @@
                                 <br><br>
                                 <div class="row">
                                     <div class="column">
-                                        <p>Total Barang : {{$jml}}</p>
                                         <p>Sales : {{$sales->Nama}}</p>
                                     </div>
                                     <div class="column"></div>
                                     <div class="column">
-                                        <p id="right">Diskon : Rp. {{number_format($penerimaanbarang->NilaiDiskon)}},-</p>
-                                        <p id="right">PPN : Rp. {{number_format($penerimaanbarang->NilaiPPN)}},-</p>
-                                        <p id="right">Subtotal : Rp. {{number_format($penerimaanbarang->Subtotal)}},-</p>
+                                        <table id="borderless">
+                                            <tr id="borderless">
+                                                <td width="35%" id="borderless">
+                                                    <p>Subtotal</p>
+                                                </td>
+                                                <td width="65%" id="borderless">
+                                                    <p>:&nbsp; Rp. {{number_format(($penerimaanbarang->Subtotal-$penerimaanbarang->NilaiDiskon-$penerimaanbarang->NilaiPPN), 0, ',', '.')}},-</p>
+                                                </td>
+                                            </tr>
+                                            <tr id="borderless">
+                                                <td width="35%" id="borderless">
+                                                    <p>PPN (10%)</p>
+                                                </td>
+                                                <td width="65%" id="borderless">
+                                                    <p>:&nbsp; Rp. {{number_format(($penerimaanbarang->NilaiPPN), 0, ',', '.')}},-</p>
+                                                </td>
+                                            </tr>
+                                            <tr id="borderless">
+                                                <td width="35%" id="borderless">
+                                                    <p>Diskon&nbsp;({{$penerimaanbarang->Diskon}}%)</p>
+                                                </td>
+                                                <td width="65%" id="borderless">
+                                                    <p>:&nbsp; Rp. {{number_format(($penerimaanbarang->NilaiDiskon), 0, ',', '.')}},-</p>
+                                                </td>
+                                            </tr>
+                                            <tr id="borderless">
+                                                <td width="35%" id="borderless">
+                                                    <p>Total</p>
+                                                </td>
+                                                <td width="65%" id="borderless">
+                                                    <p>:&nbsp; Rp. {{number_format(($penerimaanbarang->Subtotal), 0, ',', '.')}},-</p>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
                                 </div>
-                                <br>
+                                <br><br>
                                 <div class="row">
                                     <div class="column"></div>
                                     <div class="column">

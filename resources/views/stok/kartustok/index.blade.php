@@ -44,24 +44,24 @@
                                     </div>
                                 </div>
                                 <div class="col-md-3">
-                                    <label>Gudang</label>
-                                    <select class="form-control" name="lokasi" id="lokasi">
-                                        @foreach($store as $l)
-                                        <option value="{{$l->KodeLokasi}}">{{$l->NamaLokasi}}</option>
-                                        @endforeach
-                                    </select>
                                     <label>Item</label>
                                     <select class="form-control" name="item" id="item">
                                         @foreach($item as $l)
                                         <option value="{{$l->KodeItem}}">{{$l->NamaItem}}</option>
                                         @endforeach
                                     </select>
-                                </div>
-                                <div class="col-md-3">
                                     <label>Satuan</label>
                                     <select class="form-control" name="satuan" id="satuan">
                                         @foreach($satuan as $l)
-                                        <option value="{{$l->KodeSatuan}}">{{$l->NamaSatuan}}</option>
+                                        <option value="{{$l->KodeSatuan}}">{{$l->KodeSatuan}}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label>Gudang</label>
+                                    <select class="form-control" name="lokasi" id="lokasi">
+                                        @foreach($store as $l)
+                                        <option value="{{$l->KodeLokasi}}">{{$l->NamaLokasi}}</option>
                                         @endforeach
                                     </select>
                                     <label></label>
@@ -115,7 +115,7 @@
                                 <td>{{ $stk->KodeUser }}</td>
                                 <td>{{ $stk->Qty }}</td>
                                 <td>{{ $stk->saldo }}</td>
-                                <td>{{ $stk->NamaSatuan }}</td>
+                                <td>{{ $stk->KodeSatuan }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -131,7 +131,8 @@
 @push('scripts')
 <script type="text/javascript">
     $('#table').DataTable({
-        "order": []
+        "order": [],
+        "pageLength": 25
     });
     $('#lokasi').select2({
         width: '100%'

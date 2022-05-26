@@ -66,6 +66,10 @@
                                             </span>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <label>Keterangan</label>
+                                        <textarea id="Keterangan" name="Keterangan" class="form-control"></textarea>
+                                    </div>
                                 </div>
                             </div>
                         </div>

@@ -1,6 +1,11 @@
 <form action="{{ url('/suratJalan/store',$id)}}" method="post" class="formsub">
   @csrf
 
+  @foreach($alamat as $alm)
+  <input type="hidden" id="Kota{{$alm->NoIndeks}}" value="{{$alm->Kota}}">
+  <input type="hidden" id="Alamat{{$alm->NoIndeks}}" value="{{$alm->Alamat}}">
+  @endforeach
+
   <div class="form-row">
     <!-- column 1 -->
     <div class="form-group col-md-3">
@@ -16,12 +21,26 @@
         </div>
       </div>
       <div class="form-group">
-        <label for="inputBerlaku">Alamat</label>
-        <select name="AlamatPelanggan" class="form-control" id="alamat">
+        <label for="inputBerlaku">Alamat (Surat Jalan)</label>
+        <select name="Alamat" onchange="getalamat(this,1)" class="form-control alamat1" id="alamat">
+          <option value="0" selected="selected">- Pilih Alamat -</option>
           @foreach($alamat as $dalamat)
-          <option selected="selected" value="{{$dalamat->Alamat}}">{{$dalamat->Alamat}}</option>
+          <option value="{{$dalamat->NoIndeks}}">{{$dalamat->Alamat}}</option>
           @endforeach
         </select>
+        <input type="hidden" class="form-control alamat" name="AlamatPelanggan" value="">
+        <input type="text" readonly class="form-control kota" name="KotaPelanggan" value="">
+      </div>
+      <div class="form-group">
+        <label for="inputBerlaku">Alamat (Invoice)</label>
+        <select name="Alamat" onchange="getalamatinv(this,1)" class="form-control alamat1" id="alamatinv">
+          <option value="0" selected="selected">- Pilih Alamat -</option>
+          @foreach($alamat as $dalamat)
+          <option value="{{$dalamat->NoIndeks}}">{{$dalamat->Alamat}}</option>
+          @endforeach
+        </select>
+        <input type="hidden" class="form-control alamatinv" name="AlamatPelangganInvoice" value="">
+        <input type="text" readonly class="form-control kotainv" name="KotaPelangganInvoice" value="">
       </div>
       <div class="form-group">
         <label for="inputTerm">Sopir</label>
@@ -33,7 +52,7 @@
       </div>
       <div class="form-group">
         <label for="inputPO">No Polisi</label>
-        <input type="text" class="form-control" name="nopol" required="required">
+        <input type="text" class="form-control" name="nopol" required>
       </div>
     </div>
     <!-- pembatas -->
@@ -56,14 +75,12 @@
           @endforeach
         </select>
       </div>
-      <!-- <div class="form-group">
-        <label for="inputPelanggan">Pelanggan</label>
-        <select readonly="readonly " class="form-control" name="KodePelanggan" id="inputPelanggan">
-          @foreach($pelanggans as $pel)
-          <option value="{{$pel->KodePelanggan}}">{{$pel->NamaPelanggan}}</option>
-          @endforeach
-        </select>
-      </div> -->
+      <div class="form-group">
+        <label>Total Item</label>
+        <input type="text" class="form-control" name="TotalItem" id="inputFaktur" required>
+      </div>
+      <label for="inputKeterangan">Keterangan</label>
+      <textarea class="form-control" name="InputKeterangan" id="inputKeterangan" rows="3" required></textarea>
       <!-- <div class="form-group">
         <label for="inputPelanggan">Diskon</label> -->
       <input type="hidden" step=0.01 readonly="readonly" class="form-control diskon" name="diskon" value="{{$so->Diskon}}">
@@ -145,6 +162,7 @@
 
 <script type="text/javascript">
   $('#alamat').select2()
+  $('#alamatinv').select2()
   $('#sopir').select2()
   $('#gudang').select2()
   $('#matauang').select2()

@@ -31,6 +31,15 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('/masterpelanggan', 'MasterPelangganController');
     Route::resource('/mastersupplier', 'MasterSupplierController');
     Route::resource('/masterkaryawan', 'MasterKaryawanController');
+    Route::resource('/mastergolongan', 'MasterGolonganController');
+    Route::resource('/masterjabatan', 'MasterJabatanController');
+    Route::resource('/masterresep', 'MasterResepController');
+    Route::resource('/masterbonus', 'MasterBonusController');
+
+    Route::get('api/mastergolongan', 'MasterGolonganController@apiOPN')->name('api.mastergolongan');
+    Route::get('api/mastergolongan/item', 'MasterGolonganController@apiItem')->name('api.mastergolongan.item');
+    Route::get('api/bonus', 'MasterBonusController@dataBonus')->name('bonus.data');
+    Route::get('api/bonus/detail', 'MasterBonusController@dataBonusDetail')->name('bonus.data.detail');
 
     Route::get('/masteritem/editkonversi/{idItem}/{idSatuan}', 'MasterItemController@editkonversi');
 
@@ -42,7 +51,14 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/masterkaryawan/delete/{id}', 'MasterKaryawanController@destroy');
     Route::get('/masterpelanggan/delete/{id}', 'MasterPelangganController@destroy');
     Route::get('/mastersupplier/delete/{id}', 'MasterSupplierController@destroy');
+    Route::get('/mastergolongan/delete/{id}', 'MasterGolonganController@destroy');
+    Route::get('/masterjabatan/delete/{id}', 'MasterJabatanController@destroy');
+    Route::get('/masterresep/delete/{id}', 'MasterResepController@destroy');
+    Route::get('/masterbonus/delete/{id}', 'MasterBonusController@destroy');
 
+    Route::get('/masterkaryawan/print/{id}', 'MasterKaryawanController@print');
+
+    // route API master
     Route::get('api/mastergudang', 'MasterGudangController@apiOPN')->name('api.mastergudang');
     Route::get('api/masterklasifikasi', 'MasterKlasifikasiController@apiOPN')->name('api.masterklasifikasi');
     Route::get('api/mastersatuan', 'MasterSatuanController@apiOPN')->name('api.mastersatuan');
@@ -51,6 +67,11 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('api/masterkaryawan', 'MasterKaryawanController@apiOPN')->name('api.masterkaryawan');
     Route::get('api/masterpelanggan', 'MasterPelangganController@apiOPN')->name('api.masterpelanggan');
     Route::get('api/mastersupplier', 'MasterSupplierController@apiOPN')->name('api.mastersupplier');
+    Route::get('api/mastergolongan', 'MasterGolonganController@apiOPN')->name('api.mastergolongan');
+    Route::get('api/masterjabatan', 'MasterJabatanController@apiOPN')->name('api.masterjabatan');
+    Route::get('api/masterresep', 'MasterResepController@apiOPN')->name('api.masterresep');
+    Route::get('api/masterresep/detail', 'MasterResepController@apiDetail')->name('api.masterresep.detail');
+    Route::get('api/masterresep/satuan', 'MasterResepController@apiSatuanOPN')->name('api.masterresep.satuan');
 
     //ROUTE PEMBELIAN
     //route pemesananpembelian
@@ -142,6 +163,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/suratJalan/store/{id}', 'SuratJalanController@store');
     Route::get('/suratJalan/edit/{id}', 'SuratJalanController@edit');
     Route::post('/suratJalan/update/{id}', 'SuratJalanController@update');
+    Route::get('/suratJalan/editKonfirmasi/{id}', 'SuratJalanController@editKonfirmasi');
+    Route::post('/suratJalan/updateKonfirmasi/{id}', 'SuratJalanController@updateKonfirmasi');
     Route::get('/suratJalan/create', 'SuratJalanController@createByCust');
     Route::get('/suratJalan/searchsobycustid/{id}', 'SuratJalanController@searchSOByCustId');
     Route::get('/suratJalan/createbasedso/{id}', 'SuratJalanController@createBasedSO');
@@ -181,21 +204,36 @@ Route::group(['middleware' => 'auth'], function () {
     //ROUTE STOK
     //route stok masuk
     Route::get('/stokmasuk', 'StokMasukController@index');
+    Route::post('/stokmasuk/filter', 'StokMasukController@filter');
+    Route::post('/stokmasuk/filterdate', 'StokMasukController@filterdate');
     Route::get('/stokmasuk/create', 'StokMasukController@create');
     Route::get('/stokmasuk/view/{id}', 'StokMasukController@view');
     Route::post('/stokmasuk/store', 'StokMasukController@store');
 
     //route stok keluar
     Route::get('/stokkeluar', 'StokKeluarController@index');
+    Route::post('/stokkeluar/filter', 'StokKeluarController@filter');
+    Route::post('/stokkeluar/filterdate', 'StokKeluarController@filterdate');
     Route::get('/stokkeluar/create', 'StokKeluarController@create');
     Route::get('/stokkeluar/view/{id}', 'StokKeluarController@view');
     Route::post('/stokkeluar/store', 'StokKeluarController@store');
+
+    //route sisa stok
+    Route::get('/sisastok', 'SisaStokController@index');
+    Route::get('/sisastok/show', 'SisaStokController@show');
+    Route::post('/sisastok/filter', 'SisaStokController@filter');
 
     //ROUTE LAPORAN
     //route kartu stok
     Route::get('/kartustok', 'KartuStokController@index');
     Route::get('/kartustok/show', 'KartuStokController@show');
     Route::post('/kartustok/filter', 'KartuStokController@filter');
+
+    //route data stok
+    Route::get('/datastok', 'DataStokController@index');
+    Route::post('/datastok/show', 'DataStokController@show');
+    Route::post('/datastok/filter', 'DataStokController@filter');
+    Route::post('/datastok/filterdate', 'DataStokController@filterdate');
 
     //route buku kas
     Route::get('/bukukasbesar', 'BukuKasBesarController@index');
@@ -205,6 +243,18 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/bukukaskecil', 'BukuKasKecilController@index');
     Route::get('/bukukaskecil/show', 'BukuKasKecilController@show');
     Route::post('/bukukaskecil/filter', 'BukuKasKecilController@filter');
+
+    //route penjualan
+    Route::get('/laporanpenjualan', 'LaporanPenjualanController@index');
+    Route::get('/laporanpenjualan/{id}', 'LaporanPenjualanController@show');
+    Route::post('/laporanpenjualan/filter', 'LaporanPenjualanController@filter');
+    Route::post('/laporanpenjualan/filterdate', 'LaporanPenjualanController@filterdate');
+
+    //route produksi
+    Route::get('/laporanproduksi', 'LaporanProduksiController@index');
+    Route::post('/laporanproduksi/show', 'LaporanProduksiController@show');
+    Route::post('/laporanproduksi/filtergolongan', 'LaporanProduksiController@filtergolongan');
+    Route::post('/laporanproduksi/filteritem', 'LaporanProduksiController@filteritem');
 
     //ROUTE OPERASIONAL
     //route pengeluaran tambahan
@@ -234,6 +284,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     //route invoice hutang
     Route::get('/invoicehutang', 'InvoiceHutangController@hutang');
+    Route::post('/invoicehutang/filter', 'InvoiceHutangController@filter');
     Route::get('/invoicehutang/edit/{id}', 'InvoiceHutangController@edit');
     Route::post('/invoicehutang/update/{id}', 'InvoiceHutangController@update');
     Route::get('/invoicehutang/print/{id}', 'InvoiceHutangController@print');
@@ -242,6 +293,7 @@ Route::group(['middleware' => 'auth'], function () {
     //ROUTE PIUTANG
     //route invoice piutang
     Route::get('/invoicepiutang', 'InvoicePiutangController@piutang');
+    Route::post('/invoicepiutang/filter', 'InvoicePiutangController@filter');
     Route::get('/invoicepiutang/edit/{id}', 'InvoicePiutangController@edit');
     Route::post('/invoicepiutang/update/{id}', 'InvoicePiutangController@update');
     Route::get('/invoicepiutang/print/{id}', 'InvoicePiutangController@print');
@@ -256,6 +308,18 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/pelunasanpiutang/payment/{id}/edit', 'PelunasanPiutangController@edit');
     Route::post('/pelunasanpiutang/payment/{id}/update', 'PelunasanPiutangController@update');
 
+    //route kwitansi piutang
+    Route::get('/kwitansipiutang', 'KwitansiPiutangController@index');
+    Route::get('/kwitansipiutang/filter', 'KwitansiPiutangController@filter');
+    Route::get('/kwitansipiutang/view/{id}', 'KwitansiPiutangController@view');
+    Route::get('/kwitansipiutang/create', 'KwitansiPiutangController@create');
+    Route::post('/kwitansipiutang/create/kwitansi', 'KwitansiPiutangController@createKwitansi');
+    Route::post('/kwitansipiutang/store', 'KwitansiPiutangController@store');
+    Route::get('/kwitansipiutang/edit/{id}', 'KwitansiPiutangController@edit');
+    Route::post('/kwitansipiutang/update/{id}', 'KwitansiPiutangController@update');
+    Route::get('/kwitansipiutang/print/{id}', 'KwitansiPiutangController@print');
+    Route::get('/kwitansipiutang/destroy/{id}', 'KwitansiPiutangController@destroy');
+
     //ROUTE EVENTLOG
     Route::get('/eventlog', 'EventlogController@index');
 
@@ -268,4 +332,69 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/user/change/{id}', 'UserController@showchange');
     Route::get('/user/reset/{id}', 'UserController@showreset');
     Route::get('/user/destroy/{id}', 'UserController@destroy');
+
+    //ROUTE PAYROLL
+    //route absensi
+    Route::get('/absensi', 'AbsensiController@index');
+    Route::get('/absensi/absen', 'AbsensiController@create');
+    Route::post('/absensi/store', 'AbsensiController@store');
+    Route::get('/absensi/histori', 'AbsensiController@history');
+    Route::get('/absensi/data/{id}', 'AbsensiController@dataAbsen');
+
+    //route gaji
+    Route::get('/gaji', 'GajiController@index');
+    Route::get('/gaji/create', 'GajiController@create');
+    Route::get('/gaji/edit/{id}', 'GajiController@edit');
+    Route::get('/gaji/delete/{id}', 'GajiController@destroy');
+    Route::post('/gaji/store', 'GajiController@store');
+    Route::get('/gaji/show', 'GajiController@show');
+    Route::post('/gaji/filter', 'GajiController@filter');
+    Route::post('/gaji/update/{id}', 'GajiController@update');
+    Route::get('/gaji/filterfilterkaryawanbygolongan/{kode}', 'GajiController@filterByGolongan');
+    Route::get('/gaji/searchkaryawanbykode/{kode}', 'GajiController@searchByKode');
+    Route::get('/gaji/searchitembykode/{kode}', 'GajiController@searchItemByKode');
+
+    //ROUTE PENGGAJIAN
+    Route::get('penggajian', 'PenggajianKaryawanController@index')->name('penggajian');
+    Route::post('penggajian/absen', 'PenggajianKaryawanController@absen')->name('penggajian.absen');
+    Route::post('penggajian/gaji', 'PenggajianKaryawanController@gaji')->name('penggajian.gaji');
+    Route::post('penggajian/laporan', 'PenggajianKaryawanController@laporan')->name('penggajian.laporan');
+
+    //ROUTE PRODUKSI
+    //route hasil produksi
+    Route::resource('/produksi', 'ProduksiController');
+    Route::get('api/produksi', 'ProduksiController@dataProduksi')->name('produksi.data');
+    Route::get('api/produksi/detail', 'ProduksiController@dataProduksiDetail')->name('produksi.data.detail');
+
+    //route pemeriksaan produksi
+    Route::get('/pemeriksaanproduksi', 'PemeriksaanProduksiController@index');
+    Route::get('/pemeriksaanproduksi/create', 'PemeriksaanProduksiController@create');
+    Route::get('/pemeriksaanproduksi/select/{id}', 'PemeriksaanProduksiController@select');
+    Route::post('/pemeriksaanproduksi/store/{id}', 'PemeriksaanProduksiController@store');
+    Route::get('api/pemeriksaanproduksi', 'PemeriksaanProduksiController@dataPemeriksaan')->name('produksi.pemeriksaan.data');
+    Route::get('api/pemeriksaanproduksi/detail', 'PemeriksaanProduksiController@dataPemeriksaanDetail')->name('produksi.pemeriksaan.detail');
+
+    //route hutang produksi
+    Route::get('/hutangproduksi', 'HutangProduksiController@index');
+    Route::get('/hutangproduksi/select', 'HutangProduksiController@select')->name('hutangproduksi.select');
+    Route::post('/hutangproduksi/create', 'HutangProduksiController@create');
+    Route::post('/hutangproduksi/store', 'HutangProduksiController@store');
+    Route::get('/hutangproduksi/show/{id}', 'HutangProduksiController@show');
+    Route::get('/hutangproduksi/confirm/{id}', 'HutangProduksiController@confirm');
+    Route::get('/hutangproduksi/destroy/{id}', 'HutangProduksiController@destroy');
+
+    //ROUTE MUTASI
+    Route::get('/pindahgudang', 'PindahGudangController@index');
+    Route::get('/pindahgudang/create', 'PindahGudangController@create');
+    Route::get('/pindahgudang/search', 'PindahGudangController@search');
+    Route::get('/pindahgudang/edit/{id}', 'PindahGudangController@edit');
+    Route::get('/pindahgudang/confirmation/{id}', 'PindahGudangController@confirmation');
+    Route::get('/pindahgudang/destroy/{id}', 'PindahGudangController@destroy');
+    Route::get('/pindahgudang/look/{id}', 'PindahGudangController@look');
+    Route::get('/pindahgudang/print/{id}', 'PindahGudangController@print');
+    Route::get('/pindahgudang/createlpb/{id}', 'PindahGudangController@createlpb');
+    Route::post('/pindahgudang/confirm/{id}', 'PindahGudangController@confirm');
+    Route::post('/pindahgudang/store', 'PindahGudangController@store');
+    Route::post('/pindahgudang/update/{id}', 'PindahGudangController@update');
+    Route::post('/pindahgudang/storelpb/{id}', 'PindahGudangController@storelpb');
 });

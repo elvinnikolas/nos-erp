@@ -68,6 +68,8 @@
                                         </span>
                                     </div>
                                 </div>
+                                <label for="inputKeterangan">Keterangan</label>
+                                <textarea class="form-control" name="Keterangan" id="inputKeterangan" rows="3" required></textarea>
                             </div>
                             <!-- pembatas -->
                             <div class="form-group col-md-1"></div>
@@ -214,14 +216,14 @@
             }
         }
         var befDis = $(".subtotal").val();
-        diskon = parseInt($(".subtotal").val()) * diskon / 100;
         $(".subtotal").val(parseInt($(".subtotal").val()));
         var ppn = $(".ppn").val();
         if (ppn == "ya") {
-            ppn = parseInt(befDis) * 10 / 100;
+            ppn = parseInt(befDis) * 11 / 100;
         } else {
             ppn = parseInt(0);
         }
+        diskon = (parseInt($(".subtotal").val()) + ppn) * diskon / 100;
         $(".ppnval").val(ppn);
         $(".diskonval").val(diskon);
         $(".befDis").val(parseInt($(".subtotal").val()));

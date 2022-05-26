@@ -5,10 +5,14 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1>Pelunasan Piutang</h1><br>
+                    <h1>Pelunasan Piutang</h1>
+                    <a href="{{ url('/pelunasanpiutang/invoice/'.$pelanggan->KodePelanggan.'')}}" class="btn btn-success pull-right">
+                        <b>Pilih Invoice</b>
+                    </a>
+                    <br><br>
                 </div>
                 <div class="x_body">
-                    @if($sisa > 0)
+                    @if(($invoice->Status == 'OPN') || ($sisa > 0.01))
                     <a class="btn btn-primary " href="{{url('/pelunasanpiutang/payment/'.$invoice->KodeInvoicePiutang.'/add')}}">
                         <i class="fa fa-plus" aria-hidden="true"></i> Pembayaran
                     </a>
@@ -51,6 +55,8 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $('#table').DataTable();
+    $('#table').DataTable({
+        "pageLength": 25
+    });
 </script>
 @endpush

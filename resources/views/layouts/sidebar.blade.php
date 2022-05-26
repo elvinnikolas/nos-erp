@@ -13,6 +13,10 @@
                     <li><a href="{{ url('/masterpelanggan') }}">Data Pelanggan</a></li>
                     <li><a href="{{ url('/mastersupplier') }}">Data Supplier</a></li>
                     <li><a href="{{ url('/masterkaryawan')}}">Data Karyawan</a></li>
+                    <li><a href="{{ url('/mastergolongan')}}">Data Golongan</a></li>
+                    <li><a href="{{ url('/masterjabatan')}}">Data Jabatan</a></li>
+                    <li><a href="{{ url('/masterresep')}}">Data Resep</a></li>
+                    <li><a href="{{ url('/masterbonus')}}">Data Bonus</a></li>
                 </ul>
             </li>
 
@@ -51,6 +55,7 @@
                         <ul class="nav child_menu">
                             <li><a href="{{ url('/invoicepiutang') }}">Invoice</a></li>
                             <li><a href="{{ url('/pelunasanpiutang') }}">Pelunasan</a></li>
+                            <li><a href="{{ url('/kwitansipiutang') }}">Kwitansi</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -95,12 +100,14 @@
                 <ul class="nav child_menu">
                     <li><a href="{{ url('/pengeluarantambahan') }}">Biaya Operasional</a></li>
                     <li><a href="{{ url('/saldo') }}">Saldo</a></li>
+                    <li><a href="{{ url('/pindahgudang') }}">Pindah Gudang</a></li>
                 </ul>
             </li>
 
             <li>
                 <a><i class="fa fa-cube"></i> Stok <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
+                    <li><a href="{{ url('/sisastok') }}">Sisa Stok</a></li>
                     <li><a href="{{ url('/stokmasuk') }}">Stok Masuk</a></li>
                     <li><a href="{{ url('/stokkeluar') }}">Stok Keluar</a></li>
                 </ul>
@@ -109,9 +116,34 @@
             <li>
                 <a><i class="fa fa-book"></i> Laporan <span class="fa fa-chevron-down"></span></a>
                 <ul class="nav child_menu">
-                    <li><a href="{{ url('/kartustok') }}">Kartu Stok</a></li>
-                    <li><a href="{{ url('/bukukasbesar') }}">Kas Besar</a></li>
-                    <li><a href="{{ url('/bukukaskecil') }}">Kas Kecil</a></li>
+                    <li><a>Stok<span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="{{ url('/kartustok') }}">Kartu Stok</a></li>
+                            <li><a href="{{ url('/datastok') }}">Data Stok</a></li>
+                        </ul>
+                    </li>
+                    <li><a>Kas<span class="fa fa-chevron-down"></span></a>
+                        <ul class="nav child_menu">
+                            <li><a href="{{ url('/bukukasbesar') }}">Kas Besar</a></li>
+                            <li><a href="{{ url('/bukukaskecil') }}">Kas Kecil</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="{{ url('/laporanpenjualan') }}">Penjualan</a></li>
+                    <!-- <li><a href="{{ url('/laporanpembelian') }}">Pembelian</a></li> -->
+                    <li><a href="{{ url('/laporanproduksi') }}">Produksi</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="/penggajian"><i class="fa fa-money"></i> Penggajian </a>
+            </li>
+
+            <li>
+                <a><i class="fa fa-archive"></i> Produksi <span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="{{ url('/produksi') }}">Hasil Produksi</a></li>
+                    <li><a href="{{ url('/pemeriksaanproduksi') }}">Pemeriksaan Produksi</a></li>
+                    <li><a href="{{ url('/hutangproduksi') }}">Hutang Produksi</a></li>
                 </ul>
             </li>
 

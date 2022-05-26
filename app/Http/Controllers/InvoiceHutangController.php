@@ -14,14 +14,73 @@ class InvoiceHutangController extends Controller
 {
     public function hutang()
     {
+        $year_now = date('Y');
         $invoice = DB::select('SELECT i.KodeInvoiceHutangShow, i.KodeInvoiceHutang, i.NoFaktur, i.Term, p.NamaSupplier, i.Tanggal, d.KodeLPB, d.Subtotal, d.TotalReturn, pb.PPN, COALESCE(sum(ph.Jumlah),0) as bayar
             FROM invoicehutangs i
             inner join invoicehutangdetails d on i.KodeInvoiceHutang = d.KodeInvoiceHutang
             inner join suppliers p on p.KodeSupplier = i.KodeSupplier
             left join pelunasanhutangs ph on ph.KodeInvoice = i.KodeInvoiceHutang
             left join penerimaanbarangs pb on pb.KodePenerimaanBarang = d.KodeLPB
-            GROUP by i.KodeInvoiceHutangShow, i.KodeInvoiceHutang, p.NamaSupplier, i.Tanggal, d.Subtotal, i.Term');
-        return view('hutang.invoice.index', compact('invoice'));
+            GROUP by i.KodeInvoiceHutang');
+
+        $returns = DB::select("SELECT SUM(d.TotalReturn) as total_return
+            FROM invoicehutangs i
+            inner join invoicehutangdetails d on i.KodeInvoiceHutang = d.KodeInvoiceHutang
+            GROUP by i.KodeInvoiceHutang");
+        $return = 0;
+        foreach ($returns as $ret) {
+            $return += $ret->total_return;
+        }
+
+        $bayars = DB::select("SELECT SUM(p.Jumlah) as total_bayar
+            FROM invoicehutangs i
+            inner join pelunasanhutangs p on i.KodeInvoiceHutang = p.KodeInvoice
+            GROUP by i.KodeInvoiceHutang");
+        $bayar = 0;
+        foreach ($bayars as $ret) {
+            $bayar += $ret->total_bayar;
+        }
+
+        $total = DB::table('invoicehutangs')->select(DB::raw('SUM(Total) as subtotal'))->first()->subtotal;
+        $no = 1;
+        return view('hutang.invoice.index', compact('invoice', 'year_now', 'total', 'bayar', 'return', 'no'));
+    }
+
+    public function filter(Request $request)
+    {
+        $year_now = date('Y');
+        $invoice = DB::select("SELECT i.KodeInvoiceHutangShow, i.KodeInvoiceHutang, i.NoFaktur, i.Term, p.NamaSupplier, i.Tanggal, d.KodeLPB, d.Subtotal, d.TotalReturn, pb.PPN, COALESCE(sum(ph.Jumlah),0) as bayar
+            FROM invoicehutangs i
+            inner join invoicehutangdetails d on i.KodeInvoiceHutang = d.KodeInvoiceHutang
+            inner join suppliers p on p.KodeSupplier = i.KodeSupplier
+            left join pelunasanhutangs ph on ph.KodeInvoice = i.KodeInvoiceHutang
+            left join penerimaanbarangs pb on pb.KodePenerimaanBarang = d.KodeLPB
+            WHERE MONTH(i.Tanggal) = '" . $request->month . "' AND YEAR(i.Tanggal) = '" . $request->year . "'
+            GROUP by i.KodeInvoiceHutang");
+
+        $returns = DB::select("SELECT SUM(d.TotalReturn) as total_return
+                    FROM invoicehutangs i
+                    inner join invoicehutangdetails d on i.KodeInvoiceHutang = d.KodeInvoiceHutang
+                    WHERE MONTH(i.Tanggal) = '" . $request->month . "' AND YEAR(i.Tanggal) = '" . $request->year . "'
+                    GROUP by i.KodeInvoiceHutang");
+        $return = 0;
+        foreach ($returns as $ret) {
+            $return += $ret->total_return;
+        }
+
+        $bayars = DB::select("SELECT SUM(p.Jumlah) as total_bayar
+                    FROM invoicehutangs i
+                    inner join pelunasanhutangs p on i.KodeInvoiceHutang = p.KodeInvoice
+                    WHERE MONTH(i.Tanggal) = '" . $request->month . "' AND YEAR(i.Tanggal) = '" . $request->year . "'
+                    GROUP by i.KodeInvoiceHutang");
+        $bayar = 0;
+        foreach ($bayars as $ret) {
+            $bayar += $ret->total_bayar;
+        }
+
+        $total = DB::table('invoicehutangs')->whereMonth('Tanggal', $request->month)->whereYear('Tanggal', $request->year)->select(DB::raw('SUM(Total) as subtotal'))->first()->subtotal;
+        $no = 1;
+        return view('hutang.invoice.index', compact('invoice', 'year_now', 'total', 'bayar', 'return', 'no'));
     }
 
     public function edit($id)
@@ -80,7 +139,7 @@ class InvoiceHutangController extends Controller
         $penerimaanbarang = penerimaanbarang::where('KodePenerimaanBarang', $inv->KodeLPB)->first();
         $sales = karyawan::where('KodeKaryawan', $penerimaanbarang->KodeSales)->first();
         $items = DB::select(
-            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga as HargaJual
+            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga as HargaJual, s.KodeSatuan
             FROM penerimaanbarangdetails a 
             inner join items i on a.KodeItem = i.KodeItem 
             inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan 

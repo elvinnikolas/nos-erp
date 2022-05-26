@@ -6,8 +6,8 @@
 	<style>
 		p,
 		tr {
-			font-size: 12px;
-			margin: 0;
+			font-size: 15px;
+			margin: 2;
 		}
 
 		form {
@@ -63,6 +63,11 @@
 		#marginless {
 			margin: 0;
 		}
+
+		#borderless {
+			border-collapse: collapse;
+			border: none;
+		}
 	</style>
 </head>
 
@@ -75,39 +80,85 @@
 						@csrf
 						<!-- Contents -->
 						<div class="form-row">
-							<div class="column">
-								<p>No. RPB : {{$returnpenerimaanbarang->KodePenerimaanBarangReturn}}</p>
-								<p>No. PB : {{$penerimaanbarang->KodePenerimaanBarang}}</p>
-								<p>No. PO : {{$penerimaanbarang->KodePO}}</p>
+							<p id="center"><b>SURAT JALAN RETURN</b></p>
+						</div>
+						<br>
+						<div class="form-row">
+							<div style="width: 50%; float:left">
+								<table id="borderless">
+									<tr id="borderless">
+                                        <td width="24%" id="borderless">
+                                            <p>Kepada yth.</p>
+                                        </td>
+                                        <td width="3%" id="borderless">
+                                            <p>:</p>
+                                        </td>
+                                        <td width="73%" id="borderless">
+                                            <p>{{$supplier->NamaSupplier}}</p>
+                                        </td>
+                                    </tr>
+									<tr id="borderless">
+                                        <td width="24%" id="borderless">
+                                            <p>Alamat</p>
+                                        </td>
+                                        <td width="3%" id="borderless">
+                                            <p>:</p>
+                                        </td>
+                                        <td width="73%" id="borderless">
+                                            <p>{{$supplier->Alamat}}</p>
+                                        </td>
+                                    </tr>
+								</table>
 							</div>
-							<div class="column">
-								<p id="center">Return Penerimaan Barang</p>
-								<p id="center">{{$returnpenerimaanbarang->Tanggal}}</p>
-							</div>
-							<div class="column">
-								<p id="right">Kepada yth.</p>
-								<p id="right">Supplier/Toko : {{$pelanggan->NamaSupplier}}</p>
+							<div style="width: 50%; float:right">
+								<table id="borderless">
+									<tr id="borderless">
+										<td width="30%" id="borderless">
+										</td>
+										<td width="30%" id="borderless">
+											<p>No. Return</p>
+										</td>
+										<td width="40%" id="borderless">
+											<p>:&nbsp; {{$returnpenerimaanbarang->KodePenerimaanBarangReturn}}</p>
+										</td>
+									</tr>
+									<tr id="borderless">
+										<td width="30%" id="borderless">
+										</td>
+										<td width="30%" id="borderless">
+											<p>Tanggal</p>
+										</td>
+										<td width="40%" id="borderless">
+											<p>:&nbsp; {{$returnpenerimaanbarang->Tanggal}}</p>
+										</td>
+									</tr>
+								</table>
 							</div>
 						</div>
-						<br><br><br><br>
+						<br><br><br><br><br>
 						<div class="form-row">
 							<div class="form-group col-md-12">
 								<table id="items">
 									<tr>
-										<td id="center"><b>Kode Barang</b></td>
+										<td id="center"><b>No</b></td>
 										<td id="center"><b>Nama Barang</b></td>
-										<td id="center"><b>Jumlah</b></td>
+										<td id="center"><b>Qty</b></td>
+										<td id="center"><b>Satuan</b></td>
 									</tr>
+									{{$no = 1}}
 									@foreach($items as $item)
 									<tr class="rowinput">
 										<td>
-											{{$item->KodeItem}}
+											&nbsp;&nbsp;&nbsp;{{$no++}}
 										</td>
 										<td>
-											{{$item->NamaItem}}
+											&nbsp;&nbsp;&nbsp;{{$item->NamaItem}}
 										</td>
 										<td id="right">
-											{{$item->Qty}} &nbsp; {{$item->NamaSatuan}}
+											{{$item->Qty}}&nbsp;&nbsp;&nbsp;
+										</td>
+										<td id="right">
+											{{$item->KodeSatuan}}&nbsp;&nbsp;&nbsp;
 										</td>
 									</tr>
 									@endforeach
@@ -115,21 +166,42 @@
 								<br><br>
 								<div class="row">
 									<div class="column">
-										<p>Total Barang : {{$jml}}</p>
-										<p>Sales : {{$sales->Nama}}</p>
+										<!-- <p>Sales : {{$sales->Nama}}</p> -->
+										<!-- <p>No. SJ (Supplier) : {{$penerimaanbarang->KodeSJ}}</p>
+										<p>Keterangan : {{$returnpenerimaanbarang->Keterangan}}</p> -->
+										<table id="borderless">
+											<tr id="borderless">
+												<td width="27%" id="borderless">
+													<p>SJ Supplier</p>
+												</td>
+												<td width="3%" id="borderless">
+													<p>:</p>
+												</td>
+												<td width="70%" id="borderless">
+													<p>{{$penerimaanbarang->KodeSJ}}</p>
+												</td>
+											</tr>
+											<tr id="borderless">
+												<td width="27%" id="borderless">
+													<p>Keterangan</p>
+												</td>
+												<td width="3%" id="borderless">
+													<p>:</p>
+												</td>
+												<td width="70%" id="borderless">
+													<p>{{$returnpenerimaanbarang->Keterangan}}</p>
+												</td>
+											</tr>
+										</table>
 									</div>
-									<div class="column"></div>
-									<div class="column"></div>
-								</div>
-								<br>
-								<div class="row">
-									<div class="column"></div>
 									<div class="column">
+										<br><br>
 										<p id="center">Penerima,</p>
 										<br><br>
 										<p id="center">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) </p>
 									</div>
 									<div class="column">
+										<br><br>
 										<p id="center">Hormat kami,</p>
 										<br><br>
 										<p id="center">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) </p>

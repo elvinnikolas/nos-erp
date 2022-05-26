@@ -44,6 +44,12 @@
                     <form action="{{ url('/suratJalan/update',$id)}}" method="post">
                         @csrf
                         <!-- Contents -->
+
+                        @foreach($alamat as $almt)
+                        <input type="hidden" id="Kota{{$almt->NoIndeks}}" value="{{$almt->Kota}}">
+                        <input type="hidden" id="Alamat{{$almt->NoIndeks}}" value="{{$almt->Alamat}}">
+                        @endforeach
+
                         <br>
                         <div class="form-row">
                             <!-- column 1 -->
@@ -62,6 +68,11 @@
                                         </span>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="inputPelanggan">Pelanggan</label>
+                                    <input type="text" class="form-control" name="NamaPelanggan" readonly="readonly" value="{{$pelanggan->NamaPelanggan}}">
+                                    <input type="hidden" class="form-control" name="KodePelanggan" readonly="readonly" value="{{$pelanggan->KodePelanggan}}">
+                                </div>
                                 @if($suratjalan->PPN == "ya")
                                 <div class="form-group">
                                     <label for="inputDate">No Faktur</label>
@@ -74,10 +85,52 @@
                             <!-- column 2 -->
                             <div class="form-group col-md-3">
                                 <div class="form-group">
-                                    <label for="inputPelanggan">Pelanggan</label>
-                                    <input type="text" class="form-control" name="NamaPelanggan" readonly="readonly" value="{{$pelanggan->NamaPelanggan}}">
-                                    <input type="hidden" class="form-control" name="KodePelanggan" readonly="readonly" value="{{$pelanggan->KodePelanggan}}">
+                                    <label for="inputBerlaku">Alamat</label>
+                                    <select class="form-control alamat1" name="AlamatPelanggan" onchange="getalamat(this)" id="alamat">
+                                        @foreach($alamat as $alm)
+                                        @if($alm->Alamat == $suratjalan->Alamat)
+                                        <option value="{{$alm->NoIndeks}}" selected>{{$alm->Alamat}}</option>
+                                        @else
+                                        <option value="{{$alm->NoIndeks}}">{{$alm->Alamat}}</option>
+                                        @endif
+                                        @endforeach
+                                    </select>
+                                    @foreach($alamat as $dtalm)
+                                    @if($dtalm->Alamat == $suratjalan->Alamat)
+                                    <input type="hidden" class="form-control alamat" name="Alamat" value="{{$dtalm->Alamat}}">
+                                    <input type="text" readonly class="form-control kota" name="Kota" value="{{$dtalm->Kota}}">
+                                    @endif
+                                    @endforeach
                                 </div>
+                                <div class="form-group">
+                                    <label for="inputTerm">Sopir</label>
+                                    <select class="form-control" name="KodeSopir" id="sopir">
+                                        @foreach($driver as $drv)
+                                        @if($drv->KodeKaryawan == $suratjalan->KodeSopir)
+                                        <option value="{{$drv->KodeKaryawan}}" selected>{{$drv->Nama}}</option>
+                                        @else
+                                        <option value="{{$drv->KodeKaryawan}}">{{$drv->Nama}}</option>
+                                        @endif
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="inputNopol">No Polisi</label>
+                                    <input type="text" class="form-control" name="nopol" id="inputNopol" value="{{$suratjalan->Nopol}}">
+                                </div>
+                                <!-- <div class="form-group">
+                                    <label for="inputPelanggan">Diskon</label> -->
+                                <input type="hidden" readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$suratjalan->Diskon}}">
+                                <!-- </div>
+                                <div class="form-group">
+                                    <label for="inputPelanggan">PPN</label> -->
+                                <input type="hidden" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$suratjalan->PPN}}">
+                                <!-- </div> -->
+                            </div>
+                            <!-- pembatas -->
+                            <div class="form-group col-md-1"></div>
+                            <!-- column 3 -->
+                            <div class="form-group col-md-3">
                                 <div class="form-group">
                                     <label for="inputMatauang">Mata Uang</label>
                                     <select class="form-control" name="KodeMataUang" id="matauang">
@@ -102,47 +155,12 @@
                                         @endforeach
                                     </select>
                                 </div>
-                                <!-- <div class="form-group">
-                                    <label for="inputPelanggan">Diskon</label> -->
-                                <input type="hidden" readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$suratjalan->Diskon}}">
-                                <!-- </div>
                                 <div class="form-group">
-                                    <label for="inputPelanggan">PPN</label> -->
-                                <input type="hidden" readonly="readonly" class="diskon form-control ppn" name="ppn" id="inputBerlaku" value="{{$suratjalan->PPN}}">
-                                <!-- </div> -->
-                            </div>
-                            <!-- pembatas -->
-                            <div class="form-group col-md-1"></div>
-                            <!-- column 3 -->
-                            <div class="form-group col-md-3">
-                                <div class="form-group">
-                                    <label for="inputBerlaku">Alamat</label>
-                                    <select class="form-control" name="Alamat" id="alamat">
-                                        @foreach($alamat as $alm)
-                                        @if($alm->Alamat == $suratjalan->Alamat)
-                                        <option value="{{$alm->Alamat}}" selected>{{$alm->Alamat}}</option>
-                                        @else
-                                        <option value="{{$alm->Alamat}}">{{$alm->Alamat}}</option>
-                                        @endif
-                                        @endforeach
-                                    </select>
+                                    <label>Total Item</label>
+                                    <input type="text" class="form-control" name="TotalItem" id="inputFaktur" value="{{$suratjalan->TotalItem}}">
                                 </div>
-                                <div class="form-group">
-                                    <label for="inputTerm">Sopir</label>
-                                    <select class="form-control" name="KodeSopir" id="sopir">
-                                        @foreach($driver as $drv)
-                                        @if($drv->KodeKaryawan == $suratjalan->KodeSopir)
-                                        <option value="{{$drv->KodeKaryawan}}" selected>{{$drv->Nama}}</option>
-                                        @else
-                                        <option value="{{$drv->KodeKaryawan}}">{{$drv->Nama}}</option>
-                                        @endif
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputNopol">No Polisi</label>
-                                    <input type="text" class="form-control" name="nopol" id="inputNopol" value="{{$suratjalan->Nopol}}">
-                                </div>
+                                <label for="inputKeterangan">Keterangan</label>
+                                <textarea class="form-control" name="InputKeterangan" id="inputKeterangan" rows="3">{{$suratjalan->Keterangan}}</textarea>
                             </div>
                         </div>
                         <div class="form-row">
@@ -229,6 +247,13 @@
         window.location.href = base;
     }
 
+    function getalamat(val) {
+        var kota = $("#" + "Kota" + val.value).val();
+        var alamat = $("#" + "Alamat" + val.value).val();
+        $(".kota").val(kota);
+        $(".alamat").val(alamat);
+    }
+
     updatePrice($(".tot").val());
 
     function updatePrice(tot) {
@@ -244,14 +269,14 @@
             }
         }
         var befDis = $(".subtotal").val();
-        diskon = parseInt($(".subtotal").val()) * diskon / 100;
         $(".subtotal").val(parseInt($(".subtotal").val()));
         var ppn = $(".ppn").val();
         if (ppn == "ya") {
-            ppn = parseInt(befDis) * 10 / 100;
+            ppn = parseInt(befDis) * 11 / 100;
         } else {
             ppn = parseInt(0);
         }
+        diskon = (parseInt($(".subtotal").val()) + ppn) * diskon / 100;
         $(".ppnval").val(ppn);
         $(".diskonval").val(diskon);
         $(".befDis").val(parseInt($(".subtotal").val()));

@@ -13,7 +13,7 @@ class KartuStokController extends Controller
 {
     public function index()
     {
-        $stok = DB::select("SELECT a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, round((a.Qty/c.Konversi),4) as Qty, a.KodeUser, round(SUM(b.Qty)/c.Konversi,4) as saldo, l.NamaLokasi, i.NamaItem, s.NamaSatuan
+        $stok = DB::select("SELECT a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, round((a.Qty/c.Konversi),4) as Qty, a.KodeUser, round(SUM(b.Qty)/c.Konversi,4) as saldo, l.NamaLokasi, i.NamaItem, s.NamaSatuan, s.KodeSatuan
             from keluarmasukbarangs a 
             inner join lokasis l on a.KodeLokasi = l.KodeLokasi 
             inner join items i on a.KodeItem = i.KodeItem
@@ -26,6 +26,7 @@ class KartuStokController extends Controller
         $item = DB::select("SELECT s.KodeItem, s.NamaItem, s.Keterangan 
             FROM items s
             WHERE s.Status = 'OPN'
+            ORDER BY s.NamaItem
         ");
         $satuan = satuan::where('Status', 'OPN')->get();
         $filter = false;
@@ -34,8 +35,8 @@ class KartuStokController extends Controller
 
     public function show(Request $request)
     {
-        // $stok = DB::select("SELECT a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, round((a.Qty/min(c.Konversi)),4) as Qty, a.KodeUser, round((a.Saldo/min(c.Konversi)),4) as saldo, l.NamaLokasi, i.NamaItem, s.NamaSatuan
-        $stok = DB::select("SELECT a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, round((a.Qty/min(c.Konversi)),4) as Qty, a.KodeUser, round(a.saldo/min(c.Konversi),4) as saldo, l.NamaLokasi, i.NamaItem, s.NamaSatuan
+        // $stok = DB::select("SELECT a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, round((a.Qty/min(c.Konversi)),4) as Qty, a.KodeUser, round((a.Saldo/min(c.Konversi)),4) as saldo, l.NamaLokasi, i.NamaItem, s.NamaSatuan, s.KodeSatuan
+        $stok = DB::select("SELECT a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, round((a.Qty/min(c.Konversi)),4) as Qty, a.KodeUser, round(a.saldo/min(c.Konversi),4) as saldo, l.NamaLokasi, i.NamaItem, s.NamaSatuan, s.KodeSatuan
             from keluarmasukbarangs a 
             inner join lokasis l on a.KodeLokasi = l.KodeLokasi 
             inner join items i on a.KodeItem = i.KodeItem
@@ -43,11 +44,12 @@ class KartuStokController extends Controller
             left join itemkonversis c on a.KodeItem = c.KodeItem
             left join satuans s on c.KodeSatuan = s.KodeSatuan
             group by a.KodeItem, a.KodeTransaksi, a.idx, a.indexmov
-            order by convert(a.Tanggal, datetime) desc, a.created_at desc ");
+            order by convert(a.created_at, datetime) desc");
         $store = lokasi::where('Status', 'OPN')->get();
         $item = DB::select("SELECT s.KodeItem, s.NamaItem, s.Keterangan 
             FROM items s
             WHERE s.Status = 'OPN'
+            ORDER BY s.NamaItem
         ");
         $satuan = satuan::where('Status', 'OPN')->get();
         $filter = true;
@@ -61,7 +63,7 @@ class KartuStokController extends Controller
 
     public function filter(Request $request)
     {
-        $stok = DB::select("SELECT a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, round((a.Qty/c.Konversi),4) as Qty, a.KodeUser, round(a.saldo/c.Konversi,4) as saldo, l.NamaLokasi, i.NamaItem, s.NamaSatuan
+        $stok = DB::select("SELECT a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, round((a.Qty/c.Konversi),4) as Qty, a.KodeUser, round(a.saldo/c.Konversi,4) as saldo, l.NamaLokasi, i.NamaItem, s.NamaSatuan, s.KodeSatuan
             from keluarmasukbarangs a 
             inner join lokasis l on a.KodeLokasi = l.KodeLokasi 
             inner join items i on a.KodeItem = i.KodeItem    
@@ -71,11 +73,12 @@ class KartuStokController extends Controller
             where a.Tanggal >='" . $request->start . "' and a.Tanggal <='" . $request->finish . "'
             and a.KodeLokasi='" . $request->lokasi . "' and a.KodeItem='" . $request->item . "' and c.KodeSatuan='" . $request->satuan . "' 
             group by a.Tanggal, a.KodeItem, a.KodeLokasi, a.JenisTransaksi, a.KodeTransaksi, a.Qty, l.NamaLokasi, i.NamaItem
-            order by a.Tanggal desc, a.created_at desc");
+            order by convert(a.created_at, datetime) desc");
         $store = lokasi::where('Status', 'OPN')->get();
         $item = DB::select("SELECT s.KodeItem, s.NamaItem, s.Keterangan 
             FROM items s
             WHERE s.Status = 'OPN'
+            ORDER BY s.NamaItem
         ");
         $satuan = satuan::where('Status', 'OPN')->get();
         $filter = true;

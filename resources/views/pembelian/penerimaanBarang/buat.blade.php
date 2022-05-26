@@ -143,7 +143,6 @@
             }
         }
         var befDis = $(".subtotal").val();
-        diskon = parseInt($(".subtotal").val()) * diskon / 100;
         $(".subtotal").val(parseInt($(".subtotal").val()));
         var ppn = $(".ppn").val();
         if (ppn == "ya") {
@@ -151,6 +150,7 @@
         } else {
             ppn = parseInt(0);
         }
+        diskon = (parseInt($(".subtotal").val()) + ppn) * diskon / 100;
         $(".ppnval").val(ppn);
         $(".diskonval").val(diskon);
         $(".befDis").val(parseInt($(".subtotal").val()));

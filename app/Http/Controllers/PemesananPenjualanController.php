@@ -74,14 +74,33 @@ class PemesananPenjualanController extends Controller
         $satuan = DB::table('satuans')->where('Status', 'OPN')->get();
         $sales = DB::table('karyawans')->where('Status', 'OPN')->where('jabatan', 'Sales')->get();
 
-        $last_id = DB::select('SELECT * FROM pemesananpenjualans ORDER BY id DESC LIMIT 1');
+        $last_id = DB::select("SELECT * FROM pemesananpenjualans WHERE KodeSO LIKE '%SO-0%' ORDER BY id DESC LIMIT 1");
+        $last_id_tax = DB::select("SELECT * FROM pemesananpenjualans WHERE KodeSO LIKE '%SO-1%' ORDER BY id DESC LIMIT 1");
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
 
+        if ($last_id_tax == null) {
+            $newIDP = "SO-1" . $year_now . $month_now . "0001";
+        } else {
+            $string = $last_id_tax[0]->KodeSO;
+            $id = substr($string, -4, 4);
+            $month = substr($string, -6, 2);
+            $year = substr($string, -8, 2);
+
+            if ((int) $year_now > (int) $year) {
+                $newID = "0001";
+            } else if ((int) $month_now > (int) $month) {
+                $newID = "0001";
+            } else {
+                $newID = $id + 1;
+                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+            }
+            $newIDP = "SO-1" . $year_now . $month_now . $newID;
+        }
+
         if ($last_id == null) {
-            $newID = "SO-" . $year_now . $month_now . "0001";
-            $newIDP = "SOT-" . $year_now . $month_now . "0001";
+            $newID = "SO-0" . $year_now . $month_now . "0001";
         } else {
             $string = $last_id[0]->KodeSO;
             $id = substr($string, -4, 4);
@@ -96,8 +115,7 @@ class PemesananPenjualanController extends Controller
                 $newID = $id + 1;
                 $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
             }
-            $newIDP = "SOT-" . $year_now . $month_now . $newID;
-            $newID = "SO-" . $year_now . $month_now . $newID;
+            $newID = "SO-0" . $year_now . $month_now . $newID;
         }
 
         foreach ($item as $key => $value) {
@@ -133,36 +151,49 @@ class PemesananPenjualanController extends Controller
     public function store(Request $request)
     {
         $checkppn = $request->ppn;
-        $last_id = DB::select('SELECT * FROM pemesananpenjualans ORDER BY id DESC LIMIT 1');
+        $last_id = DB::select("SELECT * FROM pemesananpenjualans WHERE KodeSO LIKE '%SO-0%' ORDER BY id DESC LIMIT 1");
+        $last_id_tax = DB::select("SELECT * FROM pemesananpenjualans WHERE KodeSO LIKE '%SO-1%' ORDER BY id DESC LIMIT 1");
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
 
-        if ($last_id == null) {
-            if ($checkppn == 'ya') {
-                $newID = "SOT-" . $year_now . $month_now . "0001";
+        if ($checkppn == 'ya') {
+            if ($last_id_tax == null) {
+                $newID = "SO-1" . $year_now . $month_now . "0001";
             } else {
-                $newID = "SO-" . $year_now . $month_now . "0001";
+                $string = $last_id_tax[0]->KodeSO;
+                $id = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
+
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $id + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+                $newID = "SO-1" . $year_now . $month_now . $newID;
             }
         } else {
-            $string = $last_id[0]->KodeSO;
-            $id = substr($string, -4, 4);
-            $month = substr($string, -6, 2);
-            $year = substr($string, -8, 2);
-
-            if ((int) $year_now > (int) $year) {
-                $newID = "0001";
-            } else if ((int) $month_now > (int) $month) {
-                $newID = "0001";
+            if ($last_id == null) {
+                $newID = "SO-0" . $year_now . $month_now . "0001";
             } else {
-                $newID = $id + 1;
-                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
-            }
+                $string = $last_id[0]->KodeSO;
+                $id = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
 
-            if ($checkppn == 'ya') {
-                $newID = "SOT-" . $year_now . $month_now . $newID;
-            } else {
-                $newID = "SO-" . $year_now . $month_now . $newID;
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $id + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+                $newID = "SO-0" . $year_now . $month_now . $newID;
             }
         }
 
@@ -566,7 +597,7 @@ class PemesananPenjualanController extends Controller
             inner join pelanggans d on d.KodePelanggan = a.KodePelanggan
             where a.KodeSO ='" . $id . "' limit 1");
 
-        $items = DB::select("SELECT DISTINCT a.Qty, b.KodeItem, a.Harga, b.NamaItem, d.NamaSatuan,
+        $items = DB::select("SELECT DISTINCT a.Qty, b.KodeItem, a.Harga, b.NamaItem, d.NamaSatuan, d.KodeSatuan
             a.Subtotal, b.Keterangan  from pemesanan_penjualan_detail a
             inner join items b on a.KodeItem = b.KodeItem
             inner join itemkonversis c on c.KodeItem=a.KodeItem

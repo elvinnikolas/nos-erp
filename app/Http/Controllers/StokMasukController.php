@@ -11,9 +11,124 @@ class StokMasukController extends Controller
 {
     public function index()
     {
-        $stokmasuks = DB::select("SELECT s.KodeStokMasuk, s.KodeLokasi, s.Tanggal, s.Status, s.TotalItem, l.NamaLokasi FROM stokmasuks s 
-            inner join lokasis l on s.KodeLokasi = l.KodeLokasi");
-        return view('stok.stokmasuk.stokmasuk', compact('stokmasuks'));
+        $year_now = date('Y');
+        $filter = false;
+        $jenis = "kode";
+        $stokmasuks = DB::select("SELECT s.KodeStokMasuk, s.KodeLokasi, s.Tanggal, s.Keterangan, s.Status, s.TotalItem, l.NamaLokasi FROM stokmasuks s 
+            inner join lokasis l on s.KodeLokasi = l.KodeLokasi
+            order by s.Tanggal desc
+        ");
+        return view('stok.stokmasuk.stokmasuk', compact('stokmasuks', 'year_now', 'filter', 'jenis'));
+    }
+
+    public function filter(Request $request)
+    {
+        $year_now = date('Y');
+        $filter = true;
+        $jenis = $request->jenis;
+        $bahan = $request->bahan;
+        if ($bahan == "semua") {
+            if ($jenis == "kode") {
+                $stokmasuks = DB::select("SELECT s.Tanggal, s.KodeStokMasuk, i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokmasukdetails d
+                    INNER JOIN stokmasuks s ON s.KodeStokMasuk = d.KodeStokMasuk
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE MONTH(s.Tanggal) = '" . $request->month . "' AND YEAR(s.Tanggal) = '" . $request->year . "'
+                    GROUP BY s.KodeStokMasuk, d.KodeItem, d.KodeSatuan  
+                    ORDER BY d.KodeItem DESC
+                ");
+            } else if ($jenis == "item") {
+                $stokmasuks = DB::select("SELECT i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokmasukdetails d
+                    INNER JOIN stokmasuks s ON s.KodeStokMasuk = d.KodeStokMasuk
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE MONTH(s.Tanggal) = '" . $request->month . "' AND YEAR(s.Tanggal) = '" . $request->year . "'
+                    GROUP BY d.KodeItem, d.KodeSatuan  
+                    ORDER BY i.NamaItem ASC
+                ");
+            }
+        } else {
+            if ($jenis == "kode") {
+                $stokmasuks = DB::select("SELECT s.Tanggal, s.KodeStokMasuk, i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokmasukdetails d
+                    INNER JOIN stokmasuks s ON s.KodeStokMasuk = d.KodeStokMasuk
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE MONTH(s.Tanggal) = '" . $request->month . "' 
+                    AND YEAR(s.Tanggal) = '" . $request->year . "'
+                    AND i.jenisitem = '" . $bahan . "'
+                    GROUP BY s.KodeStokMasuk, d.KodeItem, d.KodeSatuan  
+                    ORDER BY d.KodeItem DESC
+                ");
+            } else if ($jenis == "item") {
+                $stokmasuks = DB::select("SELECT i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokmasukdetails d
+                    INNER JOIN stokmasuks s ON s.KodeStokMasuk = d.KodeStokMasuk
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE MONTH(s.Tanggal) = '" . $request->month . "' 
+                    AND YEAR(s.Tanggal) = '" . $request->year . "'
+                    AND i.jenisitem = '" . $bahan . "'
+                    GROUP BY d.KodeItem, d.KodeSatuan  
+                    ORDER BY i.NamaItem ASC
+                ");
+            }
+        }
+        return view('stok.stokmasuk.stokmasuk', compact('stokmasuks', 'year_now', 'filter', 'jenis'));
+    }
+
+    public function filterdate(Request $request)
+    {
+        $year_now = date('Y');
+        $filter = true;
+        $jenis = $request->jenis;
+        $start = $request->get('mulai');
+        $end = $request->get('sampai');
+        $mulai = $request->get('mulai');
+        $sampai = $request->get('sampai');
+        $bahan = $request->bahan;
+        if ($bahan == "semua") {
+            if ($jenis == "kode") {
+                $stokmasuks = DB::select("SELECT s.Tanggal, s.KodeStokMasuk, i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokmasukdetails d
+                    INNER JOIN stokmasuks s ON s.KodeStokMasuk = d.KodeStokMasuk
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE s.Tanggal BETWEEN '" . $request->start . "' AND '" . $request->end . "'
+                    GROUP BY s.KodeStokMasuk, d.KodeItem, d.KodeSatuan  
+                    ORDER BY s.Tanggal DESC
+                ");
+            } else if ($jenis == "item") {
+                $stokmasuks = DB::select("SELECT i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokmasukdetails d
+                    INNER JOIN stokmasuks s ON s.KodeStokMasuk = d.KodeStokMasuk
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE s.Tanggal BETWEEN '" . $request->start . "' AND '" . $request->end . "'
+                    GROUP BY d.KodeItem, d.KodeSatuan  
+                    ORDER BY i.NamaItem ASC
+                ");
+            }
+        } else {
+            if ($jenis == "kode") {
+                $stokmasuks = DB::select("SELECT s.Tanggal, s.KodeStokMasuk, i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokmasukdetails d
+                    INNER JOIN stokmasuks s ON s.KodeStokMasuk = d.KodeStokMasuk
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE s.Tanggal BETWEEN '" . $request->start . "' AND '" . $request->end . "'
+                    AND i.jenisitem = '" . $bahan . "'
+                    GROUP BY s.KodeStokMasuk, d.KodeItem, d.KodeSatuan  
+                    ORDER BY s.Tanggal DESC
+                ");
+            } else if ($jenis == "item") {
+                $stokmasuks = DB::select("SELECT i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokmasukdetails d
+                    INNER JOIN stokmasuks s ON s.KodeStokMasuk = d.KodeStokMasuk
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE s.Tanggal BETWEEN '" . $request->start . "' AND '" . $request->end . "'
+                    AND i.jenisitem = '" . $bahan . "'
+                    GROUP BY d.KodeItem, d.KodeSatuan  
+                    ORDER BY i.NamaItem ASC
+                ");
+            }
+        }
+        return view('stok.stokmasuk.stokmasuk', compact('stokmasuks', 'year_now', 'mulai', 'sampai', 'filter', 'jenis'));
     }
 
     public function create()
@@ -58,11 +173,14 @@ class StokMasukController extends Controller
         $items = $request->item;
         $satuans = $request->satuan;
         $satuanvalid = true;
+        $pesantambahan = '';
         foreach ($items as $key => $value) {
             $satuan = $satuans[$key];
             $checkkonversi = DB::table('itemkonversis')->where('KodeItem', $value)->where('KodeSatuan', $satuan)->first();
             if (empty($checkkonversi)) {
                 $satuanvalid = false;
+                $namasatuan = DB::table('items')->where('KodeItem', $value)->first();
+                $pesantambahan .= $namasatuan->NamaItem . ', ';
             }
         }
 
@@ -107,6 +225,7 @@ class StokMasukController extends Controller
                 'KodeStokMasuk' => $newID,
                 'KodeLokasi' => $request->KodeLokasi,
                 'Tanggal' => $request->Tanggal,
+                'Keterangan' => $request->Keterangan,
                 'Status' => 'CFM',
                 'Printed' => 0,
                 'TotalItem' => $tot,
@@ -176,14 +295,16 @@ class StokMasukController extends Controller
             $pesan = 'Stok Masuk  ' . $newID . ' berhasil ditambahkan';
             return redirect('/stokmasuk')->with(['created' => $pesan]);
         } else {
-            $pesan = 'Stok masuk tidak disimpan karena terdapat satuan yang tidak sesuai, mohon periksa kembali (input satuan harus sesuai dengan master item)';
+            $pesan = 'Stok Masuk tidak disimpan karena terdapat satuan yang tidak sesuai, mohon periksa kembali (input satuan ' . $pesantambahan;
+            $pesan = substr(trim($pesan), 0, -1);
+            $pesan .= ' harus sesuai dengan master item)';
             return redirect('/stokmasuk')->with(['error' => $pesan]);
         }
     }
 
     public function view($id)
     {
-        $stokmasuks = DB::select("SELECT s.KodeStokMasuk, s.Tanggal, l.NamaLokasi 
+        $stokmasuks = DB::select("SELECT s.KodeStokMasuk, s.Tanggal, s.Keterangan, l.NamaLokasi 
             FROM stokmasuks s 
             inner join lokasis l on s.KodeLokasi = l.KodeLokasi
             where s.KodeStokMasuk ='" . $id . "' ");

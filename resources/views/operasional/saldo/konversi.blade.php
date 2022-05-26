@@ -35,12 +35,12 @@
                         <form action="{{ url('/saldo/storekonversi') }}" method="post" style="display:inline-block;">
                             @csrf
                             @method('POST')
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-12">
                                 <div class="form-group">
                                     <label>Pilih konversi:</label>
                                     <select name="Tipe" class="form-control">
-                                        <option value="CR">Setor tunai (cash -> rekening)</option>
                                         <option value="RC">Tarik tunai (rekening -> cash)</option>
+                                        <option value="CR">Setor tunai (cash -> rekening)</option>
                                     </select>
                                 </div>
                                 <div class="form-group">

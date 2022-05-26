@@ -55,6 +55,10 @@
                                     <label for="inputDate">Tanggal</label>
                                     <input type="text" class="form-control" name="Tanggal" id="inputDate" readonly="readonly" value="{{\Carbon\Carbon::parse($penerimaanbarang->Tanggal)->format('d-m-Y')}}">
                                 </div>
+                                <div class="form-group">
+                                    <label for="inputPelanggan">Supplier</label>
+                                    <input type="text" class="form-control" name="KodeSupplier" readonly="readonly" value="{{$supplier->NamaSupplier}}">
+                                </div>
                                 @if($penerimaanbarang->PPN == "ya")
                                 <div class="form-group">
                                     <label for="inputDate">No Faktur</label>
@@ -67,6 +71,21 @@
                             <!-- column 2 -->
                             <div class="form-group col-md-3">
                                 <div class="form-group">
+                                    <label for="inputTerm">Sales</label>
+                                    <input type="text" class="form-control" name="KodeSales" id="inputBerlaku" readonly="readonly" value="{{$sales->Nama}}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Total Item</label>
+                                    <input type="text" class="form-control" name="TotalItem" id="inputFaktur" readonly="readonly" value="{{$penerimaanbarang->TotalItem}}">
+                                </div>
+                                <label for="inputKeterangan">Keterangan</label>
+                                <textarea class="form-control" name="InputKeterangan" id="inputKeterangan" rows="3" readonly="readonly">{{$penerimaanbarang->Keterangan}}</textarea>
+                            </div>
+                            <!-- pembatas -->
+                            <div class="form-group col-md-1"></div>
+                            <!-- column 3 -->
+                            <div class="form-group col-md-3">
+                                <div class="form-group">
                                     <label for="inputMatauang">Mata Uang</label>
                                     <input type="text" class="form-control" name="KodeMataUang" id="inputBerlaku" readonly="readonly" value="{{$matauang->NamaMataUang}}">
                                 </div>
@@ -74,18 +93,9 @@
                                     <label for="inputGudang">Gudang</label>
                                     <input type="text" class="form-control" name="KodeLokasi" readonly="readonly" value="{{$lokasi->NamaLokasi}}">
                                 </div>
-                            </div>
-                            <!-- pembatas -->
-                            <div class="form-group col-md-1"></div>
-                            <!-- column 3 -->
-                            <div class="form-group col-md-3">
                                 <div class="form-group">
-                                    <label for="inputTerm">Sales</label>
-                                    <input type="text" class="form-control" name="KodeSales" id="inputBerlaku" readonly="readonly" value="{{$sales->Nama}}">
-                                </div>
-                                <div class="form-group">
-                                    <label for="inputPelanggan">Supplier</label>
-                                    <input type="text" class="form-control" name="KodeSupplier" readonly="readonly" value="{{$supplier->NamaSupplier}}">
+                                    <label for="inputGudang">Nomor Surat Jalan (Supplier)</label>
+                                    <input type="text" class="form-control" name="KodeSJ" readonly="readonly" value="{{$penerimaanbarang->KodeSJ}}">
                                 </div>
                                 <!-- <div class="form-group">
                                     <label for="inputPelanggan">Diskon</label> -->

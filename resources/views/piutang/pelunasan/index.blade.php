@@ -39,7 +39,7 @@
 <script type="text/javascript">
     $('#table').DataTable({
         "order": [
-            [0, "desc"]
+            [0, "asc"]
         ]
     });
 </script>

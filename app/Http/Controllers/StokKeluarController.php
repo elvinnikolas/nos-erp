@@ -11,9 +11,124 @@ class StokKeluarController extends Controller
 {
     public function index()
     {
-        $stokkeluars = DB::select("SELECT s.KodeStokKeluar, s.KodeLokasi, s.Tanggal, s.Status, s.TotalItem, l.NamaLokasi FROM stokkeluars s 
-            inner join lokasis l on s.KodeLokasi = l.KodeLokasi");
-        return view('stok.stokkeluar.stokkeluar', compact('stokkeluars'));
+        $year_now = date('Y');
+        $filter = false;
+        $jenis = "kode";
+        $stokkeluars = DB::select("SELECT s.KodeStokKeluar, s.KodeLokasi, s.Tanggal, s.Keterangan, s.Status, s.TotalItem, l.NamaLokasi FROM stokkeluars s 
+            inner join lokasis l on s.KodeLokasi = l.KodeLokasi
+            order by s.Tanggal desc
+        ");
+        return view('stok.stokkeluar.stokkeluar', compact('stokkeluars', 'year_now', 'filter', 'jenis'));
+    }
+
+    public function filter(Request $request)
+    {
+        $year_now = date('Y');
+        $filter = true;
+        $jenis = $request->jenis;
+        $bahan = $request->bahan;
+        if ($bahan == "semua") {
+            if ($jenis == "kode") {
+                $stokkeluars = DB::select("SELECT s.Tanggal, s.KodeStokKeluar, i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokkeluardetails d
+                    INNER JOIN stokkeluars s ON s.KodeStokKeluar = d.KodeStokKeluar
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE MONTH(s.Tanggal) = '" . $request->month . "' AND YEAR(s.Tanggal) = '" . $request->year . "'
+                    GROUP BY s.KodeStokKeluar, d.KodeItem, d.KodeSatuan  
+                    ORDER BY d.KodeItem DESC
+                ");
+            } else if ($jenis == "item") {
+                $stokkeluars = DB::select("SELECT i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokkeluardetails d
+                    INNER JOIN stokkeluars s ON s.KodeStokKeluar = d.KodeStokKeluar
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE MONTH(s.Tanggal) = '" . $request->month . "' AND YEAR(s.Tanggal) = '" . $request->year . "'
+                    GROUP BY d.KodeItem, d.KodeSatuan  
+                    ORDER BY i.NamaItem ASC
+                ");
+            }
+        } else {
+            if ($jenis == "kode") {
+                $stokkeluars = DB::select("SELECT s.Tanggal, s.KodeStokKeluar, i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokkeluardetails d
+                    INNER JOIN stokkeluars s ON s.KodeStokKeluar = d.KodeStokKeluar
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE MONTH(s.Tanggal) = '" . $request->month . "' 
+                    AND YEAR(s.Tanggal) = '" . $request->year . "'
+                    AND i.jenisitem = '" . $bahan . "'
+                    GROUP BY s.KodeStokKeluar, d.KodeItem, d.KodeSatuan  
+                    ORDER BY d.KodeItem DESC
+                ");
+            } else if ($jenis == "item") {
+                $stokkeluars = DB::select("SELECT i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokkeluardetails d
+                    INNER JOIN stokkeluars s ON s.KodeStokKeluar = d.KodeStokKeluar
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE MONTH(s.Tanggal) = '" . $request->month . "' 
+                    AND YEAR(s.Tanggal) = '" . $request->year . "'
+                    AND i.jenisitem = '" . $bahan . "'
+                    GROUP BY d.KodeItem, d.KodeSatuan  
+                    ORDER BY i.NamaItem ASC
+                ");
+            }
+        }
+        return view('stok.stokkeluar.stokkeluar', compact('stokkeluars', 'year_now', 'filter', 'jenis'));
+    }
+
+    public function filterdate(Request $request)
+    {
+        $year_now = date('Y');
+        $filter = true;
+        $jenis = $request->jenis;
+        $start = $request->get('mulai');
+        $end = $request->get('sampai');
+        $mulai = $request->get('mulai');
+        $sampai = $request->get('sampai');
+        $bahan = $request->bahan;
+        if ($bahan == "semua") {
+            if ($jenis == "kode") {
+                $stokkeluars = DB::select("SELECT s.Tanggal, s.KodeStokKeluar, i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokkeluardetails d
+                    INNER JOIN stokkeluars s ON s.KodeStokKeluar = d.KodeStokKeluar
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE s.Tanggal BETWEEN '" . $request->start . "' AND '" . $request->end . "'
+                    GROUP BY s.KodeStokKeluar, d.KodeItem, d.KodeSatuan  
+                    ORDER BY s.Tanggal DESC
+                ");
+            } else if ($jenis == "item") {
+                $stokkeluars = DB::select("SELECT i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokkeluardetails d
+                    INNER JOIN stokkeluars s ON s.KodeStokKeluar = d.KodeStokKeluar
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE s.Tanggal BETWEEN '" . $request->start . "' AND '" . $request->end . "'
+                    GROUP BY d.KodeItem, d.KodeSatuan  
+                    ORDER BY i.NamaItem ASC
+                ");
+            }
+        } else {
+            if ($jenis == "kode") {
+                $stokkeluars = DB::select("SELECT s.Tanggal, s.KodeStokKeluar, i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokkeluardetails d
+                    INNER JOIN stokkeluars s ON s.KodeStokKeluar = d.KodeStokKeluar
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE s.Tanggal BETWEEN '" . $request->start . "' AND '" . $request->end . "'
+                    AND i.jenisitem = '" . $bahan . "'
+                    GROUP BY s.KodeStokKeluar, d.KodeItem, d.KodeSatuan  
+                    ORDER BY s.Tanggal DESC
+                ");
+            } else if ($jenis == "item") {
+                $stokkeluars = DB::select("SELECT i.NamaItem, sum(d.Qty) as total, d.KodeSatuan 
+                    FROM stokkeluardetails d
+                    INNER JOIN stokkeluars s ON s.KodeStokKeluar = d.KodeStokKeluar
+                    INNER JOIN items i ON i.KodeItem = d.KodeItem
+                    WHERE s.Tanggal BETWEEN '" . $request->start . "' AND '" . $request->end . "'
+                    AND i.jenisitem = '" . $bahan . "'
+                    GROUP BY d.KodeItem, d.KodeSatuan  
+                    ORDER BY i.NamaItem ASC
+                ");
+            }
+        }
+        return view('stok.stokkeluar.stokkeluar', compact('stokkeluars', 'year_now', 'mulai', 'sampai', 'filter', 'jenis'));
     }
 
     public function create()
@@ -60,6 +175,7 @@ class StokKeluarController extends Controller
         $keterangans = $request->keterangan;
         $qtys = $request->qty;
         $satuanvalid = true;
+        $pesantambahan = '';
         foreach ($items as $key => $value) {
             $satuan = $satuans[$key];
             $last_saldo[$key] = DB::table('keluarmasukbarangs')->where('KodeItem', $value)->orderBy('id', 'desc')->limit(1)->pluck('saldo')->toArray();
@@ -67,6 +183,8 @@ class StokKeluarController extends Controller
             $checkkonversi = DB::table('itemkonversis')->where('KodeItem', $value)->where('KodeSatuan', $satuan)->first();
             if (empty($checkkonversi)) {
                 $satuanvalid = false;
+                $namasatuan = DB::table('items')->where('KodeItem', $value)->first();
+                $pesantambahan .= $namasatuan->NamaItem . ', ';
             }
         }
 
@@ -81,8 +199,10 @@ class StokKeluarController extends Controller
 
                 if (isset($last_saldo[$key][0])) {
                     $saldo = (float) $last_saldo[$key][0] - (float) $qtys[$key];
-                    if ($saldo <= 0) {
+                    if ($saldo < 0) {
                         $checksaldo = false;
+                        $namasatuan = DB::table('items')->where('KodeItem', $value)->first();
+                        $pesantambahan .= $namasatuan->NamaItem . ', ';
                     }
                 }
 
@@ -130,6 +250,7 @@ class StokKeluarController extends Controller
                     'KodeStokKeluar' => $newID,
                     'KodeLokasi' => $request->KodeLokasi,
                     'Tanggal' => $request->Tanggal,
+                    'Keterangan' => $request->Keterangan,
                     'Status' => 'CFM',
                     'Printed' => 0,
                     'TotalItem' => $tot,
@@ -187,18 +308,21 @@ class StokKeluarController extends Controller
                 return redirect('/stokkeluar')->with(['created' => $pesan]);
                 //
             } else {
-                $pesan = 'Stok Keluar tidak disimpan karena stok item kosong atau tidak cukup, mohon menambah stok item terlebih dahulu';
+                $pesan = 'Stok Keluar tidak disimpan karena stok item kosong atau tidak cukup, mohon menambah stok item terlebih dahulu untuk ' . $pesantambahan;
+                $pesan = substr(trim($pesan), 0, -1);
                 return redirect('/stokkeluar')->with(['error' => $pesan]);
             }
         } else {
-            $pesan = 'Stok Keluar tidak disimpan karena terdapat satuan yang tidak sesuai, mohon periksa kembali (input satuan harus sesuai dengan master item)';
+            $pesan = 'Stok Keluar tidak disimpan karena terdapat satuan yang tidak sesuai, mohon periksa kembali (input satuan ' . $pesantambahan;
+            $pesan = substr(trim($pesan), 0, -1);
+            $pesan .= ' harus sesuai dengan master item)';
             return redirect('/stokkeluar')->with(['error' => $pesan]);
         }
     }
 
     public function view($id)
     {
-        $stokkeluars = DB::select("SELECT s.KodeStokKeluar, s.Tanggal, l.NamaLokasi 
+        $stokkeluars = DB::select("SELECT s.KodeStokKeluar, s.Tanggal, s.Keterangan, l.NamaLokasi 
             FROM stokkeluars s 
             inner join lokasis l on s.KodeLokasi = l.KodeLokasi
             where s.KodeStokKeluar ='" . $id . "' ");

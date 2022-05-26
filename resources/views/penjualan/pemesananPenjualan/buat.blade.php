@@ -387,13 +387,13 @@
             }
         }
         var befDis = $(".subtotal").val();
-        diskon = parseInt($(".subtotal").val()) * diskon / 100;
         var ppn = $(".ppn").val();
         if (ppn == "ya") {
-            ppn = parseInt(befDis) * 10 / 100;
+            ppn = parseInt(befDis) * 11 / 100;
         } else {
             ppn = parseInt(0);
         }
+        diskon = (parseInt($(".subtotal").val()) + ppn) * diskon / 100;
         $(".ppnval").val(ppn);
         $(".diskonval").val(diskon);
         $(".befDis").val(parseInt($(".subtotal").val()));

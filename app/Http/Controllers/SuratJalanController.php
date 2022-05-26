@@ -18,7 +18,6 @@ use function Complex\add;
 
 class SuratJalanController extends Controller
 {
-
   public function index()
   {
     $suratjalans = suratjalan::join('lokasis', 'lokasis.KodeLokasi', '=', 'suratjalans.KodeLokasi')
@@ -94,7 +93,7 @@ class SuratJalanController extends Controller
    */
   public function createBasedSO($id)
   {
-    $drivers = DB::table('karyawans')->where('Status', 'OPN')->where('Jabatan', 'driver')->get();
+    $drivers = DB::table('karyawans')->where('Status', 'OPN')->where('KodeJabatan', 'driver')->get();
     $pemesananpenjualan = DB::select("SELECT DISTINCT a.KodeSO from (
             SELECT DISTINCT a.KodeSO,
             COALESCE(a.qty,0)-COALESCE(SUM(sjd.qty),0) as jml
@@ -152,34 +151,55 @@ class SuratJalanController extends Controller
    */
   public function store(Request $request, $id)
   {
-    $last_id = DB::select('SELECT * FROM suratjalans ORDER BY KodeSuratJalanID DESC LIMIT 1');
+    $last_id = DB::select('SELECT * FROM suratjalans WHERE KodeSuratJalan LIKE "%SJ-0%" ORDER BY KodeSuratJalanID DESC LIMIT 1');
+    $last_id_tax = DB::select('SELECT * FROM suratjalans WHERE KodeSuratJalan LIKE "%SJ-1%" ORDER BY KodeSuratJalanID DESC LIMIT 1');
 
     $year_now = date('y');
     $month_now = date('m');
     $date_now = date('d');
-    $pref = "SJ";
+    $pref = "SJ-0";
     if ($request->ppn == 'ya') {
-      $pref = "SJT";
-    }
-    if ($last_id == null) {
-      $newID = $pref . "-" . $year_now . $month_now . "0001";
-    } else {
-      $string = $last_id[0]->KodeSuratJalan;
-      $ids = substr($string, -4, 4);
-      $month = substr($string, -6, 2);
-      $year = substr($string, -8, 2);
+      $pref = "SJ-1";
 
-      if ((int) $year_now > (int) $year) {
-        $newID = "0001";
-      } else if ((int) $month_now > (int) $month) {
-        $newID = "0001";
+      if ($last_id_tax == null) {
+        $newID = $pref . $year_now . $month_now . "0001";
       } else {
-        $newID = $ids + 1;
-        $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
-      }
+        $string = $last_id_tax[0]->KodeSuratJalan;
+        $ids = substr($string, -4, 4);
+        $month = substr($string, -6, 2);
+        $year = substr($string, -8, 2);
 
-      $newID = $pref . "-" . $year_now . $month_now . $newID;
+        if ((int) $year_now > (int) $year) {
+          $newID = "0001";
+        } else if ((int) $month_now > (int) $month) {
+          $newID = "0001";
+        } else {
+          $newID = $ids + 1;
+          $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+        }
+        $newID = $pref . $year_now . $month_now . $newID;
+      }
+    } else {
+      if ($last_id == null) {
+        $newID = $pref . $year_now . $month_now . "0001";
+      } else {
+        $string = $last_id[0]->KodeSuratJalan;
+        $ids = substr($string, -4, 4);
+        $month = substr($string, -6, 2);
+        $year = substr($string, -8, 2);
+
+        if ((int) $year_now > (int) $year) {
+          $newID = "0001";
+        } else if ((int) $month_now > (int) $month) {
+          $newID = "0001";
+        } else {
+          $newID = $ids + 1;
+          $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+        }
+        $newID = $pref . $year_now . $month_now . $newID;
+      }
     }
+
     DB::table('suratjalans')->insert([
       'KodeSuratJalan' => $newID,
       'KodeSO' => $request->KodeSO,
@@ -201,6 +221,11 @@ class SuratJalanController extends Controller
       'NoFaktur' => $request->NoFaktur,
       'KodeSopir' => $request->KodeSopir,
       'Alamat' => $request->AlamatPelanggan,
+      'Kota' => $request->KotaPelanggan,
+      'AlamatInvoice' => $request->AlamatPelangganInvoice,
+      'KotaInvoice' => $request->KotaPelangganInvoice,
+      'TotalItem' => $request->TotalItem,
+      'Keterangan' => $request->InputKeterangan,
       'created_at' => \Carbon\Carbon::now(),
       'updated_at' => \Carbon\Carbon::now(),
     ]);
@@ -291,20 +316,11 @@ class SuratJalanController extends Controller
   public function edit($id)
   {
     $suratjalan = suratjalan::where('KodeSuratJalanID', $id)->first();
-    $driver = DB::table('karyawans')->where('Status', 'OPN')->where('Jabatan', 'Driver')->get();
+    $driver = DB::table('karyawans')->where('Status', 'OPN')->where('KodeJabatan', 'Driver')->get();
     $matauang = DB::table('matauangs')->where('Status', 'OPN')->get();
     $lokasi = DB::table('lokasis')->where('Status', 'OPN')->get();
     $pelanggan = pelanggan::where('KodePelanggan', $suratjalan->KodePelanggan)->first();
     $alamat = DB::table('alamatpelanggans')->where('KodePelanggan', $suratjalan->KodePelanggan)->get();
-    // $items = DB::select(
-    //     "SELECT a.KodeItem,i.NamaItem, a.Qty as jml, i.Keterangan, s.NamaSatuan, a.Harga 
-    //     FROM suratjalandetails a 
-    //     inner join items i on a.KodeItem = i.KodeItem 
-    //     inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan
-    //     inner join satuans s on s.KodeSatuan = k.KodeSatuan 
-    //     where a.KodeSuratJalan='" . $suratjalan->KodeSuratJalan . "' 
-    //     group by a.KodeItem, s.NamaSatuan"
-    // );
     $items = DB::select("SELECT a.KodeItem, i.NamaItem, i.Keterangan, s.KodeSatuan, s.NamaSatuan, a.Harga, sjd.Qty as jml,
         COALESCE(a.qty,0)-COALESCE(SUM(sjdt.qty),0) as max
         FROM pemesanan_penjualan_detail a 
@@ -347,6 +363,9 @@ class SuratJalanController extends Controller
         'NoFaktur' => $request->NoFaktur,
         'KodeSopir' => $request->KodeSopir,
         'Alamat' => $request->Alamat,
+        'Kota' => $request->Kota,
+        'TotalItem' => $request->TotalItem,
+        'Keterangan' => $request->InputKeterangan,
         'updated_at' => \Carbon\Carbon::now(),
       ]);
 
@@ -384,6 +403,89 @@ class SuratJalanController extends Controller
 
     $pesan = 'Surat Jalan ' . $request->KodeSJ . ' berhasil diupdate';
     return redirect('/suratJalan')->with(['edited' => $pesan]);
+  }
+
+  public function editKonfirmasi($id)
+  {
+    $suratjalan = suratjalan::where('KodeSuratJalanID', $id)->first();
+    $driver = karyawan::where('KodeKaryawan', $suratjalan->KodeSopir)->first();
+    $matauang = matauang::where('KodeMataUang', $suratjalan->KodeMataUang)->first();
+    $lokasi = lokasi::where('KodeLokasi', $suratjalan->KodeLokasi)->first();
+    $pelanggan = pelanggan::where('KodePelanggan', $suratjalan->KodePelanggan)->first();
+    $items = DB::select("SELECT sj.KodeItem, i.NamaItem, i.Keterangan, s.KodeSatuan, s.NamaSatuan, sj.Harga, sj.Qty
+        FROM suratjalandetails sj
+        inner join items i on sj.KodeItem = i.KodeItem
+        inner join itemkonversis k on i.KodeItem = k.KodeItem
+        inner join satuans s on s.KodeSatuan = k.KodeSatuan
+        where sj.KodeSuratJalan='" . $suratjalan->KodeSuratJalan . "' and sj.KodeSatuan = k.KodeSatuan
+    ");
+
+    return view('penjualan.suratJalan.editkonfirmasi', compact('id', 'suratjalan', 'driver', 'matauang', 'lokasi', 'pelanggan', 'items'));
+  }
+
+  public function updateKonfirmasi(Request $request, $id)
+  {
+    DB::table('suratjalans')
+      ->where('KodeSuratJalanID', $id)
+      ->update([
+        'KodeUser' => \Auth::user()->name,
+        'NilaiPPN' => $request->ppnval,
+        'NilaiDiskon' => $request->diskonval,
+        'Subtotal' => $request->subtotal,
+        'updated_at' => \Carbon\Carbon::now(),
+      ]);
+
+    $inv = DB::table('invoicepiutangdetails')->where('KodeSuratJalan', $request->KodeSJ)->first();
+
+    DB::table('invoicepiutangs')
+      ->where('KodeInvoicePiutang', $inv->KodeInvoicePiutang)
+      ->update([
+        'KodeUser' => \Auth::user()->name,
+        'Total' => $request->subtotal,
+        'updated_at' => \Carbon\Carbon::now(),
+      ]);
+
+    DB::table('invoicepiutangdetails')
+      ->where('KodeInvoicePiutang', $inv->KodeInvoicePiutang)
+      ->update([
+        'Subtotal' => $request->subtotal,
+        'updated_at' => \Carbon\Carbon::now(),
+      ]);
+
+    $items = $request->item;
+    $qtys = $request->qty;
+    $prices = $request->price;
+    $keterangans = $request->keterangan;
+    $satuans = $request->satuan;
+    $nomer = 0;
+    foreach ($items as $key => $value) {
+      $nomer++;
+      DB::table('suratjalandetails')
+        ->where('KodeSuratJalan', $request->KodeSJ)
+        ->where('NoUrut', $nomer)
+        ->update([
+          'KodeItem' => $items[$key],
+          'Qty' => $qtys[$key],
+          'Harga' => $prices[$key],
+          'Keterangan' => $keterangans[$key],
+          'KodeSatuan' => $satuans[$key],
+          'NoUrut' => $nomer,
+          'updated_at' => \Carbon\Carbon::now(),
+        ]);
+    }
+
+    DB::table('eventlogs')->insert([
+      'KodeUser' => \Auth::user()->name,
+      'Tanggal' => \Carbon\Carbon::now(),
+      'Jam' => \Carbon\Carbon::now()->format('H:i:s'),
+      'Keterangan' => 'Update surat jalan konfirmasi ' . $request->KodeSJ,
+      'Tipe' => 'OPN',
+      'created_at' => \Carbon\Carbon::now(),
+      'updated_at' => \Carbon\Carbon::now(),
+    ]);
+
+    $pesan = 'Surat Jalan ' . $request->KodeSJ . ' berhasil diupdate';
+    return redirect('/konfirmasiSuratJalan')->with(['edited' => $pesan]);
   }
 
   /**
@@ -440,6 +542,7 @@ class SuratJalanController extends Controller
       );
 
       $checksaldo = true;
+      $pesantambahan = '';
       foreach ($items as $key => $value) {
         $last_saldo[$key] = DB::table('keluarmasukbarangs')->where('KodeItem', $value->KodeItem)->orderBy('id', 'desc')->limit(1)->pluck('saldo')->toArray();
 
@@ -450,8 +553,9 @@ class SuratJalanController extends Controller
 
         if (isset($last_saldo[$key][0])) {
           $saldo = (float) $last_saldo[$key][0] - (float) $value->Qty;
-          if ($saldo <= 0) {
+          if ($saldo < 0) {
             $checksaldo = false;
+            $pesantambahan .= $value->NamaItem . ', ';
           }
         }
 
@@ -486,28 +590,52 @@ class SuratJalanController extends Controller
         }
 
         //buat kode invoicepiutang
-        $last_id = DB::select('SELECT * FROM invoicepiutangs ORDER BY KodeInvoicePiutang DESC LIMIT 1');
+        $last_id = DB::select('SELECT * FROM invoicepiutangs WHERE KodeInvoicePiutangShow LIKE "%IVP-0%" ORDER BY KodeInvoicePiutang DESC LIMIT 1');
+        $last_id_tax = DB::select('SELECT * FROM invoicepiutangs WHERE KodeInvoicePiutangShow LIKE "%IVP-1%" ORDER BY KodeInvoicePiutang DESC LIMIT 1');
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
-        $pref = "IVP";
-        if ($last_id == null) {
-          $newID = $pref . "-" . $year_now . $month_now . "0001";
-        } else {
-          $string = $last_id[0]->KodeInvoicePiutangShow;
-          $ids = substr($string, -4, 4);
-          $month = substr($string, -6, 2);
-          $year = substr($string, -8, 2);
+        $pref = "IVP-0";
+        if ($sj->PPN == "ya") {
+          $pref = "IVP-1";
 
-          if ((int) $year_now > (int) $year) {
-            $newID = "0001";
-          } else if ((int) $month_now > (int) $month) {
-            $newID = "0001";
+          if ($last_id_tax == null) {
+            $newID = $pref . $year_now . $month_now . "0001";
           } else {
-            $newID = $ids + 1;
-            $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+            $string = $last_id_tax[0]->KodeInvoicePiutangShow;
+            $ids = substr($string, -4, 4);
+            $month = substr($string, -6, 2);
+            $year = substr($string, -8, 2);
+
+            if ((int) $year_now > (int) $year) {
+              $newID = "0001";
+            } else if ((int) $month_now > (int) $month) {
+              $newID = "0001";
+            } else {
+              $newID = $ids + 1;
+              $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+            }
+            $newID = $pref . $year_now . $month_now . $newID;
           }
-          $newID = $pref . "-" . $year_now . $month_now . $newID;
+        } else {
+          if ($last_id == null) {
+            $newID = $pref . $year_now . $month_now . "0001";
+          } else {
+            $string = $last_id[0]->KodeInvoicePiutangShow;
+            $ids = substr($string, -4, 4);
+            $month = substr($string, -6, 2);
+            $year = substr($string, -8, 2);
+
+            if ((int) $year_now > (int) $year) {
+              $newID = "0001";
+            } else if ((int) $month_now > (int) $month) {
+              $newID = "0001";
+            } else {
+              $newID = $ids + 1;
+              $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+            }
+            $newID = $pref . $year_now . $month_now . $newID;
+          }
         }
 
         //insert tabel invoicepiutang
@@ -577,7 +705,8 @@ class SuratJalanController extends Controller
         return redirect('/konfirmasiSuratJalan')->with(['created' => $pesan]);
         //
       } else {
-        $pesan = 'Surat Jalan tidak dikonfirmasi karena stok item kosong atau tidak cukup, mohon menambah stok item terlebih dahulu';
+        $pesan = 'Surat Jalan tidak dikonfirmasi karena stok item kosong atau tidak cukup, mohon menambah stok item terlebih dahulu untuk ' . $pesantambahan;
+        $pesan = substr(trim($pesan), 0, -1);
         return redirect('/suratJalan')->with(['error' => $pesan]);
       }
     } else {
@@ -613,7 +742,7 @@ class SuratJalanController extends Controller
     $pelanggan = pelanggan::where('KodePelanggan', $suratjalan->KodePelanggan)->first();
 
     $items = DB::select(
-      "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga
+      "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, s.KodeSatuan, a.Harga
         FROM suratjalandetails a 
         inner join items i on a.KodeItem = i.KodeItem 
         inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan 

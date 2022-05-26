@@ -36,20 +36,54 @@
             </div>
             <div class="x_panel">
                 <div class="x_body">
+                    <!-- <table class="table table-striped" id="table-karyawan">
+                        <thead class="thead-light">
+                            <tr>
+                                <th>Kode Karyawan</th>
+                                <th>Nama</th>
+                                <th>Jabatan</th>
+                                <th>Gaji Pokok</th>
+                                <th>Alamat</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table> -->
                     <table class="table table-striped" id="table-karyawan">
                         <thead class="thead-light">
                             <tr>
                                 <th>Kode Karyawan</th>
                                 <th>Nama</th>
-                                <th>Jenis Kelamin</th>
                                 <th>Jabatan</th>
+                                <th>Gaji Pokok</th>
                                 <th>Alamat</th>
-                                <th>Kota</th>
-                                <th>Telepon</th>
-                                <th>Aksi</th>
+                                <th data-orderable="false">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
+                        @foreach($karyawan as $kar)
+                            <tr>
+                                <td>{{$kar->KodeKaryawan}}</td>
+                                <td>{{$kar->Nama}}</td>
+                                <td>{{$kar->KodeJabatan}}</td>
+                                <td>{{$kar->GajiPokok}}</td>
+                                <td>{{$kar->Alamat}}</td>
+                                <td>
+                                    <form style="display:inline-block;" type="submit" action="/masterkaryawan/{{$kar->KodeKaryawan}}/edit" method="get">
+                                        <button class="btn btn-primary btn-xs"><i class="fa fa-pencil"></i>&nbsp;Ubah</button>
+                                    </form>
+
+                                    <form style="display:inline-block;" action="/masterkaryawan/delete/{{$kar->KodeKaryawan}}" method="get" onsubmit="return showConfirm()">
+                                        <button class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>&nbsp;Hapus</button>
+                                    </form>
+                                    
+                                    <form style="display:inline-block;" action="/masterkaryawan/print/{{$kar->KodeKaryawan}}" method="get">
+                                        <button class="btn btn-info btn-xs"><i class="fa fa-print"></i>&nbsp;Cetak</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -63,46 +97,7 @@
 @push('scripts')
 <script>
     $(function() {
-        $('#table-karyawan').DataTable({
-            processing: true,
-            serverSide: true,
-            ajax: "{!! route('api.masterkaryawan') !!}",
-            columns: [{
-                    data: 'KodeKaryawan',
-                    name: 'KodeKaryawan'
-                },
-                {
-                    data: 'Nama',
-                    name: 'Nama'
-                },
-                {
-                    data: 'JenisKelamin',
-                    name: 'JenisKelamin'
-                },
-                {
-                    data: 'Jabatan',
-                    name: 'Jabatan'
-                },
-                {
-                    data: 'Alamat',
-                    name: 'Alamat'
-                },
-                {
-                    data: 'Kota',
-                    name: 'Kota'
-                },
-                {
-                    data: 'Telepon',
-                    name: 'Telepon'
-                },
-                {
-                    data: 'action',
-                    name: 'action',
-                    orderable: false,
-                    searchable: false
-                }
-            ]
-        });
+        $('#table-karyawan').DataTable();
     });
 
     function showConfirm() {

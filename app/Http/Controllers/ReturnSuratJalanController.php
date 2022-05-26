@@ -70,33 +70,55 @@ class ReturnSuratJalanController extends Controller
 
     public function store(Request $request, $id)
     {
-        $last_id = DB::select('SELECT * FROM suratjalanreturns ORDER BY KodeSuratJalanReturnID DESC LIMIT 1');
+        $last_id = DB::select('SELECT * FROM suratjalanreturns WHERE KodeSuratJalanReturn LIKE "%RSJ-0%" ORDER BY KodeSuratJalanReturnID DESC LIMIT 1');
+        $last_id_tax = DB::select('SELECT * FROM suratjalanreturns WHERE KodeSuratJalanReturn LIKE "%RSJ-1%" ORDER BY KodeSuratJalanReturnID DESC LIMIT 1');
 
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
-        $pref = "RSJ";
+        $pref = "RSJ-0";
         if ($request->ppn == 'ya') {
-            $pref = "RSJT";
-        }
-        if ($last_id == null) {
-            $newID = $pref . "-" . $year_now . $month_now . "0001";
-        } else {
-            $string = $last_id[0]->KodeSuratJalanReturn;
-            $ids = substr($string, -4, 4);
-            $month = substr($string, -6, 2);
-            $year = substr($string, -8, 2);
+            $pref = "RSJ-1";
 
-            if ((int) $year_now > (int) $year) {
-                $newID = "0001";
-            } else if ((int) $month_now > (int) $month) {
-                $newID = "0001";
+            if ($last_id_tax == null) {
+                $newID = $pref . $year_now . $month_now . "0001";
             } else {
-                $newID = $ids + 1;
-                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
-            }
+                $string = $last_id_tax[0]->KodeSuratJalanReturn;
+                $ids = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
 
-            $newID = $pref . "-" . $year_now . $month_now . $newID;
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $ids + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+
+                $newID = $pref . $year_now . $month_now . $newID;
+            }
+        } else {
+            if ($last_id == null) {
+                $newID = $pref . $year_now . $month_now . "0001";
+            } else {
+                $string = $last_id[0]->KodeSuratJalanReturn;
+                $ids = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
+
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $ids + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+
+                $newID = $pref . $year_now . $month_now . $newID;
+            }
         }
 
         $sj = suratjalan::where('KodeSuratJalanID', $request->KodeSJ)->first();
@@ -113,6 +135,7 @@ class ReturnSuratJalanController extends Controller
             'Diskon' => $request->diskon,
             'NilaiDiskon' => $request->diskonval,
             'Subtotal' => $request->subtotal,
+            'Keterangan' => $request->Keterangan,
             'KodeSuratJalanID' => $request->KodeSJ,
             'KodeSuratJalan' => $sj->KodeSuratJalan,
             'created_at' => \Carbon\Carbon::now(),
@@ -159,7 +182,7 @@ class ReturnSuratJalanController extends Controller
 
     public function index()
     {
-        $suratjalanreturns = suratjalanreturn::where('Status', 'OPN')->orderBy('KodeSuratJalanID', 'desc')->get();
+        $suratjalanreturns = suratjalanreturn::where('Status', 'OPN')->orderBy('KodeSuratJalanReturnID', 'desc')->get();
         return view('penjualan.returnSuratJalan.index', compact('suratjalanreturns'));
     }
 
@@ -219,9 +242,10 @@ class ReturnSuratJalanController extends Controller
             $totalreturn = $suratjalanreturn->Total;
             if ($ppn == 'ya') {
                 if ($diskon > 0) {
-                    $totalreturn = $totalreturn + (0.1 * $totalreturn) - ($diskon / 100 * $totalreturn);
+                    $totalreturn = $totalreturn + (0.11 * $totalreturn);
+                    $totalreturn = $totalreturn - ($diskon / 100 * $totalreturn);
                 } else {
-                    $totalreturn = $totalreturn + (0.1 * $totalreturn);
+                    $totalreturn = $totalreturn + (0.11 * $totalreturn);
                 }
             } else {
                 if ($diskon > 0) {
@@ -388,19 +412,19 @@ class ReturnSuratJalanController extends Controller
         $pelanggan = pelanggan::where('KodePelanggan', $suratjalan->KodePelanggan)->first();
 
         $items = DB::select(
-            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga 
+            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, s.KodeSatuan, a.Harga 
         FROM suratjalanreturndetails a 
         inner join items i on a.KodeItem = i.KodeItem 
         inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan 
         inner join satuans s on s.KodeSatuan = k.KodeSatuan
-        where a.KodeSuratJalanReturnID='" . $id . "' group by a.KodeItem, s.NamaSatuan"
+        where a.KodeSuratJalanReturn='" . $returnsuratjalan->KodeSuratJalanReturn . "' group by a.KodeItem, s.NamaSatuan"
         );
 
         $jml = 0;
         foreach ($items as $value) {
             $jml += $value->Qty;
         }
-        $suratjalan->Tanggal = \Carbon\Carbon::parse($suratjalan->Tanggal)->format('d-m-Y');
+        $returnsuratjalan->Tanggal = \Carbon\Carbon::parse($returnsuratjalan->Tanggal)->format('d-m-Y');
 
         $pdf = PDF::loadview('penjualan.returnSuratJalan.print', compact('returnsuratjalan', 'suratjalan', 'driver', 'matauang', 'lokasi', 'pelanggan', 'items', 'jml'));
 

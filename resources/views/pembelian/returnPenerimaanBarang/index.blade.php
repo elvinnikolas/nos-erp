@@ -22,7 +22,7 @@
                 <div id="filter" class="collapse">
                     <form class="" action="{{ url('/returnPenerimaanBarang/cari')}}" method="get">
                         <div class="x_content">
-                            <div class="col-md-5 col-sm-5">
+                            <div class="col-md-3 col-sm-3">
                                 <div class="form-group">
                                     <label for="tanggalpo">Dari :</label>
                                     <div class="input-group date" id="start">
@@ -33,7 +33,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-5 col-sm-5">
+                            <div class="col-md-3 col-sm-3">
                                 <div class="form-group">
                                     <label for="tanggalpo">Sampai :</label>
                                     <div class="input-group date" id="end">
@@ -98,6 +98,7 @@
                                 <th scope="col">Nomor PB Return</th>
                                 <th scope="col">Nomor PB</th>
                                 <th scope="col">Tanggal</th>
+                                <th scope="col">Keterangan</th>
                                 <th scope="col">Total</th>
                                 <th scope="col">Action</th>
                             </tr>
@@ -108,6 +109,7 @@
                                 <td>{{ $penerimaanbarangreturn->KodePenerimaanBarangReturn}}</td>
                                 <td>{{ $penerimaanbarangreturn->KodePenerimaanBarang}}</td>
                                 <td>{{ \Carbon\Carbon::parse($penerimaanbarangreturn->Tanggal)->format('d-m-Y') }}</td>
+                                <td>{{ $penerimaanbarangreturn->Keterangan}}</td>
                                 <td>Rp. {{ number_format($penerimaanbarangreturn->Subtotal, 0, ',', '.') }},-</td>
                                 <td>
                                     <a href="{{ url('/returnPenerimaanBarang/show/'.$penerimaanbarangreturn->KodePenerimaanBarangReturn) }}" class="btn-xs btn btn-primary">
@@ -141,7 +143,8 @@
     });
 
     $('#table').DataTable({
-        "order": []
+        "order": [],
+        "pageLength": 25
     });
 </script>
 @endpush

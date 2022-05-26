@@ -62,6 +62,11 @@
                                         </span>
                                     </div>
                                 </div>
+                                <div class="form-group">
+                                    <label for="inputPelanggan">Supplier</label>
+                                    <input type="text" class="form-control" name="NamaSupplier" readonly="readonly" value="{{$supplier->NamaSupplier}}">
+                                    <input type="hidden" class="form-control" name="KodeSupplier" readonly="readonly" value="{{$supplier->KodeSupplier}}">
+                                </div>
                                 @if($penerimaanbarang->PPN == "ya")
                                 <div class="form-group">
                                     <label for="inputDate">No Faktur</label>
@@ -97,6 +102,10 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="form-group">
+                                    <label>Nomor Surat Jalan (Supplier)</label>
+                                    <input type="text" class="form-control" name="KodeSJ" value="{{$penerimaanbarang->KodeSJ}}">
+                                </div>
                                 <!-- <div class="form-group">
                                     <label for="inputPelanggan">Diskon</label> -->
                                 <input type="hidden" readonly="readonly" class="diskon form-control diskon" name="diskon" id="inputBerlaku" value="{{$penerimaanbarang->Diskon}}">
@@ -123,10 +132,11 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputPelanggan">Supplier</label>
-                                    <input type="text" class="form-control" name="NamaSupplier" readonly="readonly" value="{{$supplier->NamaSupplier}}">
-                                    <input type="hidden" class="form-control" name="KodeSupplier" readonly="readonly" value="{{$supplier->KodeSupplier}}">
+                                    <label>Total Item</label>
+                                    <input type="text" class="form-control" name="TotalItem" id="inputFaktur" value="{{$penerimaanbarang->TotalItem}}">
                                 </div>
+                                <label for="inputKeterangan">Keterangan</label>
+                                <textarea class="form-control" name="InputKeterangan" id="inputKeterangan" rows="3">{{$penerimaanbarang->Keterangan}}</textarea>
                             </div>
                         </div>
                         <div class="form-row">
@@ -228,7 +238,6 @@
             }
         }
         var befDis = $(".subtotal").val();
-        diskon = parseInt($(".subtotal").val()) * diskon / 100;
         $(".subtotal").val(parseInt($(".subtotal").val()));
         var ppn = $(".ppn").val();
         if (ppn == "ya") {
@@ -236,6 +245,7 @@
         } else {
             ppn = parseInt(0);
         }
+        diskon = (parseInt($(".subtotal").val()) + ppn) * diskon / 100;
         $(".ppnval").val(ppn);
         $(".diskonval").val(diskon);
         $(".befDis").val(parseInt($(".subtotal").val()));

@@ -59,6 +59,10 @@
                                         <label for="">Tanggal</label>
                                         <input type="text" readonly name="Tanggal" class="form-control" value="{{\Carbon\Carbon::parse($stok->Tanggal)->format('d-m-Y')}}">
                                     </div>
+                                    <div class="form-group">
+                                        <label for="">Keterangan</label>
+                                        <textarea id="Keterangan" readonly name="Keterangan" class="form-control">{{$stok->Keterangan}}</textarea>
+                                    </div>
                                     @endforeach
                                 </div>
                             </div>

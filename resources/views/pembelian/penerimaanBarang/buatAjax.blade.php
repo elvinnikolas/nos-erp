@@ -23,6 +23,12 @@
           @endforeach
         </select>
       </div>
+      <div class="form-group">
+        <label>Total Item</label>
+        <input type="text" class="form-control" name="TotalItem" id="inputFaktur" required>
+      </div>
+      <label for="inputKeterangan">Keterangan</label>
+      <textarea class="form-control" name="InputKeterangan" id="inputKeterangan" rows="3" required></textarea>
     </div>
     <!-- pembatas -->
     <div class="form-group col-md-1"></div>
@@ -43,6 +49,10 @@
           <option value="{{$lok->KodeLokasi}}">{{$lok->NamaLokasi}}</option>
           @endforeach
         </select>
+      </div>
+      <div class="form-group">
+        <label>Nomor Surat Jalan (Supplier)</label>
+        <input type="text" class="form-control" name="KodeSJ" required> 
       </div>
       <!-- <div class="form-group">
         <label for="inputPelanggan">Diskon</label> -->

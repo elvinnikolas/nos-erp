@@ -55,6 +55,10 @@
                                     <label for="inputDate">Tanggal</label>
                                     <input type="text" class="form-control" name="Tanggal" id="inputDate" readonly="readonly" value="{{\Carbon\Carbon::parse($suratjalan->Tanggal)->format('d-m-Y')}}">
                                 </div>
+                                <div class="form-group">
+                                    <label for="inputPelanggan">Pelanggan</label>
+                                    <input type="text" class="form-control" name="KodePelanggan" readonly="readonly" value="{{$pelanggan->NamaPelanggan}}">
+                                </div>
                                 @if($suratjalan->PPN == "ya")
                                 <div class="form-group">
                                     <label for="inputDate">No Faktur</label>
@@ -67,16 +71,17 @@
                             <!-- column 2 -->
                             <div class="form-group col-md-3">
                                 <div class="form-group">
-                                    <label for="inputPelanggan">Pelanggan</label>
-                                    <input type="text" class="form-control" name="KodePelanggan" readonly="readonly" value="{{$pelanggan->NamaPelanggan}}">
+                                    <label for="inputBerlaku">Alamat</label>
+                                    <input type="text" class="form-control" name="Alamat" id="inputBerlaku" readonly="readonly" value="{{$suratjalan->Alamat}}">
+                                    <input type="text" readonly class="form-control kota" name="Kota" value="{{$suratjalan->Kota}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputMatauang">Mata Uang</label>
-                                    <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$matauang->NamaMataUang}}">
+                                    <label for="inputTerm">Sopir</label>
+                                    <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$driver->Nama}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputGudang">Gudang</label>
-                                    <input type="text" class="form-control" name="KodeLokasi" readonly="readonly" value="{{$lokasi->NamaLokasi}}">
+                                    <label for="inputPO">No Polisi</label>
+                                    <input type="text" class="form-control" name="nopol" readonly="readonly" value="{{$suratjalan->Nopol}}">
                                 </div>
                                 <!-- <div class="form-group">
                                     <label for="inputPelanggan">Diskon</label> -->
@@ -92,17 +97,19 @@
                             <!-- column 3 -->
                             <div class="form-group col-md-3">
                                 <div class="form-group">
-                                    <label for="inputBerlaku">Alamat</label>
-                                    <input type="text" class="form-control" name="Alamat" id="inputBerlaku" readonly="readonly" value="{{$suratjalan->Alamat}}">
+                                    <label for="inputMatauang">Mata Uang</label>
+                                    <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$matauang->NamaMataUang}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputTerm">Sopir</label>
-                                    <input type="text" class="form-control" name="KodeSopir" id="inputBerlaku" readonly="readonly" value="{{$driver->Nama}}">
+                                    <label for="inputGudang">Gudang</label>
+                                    <input type="text" class="form-control" name="KodeLokasi" readonly="readonly" value="{{$lokasi->NamaLokasi}}">
                                 </div>
                                 <div class="form-group">
-                                    <label for="inputPO">No Polisi</label>
-                                    <input type="text" class="form-control" name="nopol" readonly="readonly" value="{{$suratjalan->Nopol}}">
+                                    <label>Total Item</label>
+                                    <input type="text" class="form-control" name="TotalItem" id="inputFaktur" readonly="readonly" value="{{$suratjalan->TotalItem}}">
                                 </div>
+                                <label for="inputKeterangan">Keterangan</label>
+                                <textarea class="form-control" name="InputKeterangan" id="inputKeterangan" rows="3" readonly="readonly">{{$suratjalan->Keterangan}}</textarea>
                             </div>
                         </div>
                         <div class="form-row">
@@ -127,19 +134,19 @@
                                             {{$data->NamaItem}}
                                         </td>
                                         <td>
-                                            {{$data->jml}}
+                                            {{number_format(($data->jml), 0, ',', '.')}}
                                         </td>
                                         <td>
                                             {{$data->NamaSatuan}}
                                         </td>
                                         <td>
-                                            Rp. {{number_format($data->Harga)}},-
+                                            Rp. {{number_format(($data->Harga), 2, ',', '.')}}
                                         </td>
                                         <td>
                                             {{$data->Keterangan}}
                                         </td>
                                         <td>
-                                            Rp. {{number_format($data->Harga * $data->jml)}},-
+                                            Rp. {{number_format(($data->Harga * $data->jml), 0, ',', '.')}},-
                                         </td>
                                     </tr>
                                     @endforeach
@@ -151,7 +158,7 @@
                                 <div class="col-md-3">
                                     <input type="hidden" value="{{sizeof($items)}}" class="tot">
                                     <label for="subtotal">Subtotal</label>
-                                    <input type="text" name="total" readonly class="form-control befDis" value="{{$string_total = "Rp. " . number_format(($suratjalan->Subtotal - $suratjalan->NilaiDiskon - $suratjalan->NilaiPPN), 0, ',', '.') .",-"}}">
+                                    <input type="text" name="total" readonly class="form-control befDis" value="{{$string_total = "Rp. " . number_format(($suratjalan->Subtotal + $suratjalan->NilaiDiskon - $suratjalan->NilaiPPN), 0, ',', '.') .",-"}}">
                                     <label for="ppn">Nilai PPN</label>
                                     <input type="text" readonly name="ppnval" class="ppnval form-control" value="{{$string_total = "Rp. " . number_format(($suratjalan->NilaiPPN), 0, ',', '.') .",-"}}">
                                     <label for="diskon">Nilai Diskon</label>

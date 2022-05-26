@@ -111,33 +111,55 @@ class ReturnPenerimaanBarangController extends Controller
      */
     public function store(Request $request, $id)
     {
-        $last_id = DB::select('SELECT * FROM penerimaanbarangreturns ORDER BY id DESC LIMIT 1');
+        $last_id = DB::select('SELECT * FROM penerimaanbarangreturns WHERE KodePenerimaanBarangReturn LIKE "%RPB-0%" ORDER BY id DESC LIMIT 1');
+        $last_id_tax = DB::select('SELECT * FROM penerimaanbarangreturns WHERE KodePenerimaanBarangReturn LIKE "%RPB-1%" ORDER BY id DESC LIMIT 1');
 
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
-        $pref = "RPB";
+        $pref = "RPB-0";
         if ($request->ppn == 'ya') {
-            $pref = "RPBT";
-        }
-        if ($last_id == null) {
-            $newID = $pref . "-" . $year_now . $month_now . "0001";
-        } else {
-            $string = $last_id[0]->KodePenerimaanBarangReturn;
-            $ids = substr($string, -4, 4);
-            $month = substr($string, -6, 2);
-            $year = substr($string, -8, 2);
+            $pref = "RPB-1";
 
-            if ((int) $year_now > (int) $year) {
-                $newID = "0001";
-            } else if ((int) $month_now > (int) $month) {
-                $newID = "0001";
+            if ($last_id_tax == null) {
+                $newID = $pref . $year_now . $month_now . "0001";
             } else {
-                $newID = $ids + 1;
-                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
-            }
+                $string = $last_id_tax[0]->KodePenerimaanBarangReturn;
+                $ids = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
 
-            $newID = $pref . "-" . $year_now . $month_now . $newID;
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $ids + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+
+                $newID = $pref . $year_now . $month_now . $newID;
+            }
+        } else {
+            if ($last_id == null) {
+                $newID = $pref . $year_now . $month_now . "0001";
+            } else {
+                $string = $last_id[0]->KodePenerimaanBarangReturn;
+                $ids = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
+
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $ids + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+
+                $newID = $pref . $year_now . $month_now . $newID;
+            }
         }
 
         DB::table('penerimaanbarangreturns')->insert([
@@ -152,6 +174,7 @@ class ReturnPenerimaanBarangController extends Controller
             'Diskon' => $request->diskon,
             'NilaiDiskon' => $request->diskonval,
             'Subtotal' => $request->subtotal,
+            'Keterangan' => $request->Keterangan,
             'KodePenerimaanBarang' => $request->KodePB,
             'created_at' => \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now(),
@@ -311,7 +334,8 @@ class ReturnPenerimaanBarangController extends Controller
             $totalreturn = $penerimaanbarangreturn->Total;
             if ($ppn == 'ya') {
                 if ($diskon > 0) {
-                    $totalreturn = $totalreturn + (0.1 * $totalreturn) - ($diskon / 100 * $totalreturn);
+                    $totalreturn = $totalreturn + (0.1 * $totalreturn);
+                    $totalreturn = $totalreturn - ($diskon / 100 * $totalreturn);
                 } else {
                     $totalreturn = $totalreturn + (0.1 * $totalreturn);
                 }
@@ -444,7 +468,7 @@ class ReturnPenerimaanBarangController extends Controller
         $supplier = supplier::where('KodeSupplier', $penerimaanbarang->KodeSupplier)->first();
 
         $items = DB::select(
-            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga 
+            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga, s.KodeSatuan
         FROM penerimaanbarangreturndetails a 
         inner join items i on a.KodeItem = i.KodeItem 
         inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan 
@@ -456,7 +480,7 @@ class ReturnPenerimaanBarangController extends Controller
         foreach ($items as $value) {
             $jml += $value->Qty;
         }
-        $penerimaanbarang->Tanggal = \Carbon\Carbon::parse($penerimaanbarang->Tanggal)->format('d-m-Y');
+        $returnpenerimaanbarang->Tanggal = \Carbon\Carbon::parse($returnpenerimaanbarang->Tanggal)->format('d-m-Y');
 
         $pdf = PDF::loadview('pembelian.returnPenerimaanBarang.print', compact('returnpenerimaanbarang', 'penerimaanbarang', 'sales', 'matauang', 'lokasi', 'supplier', 'items', 'jml'));
 

@@ -54,6 +54,7 @@
                                 <select name="jenisitem" id="JenisItem" class="form-control">
                                     <option value="BahanBaku">Bahan Baku</option>
                                     <option value="BahanJadi">Bahan Jadi</option>
+                                    <option value="BahanSetengahJadi">Bahan Setengah Jadi</option>
                                 </select>
                             </div>
                             <div class="form-group">

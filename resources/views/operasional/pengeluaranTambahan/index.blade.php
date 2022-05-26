@@ -90,9 +90,8 @@
 @push('scripts')
 <script type="text/javascript">
     $('#table').DataTable({
-        "order": [
-            [0, "desc"]
-        ]
+        "order": [0, "desc"],
+        "pageLength": 25
     });
 </script>
 @endpush

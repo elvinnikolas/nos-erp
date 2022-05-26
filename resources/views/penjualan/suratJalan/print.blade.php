@@ -6,8 +6,8 @@
     <style>
         p,
         tr {
-            font-size: 12px;
-            margin: 0;
+            font-size: 14px;
+            margin: 2;
         }
 
         form {
@@ -38,6 +38,20 @@
             text-align: left;
         }
 
+        textarea {
+            font-size: 12px;
+            border: none;
+            outline: none;
+
+            -webkit-box-shadow: none;
+            -moz-box-shadow: none;
+            box-shadow: none;
+
+            resize: vertical;
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+
         .column {
             margin: 0;
             display: inline-block;
@@ -63,6 +77,11 @@
         #marginless {
             margin: 0;
         }
+
+        #borderless {
+            border-collapse: collapse;
+            border: none;
+        }
     </style>
 </head>
 
@@ -75,55 +94,160 @@
                         @csrf
                         <!-- Contents -->
                         <div class="form-row">
-                            <div class="column">
-                                <p>No. SJ : {{$suratjalan->KodeSuratJalan}}</p>
-                                <p>No. SO : {{$suratjalan->KodeSO}}</p>
+                            <p id="center"><b>SURAT JALAN</b></p>
+                        </div>
+                        <br>
+                        <div class="form-row">
+                            <div style="width: 50%; float:left">
+                                <table id="borderless">
+                                    <tr id="borderless">
+                                        <td width="24%" id="borderless">
+                                            <p>Kepada yth.</p>
+                                        </td>
+                                        <td width="3%" id="borderless">
+                                            <p>:</p>
+                                        </td>
+                                        <td width="73%" id="borderless">
+                                            <p>{{$pelanggan->NamaPelanggan}}</p>
+                                        </td>
+                                    </tr>
+                                    <tr id="borderless">
+                                        <td width="24%" id="borderless">
+                                            <p>Alamat</p>
+                                        </td>
+                                        <td width="3%" id="borderless">
+                                            <p>:</p>
+                                        </td>
+                                        <td width="73%" id="borderless">
+                                            <p>{{$suratjalan->Alamat}}</p>
+                                        </td>
+                                    </tr>
+                                    <tr id="borderless">
+                                        <td width="24%" id="borderless">
+                                        </td>
+                                        <td width="3%" id="borderless">
+                                            <p></p>
+                                        </td>
+                                        <td width="73%" id="borderless">
+                                            <p>{{$suratjalan->Kota}}</p>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
-                            <div class="column">
-                                <p id="center">Surat Jalan</p>
-                                <p id="center">{{$suratjalan->Tanggal}}</p>
-                            </div>
-                            <div class="column">
-                                <p id="right">Kepada yth.</p>
-                                <p id="right">Pelanggan/Toko : {{$pelanggan->NamaPelanggan}}</p>
-                                <p id="right">Alamat : {{$suratjalan->Alamat}}</p>
+                            <div style="width: 50%; float:right">
+                                <table id="borderless">
+                                    <tr id="borderless">
+                                        <td width="30%" id="borderless">
+                                        </td>
+                                        <td width="30%" id="borderless">
+                                            <p>No. Surat Jalan</p>
+                                        </td>
+                                        <td width="40%" id="borderless">
+                                            <p>:&nbsp; {{$suratjalan->KodeSuratJalan}}</p>
+                                        </td>
+                                    </tr>
+                                    <tr id="borderless">
+                                        <td width="30%" id="borderless">
+                                        </td>
+                                        <td width="30%" id="borderless">
+                                            <p>Tanggal</p>
+                                        </td>
+                                        <td width="40%" id="borderless">
+                                            <p>:&nbsp; {{$suratjalan->Tanggal}}</p>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                        <br><br><br><br>
+                        <br><br><br><br><br><br>
                         <div class="form-row">
                             <div class="form-group col-md-12">
                                 <table id="items">
                                     <tr>
-                                        <td id="center"><b>Kode Barang</b></td>
+                                        <td id="center"><b>No</b></td>
+                                        <!-- <td id="center"><b>Kode Barang</b></td> -->
                                         <td id="center"><b>Nama Barang</b></td>
-                                        <td id="center"><b>Jumlah</b></td>
+                                        <td id="center"><b>Qty</b></td>
+                                        <td id="center"><b>Satuan</b></td>
                                     </tr>
+                                    {{$no = 1}}
                                     @foreach($items as $item)
                                     <tr class="rowinput">
                                         <td>
-                                            &nbsp;&nbsp;&nbsp;{{$item->KodeItem}}
+                                            &nbsp;&nbsp;&nbsp;{{$no++}}
                                         </td>
+                                        <!-- <td>
+                                            &nbsp;&nbsp;&nbsp;{{$item->KodeItem}}
+                                        </td> -->
                                         <td>
                                             &nbsp;&nbsp;&nbsp;{{$item->NamaItem}}
                                         </td>
                                         <td id="right">
-                                            {{$item->Qty}} &nbsp; {{$item->NamaSatuan}}&nbsp;&nbsp;&nbsp;
+                                            {{number_format(($item->Qty), 0, ',', '.')}}&nbsp;&nbsp;&nbsp;
+                                        </td>
+                                        <td id="right">
+                                            {{$item->KodeSatuan}}&nbsp;&nbsp;&nbsp;
                                         </td>
                                     </tr>
                                     @endforeach
                                 </table>
-                                <br><br>
+                                <br>
                                 <div class="row">
                                     <div class="column">
-                                        <p>Total Barang : {{$jml}}</p>
-                                        <p>Driver : {{$driver->Nama}}</p>
-                                        <p>No. Polisi : {{$suratjalan->Nopol}}</p>
+                                        <table id="borderless">
+                                            <tr id="borderless">
+                                                <td width="30%" id="borderless">
+                                                    <p>Driver</p>
+                                                </td>
+                                                <td width="70%" id="borderless">
+                                                    <p>:&nbsp; {{$driver->Nama}}</p>
+                                                </td>
+                                            </tr>
+                                            <tr id="borderless">
+                                                <td width="30%" id="borderless">
+                                                    <p>No. Polisi</p>
+                                                </td>
+                                                <td width="70%" id="borderless">
+                                                    <p>:&nbsp; {{$suratjalan->Nopol}}</p>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </div>
-                                    <div class="column"></div>
                                     <div class="column">
+                                        <p>
+                                            <label>Keterangan :</label>
+                                            <!-- <textarea class="form-control">{{$suratjalan->Keterangan}}</textarea> -->
+                                            <br>
+                                            {{$suratjalan->Keterangan}}
+                                        </p>
+                                    </div>
+                                    <div class="column">
+                                        <table id="borderless">
+                                            <tr id="borderless">
+                                                <td width="7%" id="borderless">
+                                                </td>
+                                                <td width="30%" id="borderless">
+                                                    <p>Total Item</p>
+                                                </td>
+                                                <td width="3%" id="borderless">
+                                                    <p>:</p>
+                                                </td>
+                                                <td width="60%" id="borderless">
+                                                    <p>{{$suratjalan->TotalItem}}</p>
+                                                </td>
+                                            </tr>
+                                            <!-- <tr id="borderless">
+                                                <td width="30%" id="borderless">
+                                                    <p>Keterangan&nbsp;&nbsp;:</p>
+                                                </td>
+                                                <td width="70%" id="borderless">
+                                                    <textarea class="form-control">{{$suratjalan->Keterangan}}</textarea>
+                                                </td>
+                                            </tr> -->
+                                        </table>
                                     </div>
                                 </div>
-                                <br>
+                                <br><br><br>
                                 <div class="row">
                                     <div class="column"></div>
                                     <div class="column">

@@ -10,6 +10,10 @@
                     <span>*hijau : sudah lunas</span><br>
                     <span>*kuning : belum lunas</span><br>
                     <span>*merah : belum lunas dan lewat jatuh tempo</span><br>
+                    <a href="{{ url('/pelunasanhutang')}}" class="btn btn-success pull-right">
+                        <b>Pilih Supplier</b>
+                    </a>
+                    <br><br>
                 </div>
                 <div class="x_body">
                     <table class="table table-light" id="table">
@@ -28,7 +32,7 @@
                         </thead>
                         <tbody>
                             @foreach ($invoice as $inv)
-                            @if ($inv->Subtotal <= $inv->bayar + $inv->TotalReturn)
+                            @if ($inv->Status == 'CLS' && (($inv->Subtotal - ($inv->bayar + $inv->TotalReturn)) <= 0.01))
                                 <tr class="success">
                                     <td>{{ $inv->KodeInvoiceHutangShow}}</td>
                                     <td>{{ $inv->KodeLPB}}</td>
@@ -87,9 +91,8 @@
 @push('scripts')
 <script type="text/javascript">
     $('#table').DataTable({
-        "order": [
-            [0, "desc"]
-        ]
+        "order": [],
+        "pageLength": 25
     });
 </script>
 @endpush

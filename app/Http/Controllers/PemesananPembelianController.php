@@ -71,16 +71,34 @@ class PemesananPembelianController extends Controller
             where i.jenisitem = 'bahanbaku' and i.Status = 'OPN'
             order by i.NamaItem ");
         $satuan = DB::table('satuans')->where('Status', 'OPN')->get();
-        $last_id = DB::select('SELECT * FROM pemesananpembelians ORDER BY KodePO DESC LIMIT 1');
-        // $last_id_tax = DB::select('SELECT * FROM pemesananpembelians WHERE KodePO LIKE "%POT-%"  ORDER BY KodePO DESC LIMIT 1');
+        $last_id = DB::select('SELECT * FROM pemesananpembelians WHERE KodePO LIKE "%PO-0%" ORDER BY id DESC LIMIT 1');
+        $last_id_tax = DB::select('SELECT * FROM pemesananpembelians WHERE KodePO LIKE "%PO-1%"  ORDER BY id DESC LIMIT 1');
 
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
 
+        if ($last_id_tax == null) {
+            $newIDP = "PO-1" . $year_now . $month_now . "0001";
+        } else {
+            $string = $last_id_tax[0]->KodePO;
+            $id = substr($string, -4, 4);
+            $month = substr($string, -6, 2);
+            $year = substr($string, -8, 2);
+
+            if ((int) $year_now > (int) $year) {
+                $newID = "0001";
+            } else if ((int) $month_now > (int) $month) {
+                $newID = "0001";
+            } else {
+                $newID = $id + 1;
+                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+            }
+            $newIDP = "PO-1" . $year_now . $month_now . $newID;
+        }
+
         if ($last_id == null) {
-            $newID = "PO-" . $year_now . $month_now . "0001";
-            $newIDP = "POT-" . $year_now . $month_now . "0001";
+            $newID = "PO-0" . $year_now . $month_now . "0001";
         } else {
             $string = $last_id[0]->KodePO;
             $id = substr($string, -4, 4);
@@ -95,8 +113,7 @@ class PemesananPembelianController extends Controller
                 $newID = $id + 1;
                 $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
             }
-            $newIDP = "POT-" . $year_now . $month_now . $newID;
-            $newID = "PO-" . $year_now . $month_now . $newID;
+            $newID = "PO-0" . $year_now . $month_now . $newID;
         }
 
         foreach ($item as $key => $value) {
@@ -130,36 +147,49 @@ class PemesananPembelianController extends Controller
     public function store(Request $request)
     {
         $checkppn = $request->ppn;
-        $last_id = DB::select('SELECT * FROM pemesananpembelians ORDER BY id DESC LIMIT 1');
+        $last_id = DB::select('SELECT * FROM pemesananpembelians WHERE KodePO LIKE "%PO-0%" ORDER BY id DESC LIMIT 1');
+        $last_id_tax = DB::select('SELECT * FROM pemesananpembelians WHERE KodePO LIKE "%PO-1%" ORDER BY id DESC LIMIT 1');
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
 
-        if ($last_id == null) {
-            if ($checkppn == 'ya') {
-                $newID = "POT-" . $year_now . $month_now . "0001";
+        if ($checkppn == 'ya') {
+            if ($last_id_tax == null) {
+                $newID = "PO-1" . $year_now . $month_now . "0001";
             } else {
-                $newID = "PO-" . $year_now . $month_now . "0001";
+                $string = $last_id_tax[0]->KodePO;
+                $id = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
+
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $id + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+                $newID = "PO-1" . $year_now . $month_now . $newID;
             }
         } else {
-            $string = $last_id[0]->KodePO;
-            $id = substr($string, -4, 4);
-            $month = substr($string, -6, 2);
-            $year = substr($string, -8, 2);
-
-            if ((int) $year_now > (int) $year) {
-                $newID = "0001";
-            } else if ((int) $month_now > (int) $month) {
-                $newID = "0001";
+            if ($last_id == null) {
+                $newID = "PO-0" . $year_now . $month_now . "0001";
             } else {
-                $newID = $id + 1;
-                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
-            }
+                $string = $last_id[0]->KodePO;
+                $id = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
 
-            if ($checkppn == 'ya') {
-                $newID = "POT-" . $year_now . $month_now . $newID;
-            } else {
-                $newID = "PO-" . $year_now . $month_now . $newID;
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $id + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+                $newID = "PO-0" . $year_now . $month_now . $newID;
             }
         }
 
@@ -272,7 +302,8 @@ class PemesananPembelianController extends Controller
             inner join suppliers d on d.KodeSupplier = a.KodeSupplier
             where a.KodePO ='" . $id . "' limit 1");
 
-        $items = DB::select("SELECT a.KodeItem, a.Qty, b.NamaItem, d.NamaSatuan, a.Harga, a.Subtotal, b.Keterangan  from pemesananpembeliandetails a 
+        $items = DB::select("SELECT a.KodeItem, a.Qty, b.NamaItem, d.NamaSatuan, a.Harga, a.Subtotal, b.Keterangan, d.KodeSatuan
+            from pemesananpembeliandetails a 
             inner join items b on a.KodeItem = b.KodeItem
             inner join itemkonversis c on c.KodeItem = a.KodeItem 
             inner join satuans d on c.KodeSatuan = d.KodeSatuan

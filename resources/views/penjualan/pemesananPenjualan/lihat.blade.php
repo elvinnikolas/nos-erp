@@ -140,19 +140,19 @@
                                                 {{$item->NamaItem}}
                                             </td>
                                             <td>
-                                                {{$item->Qty}}
+                                                {{number_format(($item->Qty), 0, ',', '.')}}
                                             </td>
                                             <td>
                                                 {{$item->NamaSatuan}}
                                             </td>
                                             <td>
-                                                Rp. {{number_format($item->Harga)}},-
+                                                Rp. {{number_format(($item->Harga), 2, ',', '.')}}
                                             </td>
                                             <td>
                                                 {{$item->Keterangan}}
                                             </td>
                                             <td>
-                                                Rp {{number_format($item->Subtotal)}},-
+                                                Rp. {{number_format(($item->Subtotal), 0, ',', '.')}},-
                                             </td>
                                         </tr>
                                         @endforeach

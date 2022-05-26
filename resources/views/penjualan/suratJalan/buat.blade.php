@@ -72,6 +72,7 @@
 <script type="text/javascript">
   $('#custId').select2()
   $('#alamat').select2()
+  $('#alamatinv').select2()
   $('#sopir').select2()
   $('#gudang').select2()
   $('#matauang').select2()
@@ -143,14 +144,14 @@
       }
     }
     var befDis = $(".subtotal").val();
-    diskon = parseInt($(".subtotal").val()) * diskon / 100;
     $(".subtotal").val(parseInt($(".subtotal").val()));
     var ppn = $(".ppn").val();
     if (ppn == "ya") {
-      ppn = parseInt(befDis) * 10 / 100;
+      ppn = parseInt(befDis) * 11 / 100;
     } else {
       ppn = parseInt(0);
     }
+    diskon = (parseInt($(".subtotal").val()) + ppn) * diskon / 100;
     $(".ppnval").val(ppn);
     $(".diskonval").val(diskon);
     $(".befDis").val(parseInt($(".subtotal").val()));
@@ -180,6 +181,20 @@
     $(".showtotal" + int).val(formattotal);
     var count = $(".tot").val();
     updatePrice(count);
+  }
+
+  function getalamat(val, int) {
+    var kota = $("#" + "Kota" + val.value).val();
+    var alamat = $("#" + "Alamat" + val.value).val();
+    $(".kota").val(kota);
+    $(".alamat").val(alamat);
+  }
+
+  function getalamatinv(val, int) {
+    var kota = $("#" + "Kota" + val.value).val();
+    var alamat = $("#" + "Alamat" + val.value).val();
+    $(".kotainv").val(kota);
+    $(".alamatinv").val(alamat);
   }
 
   $('.formsub').submit(function(event) {

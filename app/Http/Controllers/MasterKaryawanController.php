@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use App\Model\karyawan;
 use DB;
 use Datatables;
+use PDF;
+use PhpParser\Node\Expr\Cast\Double;
 
 class MasterKaryawanController extends Controller
 {
@@ -16,7 +18,9 @@ class MasterKaryawanController extends Controller
      */
     public function index()
     {
-        return view('master.karyawan.index');
+        // return view('master.karyawan.index');
+        $karyawan   = DB::table('karyawans')->where('Status', 'OPN')->get();
+        return view('master.karyawan.index', compact('karyawan'));
     }
 
     /**
@@ -26,20 +30,25 @@ class MasterKaryawanController extends Controller
      */
     public function create()
     {
-        $last_id = DB::select('SELECT * FROM karyawans ORDER BY KodeKaryawan DESC LIMIT 1');
+        $last_id = DB::select('SELECT * FROM karyawans WHERE Status = "OPN" ORDER BY KodeKaryawan DESC LIMIT 1');
+        $golongan = DB::table('golongans')->get();
 
         //Auto generate ID
         if ($last_id == null) {
             $newID = "KAR-001";
         } else {
             $string = $last_id[0]->KodeKaryawan;
-            $id = substr($string, -3, 3);
+            $id = substr($string, 4, 3);
             $new = $id + 1;
             $new = str_pad($new, 3, '0', STR_PAD_LEFT);
             $newID = "KAR-" . $new;
         }
 
-        return view('master.karyawan.create', compact('newID'));
+        $jabatan = DB::table('jabatans')
+            ->where('Status', 'OPN')
+            ->get();
+
+        return view('master.karyawan.create', compact('newID', 'golongan', 'jabatan'));
     }
 
     /**
@@ -57,16 +66,20 @@ class MasterKaryawanController extends Controller
             'Jabatan' => 'required',
         ]);
 
-        karyawan::create([
+        DB::table('karyawans')->insert([
             'KodeKaryawan' => $request->KodeKaryawan,
             'Nama' => $request->Nama,
             'Alamat' => $request->Alamat,
             'Kota' => $request->Kota,
             'Telepon' => $request->Telepon,
             'JenisKelamin' => $request->JenisKelamin,
+            'GajiPokok' => $request->GajiPokok,
             'KodeUser' => \Auth::user()->name,
             'Status' => 'OPN',
-            'Jabatan' => $request->Jabatan
+            'KodeJabatan' => $request->Jabatan,
+            'KodeGolongan' => $request->Golongan,
+            'created_at' => \Carbon\Carbon::now(),
+            'updated_at' => \Carbon\Carbon::now(),
         ]);
 
         DB::table('eventlogs')->insert([
@@ -102,8 +115,17 @@ class MasterKaryawanController extends Controller
      */
     public function edit($id)
     {
-        $karyawan = DB::table('karyawans')->get()->where('KodeKaryawan', $id);
-        return view('master.karyawan.edit', compact('karyawan'));
+        $karyawan = DB::table('karyawans')
+        	->where('KodeKaryawan',$id)
+        	->get();
+        
+        $golongan = DB::table('golongans')->get();
+
+        $jabatan = DB::table('jabatans')
+            ->where('Status','OPN')
+            ->get();
+
+        return view('master.karyawan.edit', compact('karyawan', 'golongan', 'jabatan'));
     }
 
     /**
@@ -128,9 +150,11 @@ class MasterKaryawanController extends Controller
             'Alamat' => $request->Alamat,
             'Kota' => $request->Kota,
             'Telepon' => $request->Telepon,
+            'GajiPokok' => $request->GajiPokok,
             'KodeUser' => \Auth::user()->name,
             'Status' => 'OPN',
-            'Jabatan' => $request->Jabatan,
+            'KodeJabatan' => $request->Jabatan,
+            'KodeGolongan' => $request->Golongan,
             'JenisKelamin' => $request->JenisKelamin,
             'updated_at' => \Carbon\Carbon::now()
         ]);
@@ -176,6 +200,16 @@ class MasterKaryawanController extends Controller
             $pesan = 'karyawan ' . $kar->Nama . ' berhasil dihapus';
         }
         return redirect('/masterkaryawan')->with(['deleted' => $pesan]);
+    }
+    
+    public function print($id) {
+    	$data      = DB::table('karyawans')->where('KodeKaryawan', $id)->get();
+    	$pdf       = PDF::loadview('master.karyawan.membercard', compact('data'));
+    	
+        foreach ($data as $value) {
+            return $pdf->download('Kartu Karyawan '.$value->Nama.'.pdf');
+        }
+        // return view('master.karyawan.membercard', compact('data'));
     }
 
     public function apiOPN()

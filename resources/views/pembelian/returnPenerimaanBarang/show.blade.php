@@ -55,6 +55,8 @@
                                     <label for="inputDate">Tanggal</label>
                                     <input type="text" class="form-control" name="Tanggal" id="inputDate" readonly="readonly" value="{{\Carbon\Carbon::parse($penerimaanbarangreturn->Tanggal)->format('d-m-Y')}}">
                                 </div>
+                                <label for="inputKeterangan">Keterangan</label>
+                                <textarea class="form-control" name="Keterangan" id="inputKeterangan" rows="3" readonly="readonly">{{$penerimaanbarangreturn->Keterangan}}</textarea>
                             </div>
                             <!-- pembatas -->
                             <div class="form-group col-md-1"></div>

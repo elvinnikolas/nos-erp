@@ -169,34 +169,55 @@ class PenerimaanBarangController extends Controller
      */
     public function store(Request $request, $id)
     {
-        $last_id = DB::select('SELECT * FROM penerimaanbarangs ORDER BY id DESC LIMIT 1');
+        $last_id = DB::select('SELECT * FROM penerimaanbarangs WHERE KodePenerimaanBarang LIKE "%LPB-0%" ORDER BY id DESC LIMIT 1');
+        $last_id_tax = DB::select('SELECT * FROM penerimaanbarangs WHERE KodePenerimaanBarang LIKE "%LPB-1%" ORDER BY id DESC LIMIT 1');
 
         $year_now = date('y');
         $month_now = date('m');
         $date_now = date('d');
-        $pref = "LPB";
+        $pref = "LPB-0";
         if ($request->ppn == 'ya') {
-            $pref = "LPBT";
-        }
-        if ($last_id == null) {
-            $newID = $pref . "-" . $year_now . $month_now . "0001";
-        } else {
-            $string = $last_id[0]->KodePenerimaanBarang;
-            $ids = substr($string, -4, 4);
-            $month = substr($string, -6, 2);
-            $year = substr($string, -8, 2);
+            $pref = "LPB-1";
 
-            if ((int) $year_now > (int) $year) {
-                $newID = "0001";
-            } else if ((int) $month_now > (int) $month) {
-                $newID = "0001";
+            if ($last_id_tax == null) {
+                $newID = $pref . $year_now . $month_now . "0001";
             } else {
-                $newID = $ids + 1;
-                $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
-            }
+                $string = $last_id_tax[0]->KodePenerimaanBarang;
+                $ids = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
 
-            $newID = $pref . "-" . $year_now . $month_now . $newID;
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $ids + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+                $newID = $pref . $year_now . $month_now . $newID;
+            }
+        } else {
+            if ($last_id == null) {
+                $newID = $pref . $year_now . $month_now . "0001";
+            } else {
+                $string = $last_id[0]->KodePenerimaanBarang;
+                $ids = substr($string, -4, 4);
+                $month = substr($string, -6, 2);
+                $year = substr($string, -8, 2);
+
+                if ((int) $year_now > (int) $year) {
+                    $newID = "0001";
+                } else if ((int) $month_now > (int) $month) {
+                    $newID = "0001";
+                } else {
+                    $newID = $ids + 1;
+                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                }
+                $newID = $pref . $year_now . $month_now . $newID;
+            }
         }
+
         DB::table('penerimaanbarangs')->insert([
             'KodePenerimaanBarang' => $newID,
             'Tanggal' => $request->Tanggal,
@@ -215,6 +236,9 @@ class PenerimaanBarangController extends Controller
             'KodePO' => $request->KodePO,
             'NoFaktur' => $request->NoFaktur,
             'KodeSales' => $request->KodeSales,
+            'KodeSJ' => $request->KodeSJ,
+            'TotalItem' => $request->TotalItem,
+            'Keterangan' => $request->InputKeterangan,
             'created_at' => \Carbon\Carbon::now(),
             'updated_at' => \Carbon\Carbon::now(),
         ]);
@@ -366,6 +390,9 @@ class PenerimaanBarangController extends Controller
                 'Subtotal' => $request->subtotal,
                 'NoFaktur' => $request->NoFaktur,
                 'KodeSales' => $request->KodeSales,
+                'KodeSJ' => $request->KodeSJ,
+                'TotalItem' => $request->TotalItem,
+                'Keterangan' => $request->InputKeterangan,
                 'updated_at' => \Carbon\Carbon::now(),
             ]);
 
@@ -469,37 +496,62 @@ class PenerimaanBarangController extends Controller
                 left join penerimaanbarangdetails pbd on pbd.KodePenerimaanBarang = pb.KodePenerimaanBarang and pbd.KodeItem = a.KodeItem and pbd.KodeSatuan = k.KodeSatuan
                 where a.KodePO='" . $pb['KodePO'] . "' and a.KodeSatuan = k.KodeSatuan
                 group by a.KodeItem, s.NamaSatuan
-                having jml > 0");
+                having jml > 0.1");
 
             if (empty($checkitem)) {
                 $po->Status = "CLS";
                 $po->save();
             }
 
-            $last_id = DB::select('SELECT * FROM invoicehutangs ORDER BY KodeInvoiceHutangShow DESC LIMIT 1');
+            $last_id = DB::select('SELECT * FROM invoicehutangs WHERE KodeInvoiceHutangShow LIKE "%IVH-0%" ORDER BY KodeInvoiceHutangShow DESC LIMIT 1');
+            $last_id_tax = DB::select('SELECT * FROM invoicehutangs WHERE KodeInvoiceHutangShow LIKE "%IVH-1%" ORDER BY KodeInvoiceHutangShow DESC LIMIT 1');
 
             $year_now = date('y');
             $month_now = date('m');
             $date_now = date('d');
-            $pref = "IVH";
-            if ($last_id == null) {
-                $newID = $pref . "-" . $year_now . $month_now . "0001";
-            } else {
-                $string = $last_id[0]->KodeInvoiceHutangShow;
-                $ids = substr($string, -4, 4);
-                $month = substr($string, -6, 2);
-                $year = substr($string, -8, 2);
+            $pref = "IVH-0";
+            if ($pb->PPN == "ya") {
+                $pref = "IVH-1";
 
-                if ((int) $year_now > (int) $year) {
-                    $newID = "0001";
-                } else if ((int) $month_now > (int) $month) {
-                    $newID = "0001";
+                if ($last_id_tax == null) {
+                    $newID = $pref . $year_now . $month_now . "0001";
                 } else {
-                    $newID = $ids + 1;
-                    $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
-                }
+                    $string = $last_id_tax[0]->KodeInvoiceHutangShow;
+                    $ids = substr($string, -4, 4);
+                    $month = substr($string, -6, 2);
+                    $year = substr($string, -8, 2);
 
-                $newID = $pref . "-" . $year_now . $month_now . $newID;
+                    if ((int) $year_now > (int) $year) {
+                        $newID = "0001";
+                    } else if ((int) $month_now > (int) $month) {
+                        $newID = "0001";
+                    } else {
+                        $newID = $ids + 1;
+                        $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                    }
+
+                    $newID = $pref . $year_now . $month_now . $newID;
+                }
+            } else {
+                if ($last_id == null) {
+                    $newID = $pref . $year_now . $month_now . "0001";
+                } else {
+                    $string = $last_id[0]->KodeInvoiceHutangShow;
+                    $ids = substr($string, -4, 4);
+                    $month = substr($string, -6, 2);
+                    $year = substr($string, -8, 2);
+
+                    if ((int) $year_now > (int) $year) {
+                        $newID = "0001";
+                    } else if ((int) $month_now > (int) $month) {
+                        $newID = "0001";
+                    } else {
+                        $newID = $ids + 1;
+                        $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
+                    }
+
+                    $newID = $pref . $year_now . $month_now . $newID;
+                }
             }
 
             DB::table('invoicehutangs')->insert([
@@ -604,7 +656,7 @@ class PenerimaanBarangController extends Controller
                     $newID = str_pad($newID, 4, '0', STR_PAD_LEFT);
                 }
 
-                $newID = "IVH-" . $year_now . $month_now . $newID;
+                $newID = "IVH-0" . $year_now . $month_now . $newID;
                 $is->KodeInvoiceHutangShow = $newID;
                 $is->save();
             }
@@ -621,7 +673,7 @@ class PenerimaanBarangController extends Controller
         $supplier = supplier::where('KodeSupplier', $penerimaanbarang->KodeSupplier)->first();
 
         $items = DB::select(
-            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, a.Harga
+            "SELECT a.KodeItem,i.NamaItem, a.Qty, i.Keterangan, s.NamaSatuan, s.KodeSatuan, a.Harga
             FROM penerimaanbarangdetails a 
             inner join items i on a.KodeItem = i.KodeItem 
             inner join itemkonversis k on i.KodeItem = k.KodeItem and a.KodeSatuan = k.KodeSatuan 
