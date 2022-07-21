@@ -34,9 +34,9 @@
                             <label>Golongan: </label>
                             <select name="Golongan" id="Golongan" class="form-control">
                                 @foreach($golongan as $datagol)
-                                    <option value="{{ $datagol->KodeGolongan }}" {{ ($kar->KodeGolongan == $datagol->KodeGolongan) ? "selected" : "" }}>
-                                      {{ $datagol->NamaGolongan }}
-                                    </option>
+                                <option value="{{ $datagol->KodeGolongan }}" {{ ($kar->KodeGolongan == $datagol->KodeGolongan) ? "selected" : "" }}>
+                                    {{ $datagol->NamaGolongan }}
+                                </option>
                                 @endforeach
                             </select>
                         </div>
@@ -86,23 +86,22 @@
 @push('scripts')
 <script type="text/javascript">
     $(document).ready(function() {
-        var gaji        = +($('#GajiPokok').val());
+        var gaji = +($('#GajiPokok').val());
         $('#GajiPokokFormat').val(number_format(gaji));
     });
 
     $('#Golongan').on('change', function() {
-        var kodegolongan            = $(this).val();
-        var nomorgolongan           = +(kodegolongan.substr(-2));
+        var kodegolongan = $(this).val();
+        var nomorgolongan = +(kodegolongan.substr(-2));
         if (nomorgolongan < 4) {
-            $('#GajiPokok').attr('readonly','readonly');
-        }
-        else {
+            $('#GajiPokok').attr('readonly', 'readonly');
+        } else {
             $('#GajiPokok').removeAttr('readonly');
         }
     });
 
     $('#GajiPokok').on('change', function() {
-        var gaji        = +($('#GajiPokok').val());
+        var gaji = +($('#GajiPokok').val());
         $('#GajiPokokFormat').val(number_format(gaji));
     });
 

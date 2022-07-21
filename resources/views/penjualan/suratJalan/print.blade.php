@@ -249,7 +249,36 @@
                                 </div>
                                 <br><br><br>
                                 <div class="row">
-                                    <div class="column"></div>
+                                    <table id="borderless">
+                                        <tr id="borderless">
+                                            <td width="20%" id="borderless">
+                                                <p id="center">Penerima,</p>
+                                                <br><br>
+                                                <p id="center">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) </p>
+                                            </td>
+                                            <td width="20%" id="borderless">
+                                                <p id="center">Driver,</p>
+                                                <br><br>
+                                                <p id="center">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) </p>
+                                            </td>
+                                            <td width="20%" id="borderless">
+                                                <p id="center">Security,</p>
+                                                <br><br>
+                                                <p id="center">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) </p>
+                                            </td>
+                                            <td width="20%" id="borderless">
+                                                <p id="center">Pengawas,</p>
+                                                <br><br>
+                                                <p id="center">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) </p>
+                                            </td>
+                                            <td width="20%" id="borderless">
+                                                <p id="center">Hormat Kami,</p>
+                                                <br><br>
+                                                <p id="center">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                    <!-- <div class="column"></div>
                                     <div class="column">
                                         <p id="center">Penerima,</p>
                                         <br><br>
@@ -259,7 +288,7 @@
                                         <p id="center">Hormat kami,</p>
                                         <br><br>
                                         <p id="center">( &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ) </p>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>

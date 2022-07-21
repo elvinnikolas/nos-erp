@@ -20,7 +20,6 @@
         <thead>
           <tr>
             <th rowspan="2">Nama</th>
-            @if($golongan['Borongan'] == 1) <th rowspan="2" width="5%">Nutuk?</th> @endif
             <th>Hadir</th>
             <th>Harian</th>
             @if($golongan['Borongan'] == 0) <th>Jam</th> @endif
@@ -34,7 +33,7 @@
             @endif
             @endforeach
             @endif
-            @if($golongan['Borongan'] == 1) <th rowspan="2">Total Item</th> @endif
+            @if($golongan['Borongan'] == 1) <th colspan="2">Total Item</th> @endif
             @if($golongan['Borongan'] == 1) <th rowspan="2">Bonus</th> @endif
             <th rowspan="2">Hutang</th>
             <th rowspan="2">Subtotal</th>
@@ -54,6 +53,8 @@
             @endif
             @endforeach
             @endif
+            @if($golongan['Borongan'] == 1) <th>P</th> @endif
+            @if($golongan['Borongan'] == 1) <th>N</th> @endif
           </tr>
         </thead>
         <tbody>
@@ -61,10 +62,6 @@
           <tr>
             <!-- nama -->
             <td>{{ $karyawan['NamaKaryawan'] }}<input type="hidden" name="Karyawan[]" value="{{ $karyawan['KodeKaryawan'] }}"></td>
-            <!-- nutuk -->
-            @if($golongan['Borongan'] == 1)
-            <td><input type="checkbox" name="Nutuk[]" class="checkbox-nutuk"></td>
-            @endif
             <!-- hadir -->
             <td><input type="number" name="Hadir[]" class="input-hadir form-control" step="1" min="0" max="6" data-multiplier="{{ $golongan['UangHadir'] }}" value="0"></td>
             <!-- l.harian -->
@@ -85,18 +82,23 @@
             @foreach($golongan['GroupItem'] as $group)
             @if($golongan['Borongan'] == 1)
             <td><input type="number" name="Produksi[{{$group['NoGroupItem']}}][]" class="input-packing form-control input-item" step="1" min="0" data-multiplier="{{ $group['NominalGroupItem'] }}" value="0"></td>
-            <td><input type="number" name="Produksi[{{$group['NoGroupItem']}}][]" class="input-nutuk form-control input-item" step="1" min="0" data-multiplier="{{ $group['NominalGroupItemNutuk'] }}" value="0" disabled></td>
+            <td><input type="number" name="ProduksiNutuk[{{$group['NoGroupItem']}}][]" class="input-nutuk form-control input-item" step="1" min="0" data-multiplier="{{ $group['NominalGroupItemNutuk'] }}" value="0"></td>
             @else
             <td><input type="number" name="Produksi[{{$group['NoGroupItem']}}][]" class="form-control input-item" step="1" min="0" data-multiplier="{{ $group['NominalGroupItem'] }}" value="0"></td>
             @endif
             @endforeach
             @endif
             <!-- total item -->
-            @if($golongan['Borongan'] == 1) <td class="total-item">0</td> @endif
+            @if($golongan['Borongan'] == 1)
+            <td class="total-packing">0</td>
+            <td class="total-nutuk">0</td>
+            @endif
             <!-- bonus -->
-            @if($golongan['Borongan'] == 1) <td><input type="number" name="Bonus[]" class="input-bonus form-control" data-multiplier="1" value="0"></td> @endif
+            @if($golongan['Borongan'] == 1)
+            <td><input type="number" name="Bonus[]" class="input-bonus form-control" data-multiplier="1" value="0"></td>
+            @endif
             <!-- hutang -->
-            <td><input type="number" name="Hutang[]" class="input-hutang form-control" data-multiplier="-1" value="0"></td>
+            <td><input type="number" name="Hutang[]" class="input-hutang form-control" data-multiplier="-1" value="{{ $karyawan['Hutang'] }}"></td>
             <!-- subtotal -->
             <td class="subtotal">0</td>
             <input type="hidden" name="Subtotal[]" class="input-subtotal" value="0">

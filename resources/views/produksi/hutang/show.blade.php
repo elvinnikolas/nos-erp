@@ -85,13 +85,23 @@
 
                         <table id="items" class="table">
                             <tr>
-                                <td id="header">Karyawan</td>
-                                <td id="header">Golongan</td>
-                                <td id="header">Qty Produksi (buku)</td>
-                                <td id="header">Qty Produksi (cek)</td>
-                                <td id="header">Qty Hutang</td>
-                                <td id="header">Gaji / Packing</td>
-                                <td id="header">Total Hutang</td>
+                                <th rowspan="2" style="width:14%" id="header">Karyawan</th>
+                                <th rowspan="2" style="width:12%" id="header">Golongan</th>
+                                <th colspan="2" style="width:14%" id="header">Qty Produksi (Buku)</th>
+                                <th colspan="2" style="width:14%" id="header">Qty Produksi (Cek)</th>
+                                <th colspan="2" style="width:14%" id="header">Qty Hutang</th>
+                                <th colspan="2" style="width:17%" id="header">Gaji</th>
+                                <th rowspan="2" style="width:15%" id="header">Total Hutang</th>
+                            </tr>
+                            <tr>
+                                <th id="header">Pck</th>
+                                <th id="header">Ntk</th>
+                                <th id="header">Pck</th>
+                                <th id="header">Ntk</th>
+                                <th id="header">Pck</th>
+                                <th id="header">Ntk</th>
+                                <th id="header">Pck</th>
+                                <th id="header">Ntk</th>
                             </tr>
                             @foreach($detail as $d)
                             <tr class="rowinput">
@@ -102,19 +112,31 @@
                                     <input type="text" readonly class="form-control" value="{{ $d->NamaGroupItem}}">
                                 </td>
                                 <td>
-                                    <input type="text" readonly class="form-control" value="{{ $d->Qty}}">
+                                    <input type="text" readonly class="form-control" value="{{ $d->QtyBuku_Packing}}">
                                 </td>
                                 <td>
-                                    <input type="text" readonly class="form-control" value="{{ $d->QtyCek}}">
+                                    <input type="text" readonly class="form-control" value="{{ $d->QtyBuku_Nutuk}}">
                                 </td>
                                 <td>
-                                    <input type="text" readonly class="form-control" value="{{ $d->QtyHutang}}">
+                                    <input type="text" readonly class="form-control" value="{{ $d->QtyCek_Packing}}">
                                 </td>
                                 <td>
-                                    <input type="text" readonly class="form-control" value="{{ $d->Gaji}}">
+                                    <input type="text" readonly class="form-control" value="{{ $d->QtyCek_Nutuk}}">
                                 </td>
                                 <td>
-                                    <input type="text" readonly class="form-control" value="{{ $d->Total}}">
+                                    <input type="text" readonly class="form-control" value="{{ $d->QtyHutang_Packing}}">
+                                </td>
+                                <td>
+                                    <input type="text" readonly class="form-control" value="{{ $d->QtyHutang_Nutuk}}">
+                                </td>
+                                <td>
+                                    <input type="text" readonly class="form-control" value="{{ $d->Gaji_Packing}}">
+                                </td>
+                                <td>
+                                    <input type="text" readonly class="form-control" value="{{ $d->Gaji_Nutuk}}">
+                                </td>
+                                <td>
+                                    <input type="text" readonly class="form-control" value="{{$string_total = "Rp " . number_format($d->Total, 0, ',', '.') .",-"}}">
                                 </td>
                             </tr>
                             @endforeach
@@ -134,3 +156,33 @@
 </div>
 </div>
 @endsection
+
+@push('scripts')
+<script type="text/javascript">
+    function number_format(number, decimals, decPoint, thousandsSep) {
+        number = (number + '').replace(/[^0-9+\-Ee.]/g, '')
+        var n = !isFinite(+number) ? 0 : +number
+        var prec = !isFinite(+decimals) ? 0 : Math.abs(decimals)
+        var sep = (typeof thousandsSep === 'undefined') ? '.' : thousandsSep
+        var dec = (typeof decPoint === 'undefined') ? ',' : decPoint
+        var s = ''
+
+        var toFixedFix = function(n, prec) {
+            var k = Math.pow(10, prec)
+            return '' + (Math.round(n * k) / k)
+                .toFixed(prec)
+        }
+
+        s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.')
+        if (s[0].length > 3) {
+            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep)
+        }
+        if ((s[1] || '').length < prec) {
+            s[1] = s[1] || ''
+            s[1] += new Array(prec - s[1].length + 1).join('0')
+        }
+
+        return s.join(dec)
+    }
+</script>
+@endpush

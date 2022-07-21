@@ -83,13 +83,23 @@
 
                                 <table id="items" class="table">
                                     <tr>
-                                        <td id="header">Karyawan</td>
-                                        <td id="header">Golongan</td>
-                                        <td id="header">Qty Produksi (buku)</td>
-                                        <td id="header">Qty Produksi (cek)</td>
-                                        <td id="header">Qty Hutang</td>
-                                        <td id="header">Gaji / Packing</td>
-                                        <td id="header">Total Hutang</td>
+                                        <th rowspan="2" style="width:14%" id="header">Karyawan</th>
+                                        <th rowspan="2" style="width:12%" id="header">Golongan</th>
+                                        <th colspan="2" style="width:14%" id="header">Qty Produksi (Buku)</th>
+                                        <th colspan="2" style="width:14%" id="header">Qty Produksi (Cek)</th>
+                                        <th colspan="2" style="width:14%" id="header">Qty Hutang</th>
+                                        <th colspan="2" style="width:17%" id="header">Gaji</th>
+                                        <th rowspan="2" style="width:15%" id="header">Total Hutang</th>
+                                    </tr>
+                                    <tr>
+                                        <th id="header">Pck</th>
+                                        <th id="header">Ntk</th>
+                                        <th id="header">Pck</th>
+                                        <th id="header">Ntk</th>
+                                        <th id="header">Pck</th>
+                                        <th id="header">Ntk</th>
+                                        <th id="header">Pck</th>
+                                        <th id="header">Ntk</th>
                                     </tr>
                                     @foreach($data as $key => $dt)
                                     <tr class="rowinput">
@@ -102,21 +112,32 @@
                                             <input readonly="" type="hidden" name="golongan[]" class="form-control" required="" value="{{$dt->kodegolongan}}">
                                         </td>
                                         <td>
-                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="gaji[]" class="form-control gaji{{$key+1}}" required="" value="{{$dt->gaji}}">
-                                            <!-- <input type="number" name="gaji[]" class="form-control" required="" value="{{number_format($dt->gaji, 0, ',', '.')}}"> -->
+                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="buku_packing[]" class="form-control buku_packing{{$key+1}}" required="" value="{{$dt->buku_packing}}">
                                         </td>
                                         <td>
-                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="produksi[]" class="form-control produksi{{$key+1}}" required="" value="{{$dt->produksi}}">
+                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="buku_nutuk[]" class="form-control buku_nutuk{{$key+1}}" required="" value="{{$dt->buku_nutuk}}">
                                         </td>
                                         <td>
-                                            <input type="number" readonly="" step=0.01 onchange="update({{$key+1}});" name="hutang[]" class="form-control hutang{{$key+1}}" required="" value="{{$dt->hutang}}">
+                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="cek_packing[]" class="form-control cek_packing{{$key+1}}" required="" value="{{$dt->cek_packing}}">
                                         </td>
                                         <td>
-                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="packing[]" class="form-control packing{{$key+1}}" required="" value="{{$dt->packing}}">
+                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="cek_nutuk[]" class="form-control cek_nutuk{{$key+1}}" required="" value="{{$dt->cek_nutuk}}">
                                         </td>
                                         <td>
-                                            <input type="text" readonly="" class="form-control showtotal{{$key+1}}" required="" value="{{$string_total = "Rp " . number_format($dt->total, 0, ',', '.') .",-"}}">
-                                            <input type="hidden" readonly="" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$dt->total}}">
+                                            <input type="number" readonly="" step=0.01 onchange="update({{$key+1}});" name="hutang_packing[]" class="form-control hutang_packing{{$key+1}}" required="" value="{{$dt->hutang_packing}}">
+                                        </td>
+                                        <td>
+                                            <input type="number" readonly="" step=0.01 onchange="update({{$key+1}});" name="hutang_nutuk[]" class="form-control hutang_nutuk{{$key+1}}" required="" value="{{$dt->hutang_nutuk}}">
+                                        </td>
+                                        <td>
+                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="gaji_packing[]" class="form-control gaji_packing{{$key+1}}" required="" value="{{$dt->gaji_packing}}">
+                                        </td>
+                                        <td>
+                                            <input type="number" step=0.01 onchange="update({{$key+1}});" name="gaji_nutuk[]" class="form-control gaji_nutuk{{$key+1}}" required="" value="{{$dt->gaji_nutuk}}">
+                                        </td>
+                                        <td>
+                                            <input type="text" readonly="" class="form-control showtotal{{$key+1}}" required="" value="{{$string_total = "Rp " . number_format($dt->total_packing+$dt->total_nutuk, 0, ',', '.') .",-"}}">
+                                            <input type="hidden" readonly="" name="total[]" class="form-control total{{$key+1}}" required="" value="{{$dt->total_packing+$dt->total_nutuk}}">
                                         </td>
                                     </tr>
                                     @endforeach
@@ -140,15 +161,20 @@
 @push('scripts')
 <script type="text/javascript">
     function update(int) {
-        var gaji = $(".gaji" + int).val();
-        var produksi = $(".produksi" + int).val();
-        var packing = $(".packing" + int).val();
+        var buku_packing = $(".buku_packing" + int).val();
+        var buku_nutuk = $(".buku_nutuk" + int).val();
+        var cek_packing = $(".cek_packing" + int).val();
+        var cek_nutuk = $(".cek_nutuk" + int).val();
+        var gaji_packing = $(".gaji_packing" + int).val();
+        var gaji_nutuk = $(".gaji_nutuk" + int).val();
 
-        $(".hutang" + int).val(gaji - produksi);
-        var hutang = $(".hutang" + int).val();
+        $(".hutang_packing" + int).val(buku_packing - cek_packing);
+        var hutang_packing = $(".hutang_packing" + int).val();
+        $(".hutang_nutuk" + int).val(buku_nutuk - cek_nutuk);
+        var hutang_nutuk = $(".hutang_nutuk" + int).val();
 
-        $(".total" + int).val(hutang * packing);
-        var showtotal = 'Rp ' + number_format(hutang * packing) + ',-';
+        $(".total" + int).val((hutang_packing * gaji_packing) + (hutang_nutuk * gaji_nutuk));
+        var showtotal = 'Rp ' + number_format((hutang_packing * gaji_packing) + (hutang_nutuk * gaji_nutuk)) + ',-';
         $(".showtotal" + int).val(showtotal);
     }
 

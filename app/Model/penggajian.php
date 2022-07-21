@@ -47,7 +47,6 @@ class penggajian extends Model
       $id_karyawan = DB::table('new_gajiandetailkaryawan')->insertGetId([
         'NoGajian' => $idGaji,
         'KodeKaryawan' => $value,
-        'Nutuk' => isset($data['Nutuk'][$key]) ? 1 : 0,
         'AbsenMasuk' => $data['Hadir'][$key],
         'LemburHarian' => $data['Harian'][$key],
         'LemburJam' => isset($data['Harian'][$key]) ? $data['Harian'][$key] : 0,
@@ -61,8 +60,18 @@ class penggajian extends Model
         if ($data['Produksi'][$kode->NoGroupItem][$key] > 0) {
           DB::table('new_gajiandetailproduksi')->insert([
             'NoGajianDetailKaryawan' => $id_karyawan,
-            'KodeItem' => $kode->NoGroupItem,
+            'KodeGolongan' => $kode->NoGroupItem,
+            'Jenis' => 'Packing',
             'JumlahProduksi' => $data['Produksi'][$kode->NoGroupItem][$key],
+            'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+          ]);
+        }
+        if ($data['ProduksiNutuk'][$kode->NoGroupItem][$key] > 0) {
+          DB::table('new_gajiandetailproduksi')->insert([
+            'NoGajianDetailKaryawan' => $id_karyawan,
+            'KodeGolongan' => $kode->NoGroupItem,
+            'Jenis' => 'Nutuk',
+            'JumlahProduksi' => $data['ProduksiNutuk'][$kode->NoGroupItem][$key],
             'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
           ]);
         }
@@ -115,11 +124,45 @@ class penggajian extends Model
         ['Status', '=', 'OPN'],
         ['KodeGolongan', '=', $gol->KodeGolongan]
       ])->select('KodeKaryawan', 'Nama')->get();
+
+      // $hutang = DB::table('prod_hutangdetail')
+      //   ->join('prod_hutangheader', 'prod_hutangheader.id', '=', 'prod_hutangdetail.IDHutang')
+      //   ->where('prod_hutangheader.Status', '=', 'OPN')
+      //   ->select(
+      //     DB::raw('SUM(Total) as Total, KodeKaryawan')
+      //   )
+      //   ->get();
+
+      $hutang = DB::select("SELECT phd.KodeKaryawan, SUM(phd.Total) as Total FROM prod_hutangdetail phd
+        JOIN prod_hutangheader ph ON ph.id = phd.IDHutang
+        WHERE ph.Status = 'OPN'
+        GROUP BY phd.KodeKaryawan
+      ");
+
       foreach ($karyawan as $k) {
-        array_push($dataKaryawan, array(
-          'KodeKaryawan' => $k->KodeKaryawan,
-          'NamaKaryawan' => $k->Nama
-        ));
+        if ($hutang) {
+          foreach ($hutang as $h) {
+            if ($h->KodeKaryawan == $k->KodeKaryawan) {
+              array_push($dataKaryawan, array(
+                'KodeKaryawan' => $k->KodeKaryawan,
+                'NamaKaryawan' => $k->Nama,
+                'Hutang' => $h->Total
+              ));
+            } else {
+              array_push($dataKaryawan, array(
+                'KodeKaryawan' => $k->KodeKaryawan,
+                'NamaKaryawan' => $k->Nama,
+                'Hutang' => 0
+              ));
+            }
+          }
+        } else {
+          array_push($dataKaryawan, array(
+            'KodeKaryawan' => $k->KodeKaryawan,
+            'NamaKaryawan' => $k->Nama,
+            'Hutang' => 0
+          ));
+        }
       }
 
       array_push($result, array(

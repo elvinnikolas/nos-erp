@@ -32,10 +32,10 @@
                             <div class="form-group">
                                 <label>Golongan: </label>
                                 <select name="Golongan" id="Golongan" class="form-control">
-                                    <option selected disabled hidden>-- Pilih Golongan  --</option>
+                                    <option selected disabled hidden>-- Pilih Golongan --</option>
                                     @foreach($golongan as $datagol)
                                     <option value="{{ $datagol->KodeGolongan }}">
-                                      {{ $datagol->NamaGolongan }}
+                                        {{ $datagol->NamaGolongan }}
                                     </option>
                                     @endforeach
                                 </select>
@@ -80,19 +80,19 @@
 
 @push('scripts')
 <script type="text/javascript">
-    $('#Golongan').on('change', function() {
-        var kodegolongan            = $(this).val();
-        var nomorgolongan           = +(kodegolongan.substr(-2));
-        if (nomorgolongan < 4) {
-            $('#GajiPokok').attr('readonly','readonly');
-        }
-        else {
-            $('#GajiPokok').removeAttr('readonly');
-        }
-    });
+    // $('#Golongan').on('change', function() {
+    //     var kodegolongan            = $(this).val();
+    //     var nomorgolongan           = +(kodegolongan.substr(-2));
+    //     if (nomorgolongan < 4) {
+    //         $('#GajiPokok').attr('readonly','readonly');
+    //     }
+    //     else {
+    //         $('#GajiPokok').removeAttr('readonly');
+    //     }
+    // });
 
     $('#GajiPokok').on('change', function() {
-        var gaji        = +($('#GajiPokok').val());
+        var gaji = +($('#GajiPokok').val());
         $('#GajiPokokFormat').val(number_format(gaji));
     });
 

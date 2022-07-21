@@ -50,14 +50,14 @@
                             <div class="form-group col-md-3">
                                 <div class="form-group">
                                     <label for="kodeproduksi">Kode Produksi: </label>
-                                    <input type="text" class="form-control bahanjadi" name="KodeProduksi" id="kodeproduksi" value="{{$kode_produksi}}" readonly required>
+                                    <input type="text" class="form-control" name="KodeProduksi" id="kodeproduksi" value="{{$kode_produksi}}" readonly required>
                                 </div>
                                 <div class="form-group">
                                     {{--<label for="tanggalproduksi">Tanggal: </label>
-                                    <input type="text" class="form-control bahanjadi" name="TanggalProduksi" id="tanggalproduksi" value="{{$tanggal_produksi}}" required>--}}
+                                    <input type="text" class="form-control" name="TanggalProduksi" id="tanggalproduksi" value="{{$tanggal_produksi}}" required>--}}
                                     <label for="tanggalproduksi">Tanggal : </label>
                                     <div class="input-group inputDate">
-                                        <input type="text" class="form-control bahanjadi" id="tanggalproduksi" name="TanggalProduksi" value="{{date('d-m-Y')}}">
+                                        <input type="text" class="form-control" id="tanggalproduksi" name="TanggalProduksi" value="{{date('d-m-Y')}}">
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -71,7 +71,7 @@
                             <div class="form-group col-md-3">
                                 <div class="form-group">
                                     <label for="golonganproduksi">Golongan: </label>
-                                    <select class="form-control bahanjadi" name="GolonganProduksi" id="golonganproduksi" placeholder="Pilih golongan" required>
+                                    <select class="form-control" name="GolonganProduksi" id="golonganproduksi" placeholder="Pilih golongan" required>
                                         <option selected disabled hidden>-- Pilih golongan --</option>
                                         @foreach($golongan as $gol)
                                         <option value="{{$gol->NoGolongan}}" nomor="{{$loop->iteration}}">{{$gol->NamaGroupItem}}</option>
@@ -80,13 +80,21 @@
                                 </div>
                                 <div class="form-group">
                                     <label for="resepproduksi">Resep: </label>
-                                    <select class="form-control bahanjadi" name="ResepProduksi" id="resepproduksi" placeholder="Pilih resep" required>
+                                    <select class="form-control" name="ResepProduksi" id="resepproduksi" placeholder="Pilih resep" required>
                                         <option selected disabled hidden>-- Pilih resep --</option>
                                         @foreach($resep as $rsp)
                                         <option value="{{$rsp->KodeResep}}" nomor="{{$loop->iteration}}">{{$rsp->NamaItem}}</option>
                                         <input type="hidden" class="idsatuanresep" nomor="{{$loop->iteration}}" value="{{$rsp->KodeSatuan}}">
                                         <input type="hidden" class="namasatuanresep" nomor="{{$loop->iteration}}" value="{{$rsp->NamaSatuan}}">
                                         @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="jenisproduksi">Jenis: </label>
+                                    <select class="form-control" name="JenisProduksi" id="jenisproduksi" placeholder="Pilih jenis" required>
+                                        <option selected disabled hidden>-- Pilih jenis --</option>
+                                        <option value="Packing">Packing</option>
+                                        <option value="Nutuk">Nutuk</option>
                                     </select>
                                 </div>
                             </div>

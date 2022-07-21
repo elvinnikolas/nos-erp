@@ -55,6 +55,7 @@
                                 <th>Kode Produksi</th>
                                 <th>Tanggal</th>
                                 <th>Barang Produksi</th>
+                                <th>Jenis Produksi</th>
                                 <th>Keterangan</th>
                                 <th></th>
                             </tr>
@@ -112,6 +113,9 @@
                 },
                 {
                     data: 'NamaItem'
+                },
+                {
+                    data: 'Jenis'
                 },
                 {
                     data: 'Keterangan'

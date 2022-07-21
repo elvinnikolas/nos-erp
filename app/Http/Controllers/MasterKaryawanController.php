@@ -31,7 +31,7 @@ class MasterKaryawanController extends Controller
     public function create()
     {
         $last_id = DB::select('SELECT * FROM karyawans WHERE Status = "OPN" ORDER BY KodeKaryawan DESC LIMIT 1');
-        $golongan = DB::table('golongans')->get();
+        $golongan = DB::table('new_golongan')->get();
 
         //Auto generate ID
         if ($last_id == null) {
@@ -116,13 +116,13 @@ class MasterKaryawanController extends Controller
     public function edit($id)
     {
         $karyawan = DB::table('karyawans')
-        	->where('KodeKaryawan',$id)
-        	->get();
-        
-        $golongan = DB::table('golongans')->get();
+            ->where('KodeKaryawan', $id)
+            ->get();
+
+        $golongan = DB::table('new_golongan')->get();
 
         $jabatan = DB::table('jabatans')
-            ->where('Status','OPN')
+            ->where('Status', 'OPN')
             ->get();
 
         return view('master.karyawan.edit', compact('karyawan', 'golongan', 'jabatan'));
@@ -201,13 +201,14 @@ class MasterKaryawanController extends Controller
         }
         return redirect('/masterkaryawan')->with(['deleted' => $pesan]);
     }
-    
-    public function print($id) {
-    	$data      = DB::table('karyawans')->where('KodeKaryawan', $id)->get();
-    	$pdf       = PDF::loadview('master.karyawan.membercard', compact('data'));
-    	
+
+    public function print($id)
+    {
+        $data      = DB::table('karyawans')->where('KodeKaryawan', $id)->get();
+        $pdf       = PDF::loadview('master.karyawan.membercard', compact('data'));
+
         foreach ($data as $value) {
-            return $pdf->download('Kartu Karyawan '.$value->Nama.'.pdf');
+            return $pdf->download('Kartu Karyawan ' . $value->Nama . '.pdf');
         }
         // return view('master.karyawan.membercard', compact('data'));
     }

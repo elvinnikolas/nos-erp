@@ -88,6 +88,8 @@ class ProduksiController extends Controller
             ->insert([
                 'KodeProduksi' => $request->KodeProduksi,
                 'KodeResep' => $request->ResepProduksi,
+                'KodeGolongan' => $request->GolonganProduksi,
+                'Jenis' => $request->JenisProduksi,
                 'TanggalProduksi' => $request->TanggalProduksi,
                 'Status' => 'OPN',
                 'created_at' => \Carbon\Carbon::now(),
@@ -215,6 +217,7 @@ class ProduksiController extends Controller
             ->select(
                 'prod_hasilproduksiheader.id',
                 'prod_hasilproduksiheader.KodeProduksi',
+                'prod_hasilproduksiheader.Jenis',
                 'items.NamaItem',
                 'prod_hasilproduksiheader.TanggalProduksi'
             )

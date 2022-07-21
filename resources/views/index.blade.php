@@ -24,6 +24,18 @@
     <link href="{{ asset('/vendors/bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css') }}" rel="stylesheet">
     <link href="{{ url('css/custom.min.css') }}" rel="stylesheet">
 
+    <style>
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+
     @yield('styles')
 </head>
 

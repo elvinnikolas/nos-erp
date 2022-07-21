@@ -9,14 +9,14 @@
                     <li><a href="{{ url('/masterklasifikasi') }}">Data Klasifikasi</a></li>
                     <li><a href="{{ url('/mastersatuan') }}">Data Satuan</a></li>
                     <li><a href="{{ url('/masteritem') }}">Data Item</a></li>
-                    <li><a href="{{ url('/mastermatauang')}}">Data Mata Uang</a></li>
+                    <!-- <li><a href="{{ url('/mastermatauang')}}">Data Mata Uang</a></li> -->
                     <li><a href="{{ url('/masterpelanggan') }}">Data Pelanggan</a></li>
                     <li><a href="{{ url('/mastersupplier') }}">Data Supplier</a></li>
                     <li><a href="{{ url('/masterkaryawan')}}">Data Karyawan</a></li>
                     <li><a href="{{ url('/mastergolongan')}}">Data Golongan</a></li>
                     <li><a href="{{ url('/masterjabatan')}}">Data Jabatan</a></li>
                     <li><a href="{{ url('/masterresep')}}">Data Resep</a></li>
-                    <li><a href="{{ url('/masterbonus')}}">Data Bonus</a></li>
+                    <!-- <li><a href="{{ url('/masterbonus')}}">Data Bonus</a></li> -->
                 </ul>
             </li>
 

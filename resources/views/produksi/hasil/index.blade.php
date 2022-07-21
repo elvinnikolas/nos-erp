@@ -45,6 +45,7 @@
                                 <th>Kode Produksi</th>
                                 <th>Tanggal</th>
                                 <th>Barang Produksi</th>
+                                <th>Jenis Produksi</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -99,6 +100,9 @@
                 },
                 {
                     data: 'NamaItem'
+                },
+                {
+                    data: 'Jenis'
                 },
                 {
                     data: 'action'

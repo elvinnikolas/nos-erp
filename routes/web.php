@@ -36,6 +36,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('/masterresep', 'MasterResepController');
     Route::resource('/masterbonus', 'MasterBonusController');
 
+    Route::get('mastergolongan/test', 'MasterGolonganController@test')->name('mastergolongan.test');
     Route::get('api/mastergolongan', 'MasterGolonganController@apiOPN')->name('api.mastergolongan');
     Route::get('api/mastergolongan/item', 'MasterGolonganController@apiItem')->name('api.mastergolongan.item');
     Route::get('api/bonus', 'MasterBonusController@dataBonus')->name('bonus.data');

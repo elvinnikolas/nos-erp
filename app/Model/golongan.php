@@ -15,9 +15,10 @@ class golongan extends Model
             $noGolongan = DB::table('new_golongan')->insertGetId([
                 'NamaGolongan' => strtoupper($data['NamaGolongan']),
                 'UangHadir' => $data['UangHadir'],
+                'UangHadirHarian' => $data['UangHadirHarian'],
                 'UangLembur' => $data['UangLembur'],
                 'UangMinggu' => $data['UangMinggu'],
-                'Borongan' => $data['Borongan'] == 'on' ? 1 : 0,
+                'Borongan' => 1,
                 'modified_at' => \Carbon\Carbon::now()
             ]);
 
@@ -29,9 +30,10 @@ class golongan extends Model
             DB::table('new_golongan')->where('NoGolongan', $data['NoGolongan'])->update([
                 'NamaGolongan' => strtoupper($data['NamaGolongan']),
                 'UangHadir' => $data['UangHadir'],
+                'UangHadirHarian' => $data['UangHadirHarian'],
                 'UangLembur' => $data['UangLembur'],
                 'UangMinggu' => $data['UangMinggu'],
-                'Borongan' => $data['Borongan'] == 'on' ? 1 : 0,
+                'Borongan' => 1,
                 'modified_at' => \Carbon\Carbon::now()
             ]);
         }
@@ -42,11 +44,12 @@ class golongan extends Model
                 if (isset($data['NoGroupItem'][$key])) {
                     $lastId = $data['NoGroupItem'][$key];
                 } else {
-                    $lastId = DB::table('new_golongangroupitem')
-                        ->where('NoGolongan', $noGolongan)
-                        ->orderBy('NoGroupItem', 'desc')
-                        ->take(1)
-                        ->value('NoGroupItem');
+                    $last_data = DB::select(
+                        "SELECT * FROM new_golongangroupitem
+                        ORDER BY NoGroupItem desc
+                        LIMIT 1"
+                    );
+                    $lastId = $last_data[0]->NoGroupItem;
                     if (!empty($lastId)) {
                         $lastId = $lastId + 1;
                     } else {
@@ -82,6 +85,7 @@ class golongan extends Model
             }
 
             DB::table('new_golongangroupitem')
+                ->where('NoGolongan', $noGolongan)
                 ->whereNotIn('NoGroupItem', $listGroupItem)
                 ->delete();
         } else {
@@ -159,6 +163,7 @@ class golongan extends Model
                 'KodeGolongan' => $gol->KodeGolongan,
                 'NamaGolongan' => $gol->NamaGolongan,
                 'UangHadir' => $gol->UangHadir,
+                'UangHadirHarian' => $gol->UangHadirHarian,
                 'UangLembur' => $gol->UangLembur,
                 'UangMinggu' => $gol->UangMinggu,
                 'Borongan' => $gol->Borongan,
@@ -186,8 +191,8 @@ class golongan extends Model
             'modified_at' => \Carbon\Carbon::now()
         ]);
 
-        DB::table('new_golongangroupitem')->where('NoGolongan', $id)->delete();
-        DB::table('new_golongangroupitemdetail')->where('NoGolongan', $id)->delete();
+        // DB::table('new_golongangroupitem')->where('NoGolongan', $id)->delete();
+        // DB::table('new_golongangroupitemdetail')->where('NoGolongan', $id)->delete();
 
         DB::table('eventlogs')->insert([
             'KodeUser' => Auth::user()->name,
