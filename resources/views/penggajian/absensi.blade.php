@@ -17,7 +17,7 @@
         <thead>
           <tr>
             <th width="15%">Karyawan</th>
-            <th><input type="checkbox" id="checkbox-absen-semua"></th>
+            <th>Hadir semua&nbsp;&nbsp;<input type="checkbox" id="checkbox-absen-semua"></th>
           </tr>
         </thead>
         <tbody>

@@ -56,17 +56,19 @@
                                 <th>Kode Karyawan</th>
                                 <th>Nama</th>
                                 <th>Jabatan</th>
+                                <th>Golongan</th>
                                 <th>Gaji Pokok</th>
                                 <th>Alamat</th>
                                 <th data-orderable="false">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                        @foreach($karyawan as $kar)
+                            @foreach($karyawan as $kar)
                             <tr>
                                 <td>{{$kar->KodeKaryawan}}</td>
                                 <td>{{$kar->Nama}}</td>
-                                <td>{{$kar->KodeJabatan}}</td>
+                                <td>{{$kar->KodeJabatan ? $kar->KodeJabatan : '-'}}</td>
+                                <td>{{$kar->NamaGolongan ? $kar->NamaGolongan : '-'}}</td>
                                 <td>{{$kar->GajiPokok}}</td>
                                 <td>{{$kar->Alamat}}</td>
                                 <td>
@@ -77,13 +79,13 @@
                                     <form style="display:inline-block;" action="/masterkaryawan/delete/{{$kar->KodeKaryawan}}" method="get" onsubmit="return showConfirm()">
                                         <button class="btn btn-danger btn-xs"><i class="fa fa-trash"></i>&nbsp;Hapus</button>
                                     </form>
-                                    
+
                                     <form style="display:inline-block;" action="/masterkaryawan/print/{{$kar->KodeKaryawan}}" method="get">
                                         <button class="btn btn-info btn-xs"><i class="fa fa-print"></i>&nbsp;Cetak</button>
                                     </form>
                                 </td>
                             </tr>
-                        @endforeach
+                            @endforeach
                         </tbody>
                     </table>
                 </div>

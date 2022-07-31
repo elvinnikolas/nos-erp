@@ -52,7 +52,7 @@ class MasterResepController extends Controller
         $bahanbaku = DB::table('items')
             ->select('KodeItem', 'NamaItem')
             ->where('items.Status', 'OPN')
-            ->where('items.jenisitem', 'bahanbaku')
+            ->where('items.jenisitem', 'bahansetengahjadi')
             ->get();
 
         return view('master.resep.create', compact('newkoderesep', 'bahanjadi', 'bahanbaku'));
@@ -66,15 +66,15 @@ class MasterResepController extends Controller
      */
     public function store(Request $request)
     {
-        $koderesep      = $request->KodeResep;
-        $namaresep      = $request->NamaResep;
+        $koderesep       = $request->KodeResep;
+        $namaresep       = $request->NamaResep;
         $keteranganresep = $request->KeteranganResep;
-        $satuanresep    = $request->SatuanResep;
-        $qtyresep       = $request->JumlahResep;
-        $baku           = $request->BahanBaku;
-        $satuanbaku     = $request->SatuanBahanBaku;
-        $jumlahbaku     = $request->JumlahBahanBaku;
-        $keteranganbaku = $request->KeteranganBahanBaku;
+        $satuanresep     = $request->SatuanResep;
+        $qtyresep        = $request->JumlahResep;
+        $baku            = $request->BahanBaku;
+        $satuanbaku      = $request->SatuanBahanBaku;
+        $jumlahbaku      = $request->JumlahBahanBaku;
+        $keteranganbaku  = $request->KeteranganBahanBaku;
 
         DB::table('prod_resepheader')->insert([
             'KodeResep'         => $koderesep,
@@ -153,7 +153,9 @@ class MasterResepController extends Controller
             ->where('prod_resepheader.KodeResep', $id)
             ->where('prod_resepheader.Status', 'OPN')
             ->select('prod_resepheader.*', 'items.NamaItem')
-            ->get();
+            ->first();
+
+        // dd($bahanbaku, $bahanbakuresep, $bahanjadi);
 
         return view('master.resep.edit', [
             'bahanbaku'     => $bahanbaku,
@@ -259,8 +261,8 @@ class MasterResepController extends Controller
                     '<form style="display:inline-block;">' .
                     '<button type="button" class="btn btn-primary btn-xs" onclick="detailResep(\'' . $resep->KodeResep . '\')"><i class="fa fa-eye"></i>&nbsp;Lihat Bahan</button></form>' .
 
-                    '<form style="display:inline-block;" type="submit" action="/masterresep/' . $resep->KodeResep . '/edit" method="get">' .
-                    '<button class="btn btn-success btn-xs" data-function="ubah"><i class="fa fa-pencil"></i>&nbsp;Ubah</button></form>' .
+                    // '<form style="display:inline-block;" type="submit" action="/masterresep/' . $resep->KodeResep . '/edit" method="get">' .
+                    // '<button class="btn btn-success btn-xs" data-function="ubah"><i class="fa fa-pencil"></i>&nbsp;Ubah</button></form>' .
 
                     '<form style="display:inline-block;" action="/masterresep/delete/' . $resep->KodeResep . '" method="get" onsubmit="return showConfirm()">' .
                     '<button class="btn btn-danger btn-xs" data-function="hapus"><i class="fa fa-trash"></i>&nbsp;Hapus</button></form>';

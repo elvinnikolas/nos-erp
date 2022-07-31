@@ -84,8 +84,6 @@
                                         <option selected disabled hidden>-- Pilih resep --</option>
                                         @foreach($resep as $rsp)
                                         <option value="{{$rsp->KodeResep}}" nomor="{{$loop->iteration}}">{{$rsp->NamaItem}}</option>
-                                        <input type="hidden" class="idsatuanresep" nomor="{{$loop->iteration}}" value="{{$rsp->KodeSatuan}}">
-                                        <input type="hidden" class="namasatuanresep" nomor="{{$loop->iteration}}" value="{{$rsp->NamaSatuan}}">
                                         @endforeach
                                     </select>
                                 </div>
@@ -97,6 +95,12 @@
                                         <option value="Nutuk">Nutuk</option>
                                     </select>
                                 </div>
+                                <!-- hidden satuan -->
+                                @foreach($resep as $rsp)
+                                <input type="hidden" class="idsatuanresep" nomor="{{$loop->iteration}}" value="{{$rsp->KodeSatuan}}">
+                                <input type="hidden" class="namasatuanresep" nomor="{{$loop->iteration}}" value="{{$rsp->NamaSatuan}}">
+                                @endforeach
+                                <input type="hidden" name="KodeSatuan" id="input-satuan">
                             </div>
                         </div>
                         <div class="form-row">
@@ -115,9 +119,9 @@
                                 <table id="items" class="table">
                                     <tr>
                                         <td id="header" style="width:10%;">No.</td>
-                                        <td id="header" style="width:25%;">Karyawan</td>
+                                        <td id="header" style="width:30%;">Karyawan</td>
                                         <td id="header" style="width:20%;">Jumlah</td>
-                                        <td id="header" style="width:30%;">Satuan</td>
+                                        <td id="header" style="width:25%;">Satuan</td>
                                         <td id="header" style="width:5%;"></td>
                                     </tr>
                                     <tr class="rowinput">
@@ -133,8 +137,9 @@
                                         <td>
                                             <input type="number" step=1 name="JumlahProduksi[]" class="form-control" id="input-jumlah1" value="0" urutan="1" required>
                                         </td>
-                                        <td id="text-satuan1" style="vertical-align: middle; text-align: center;"></td>
-                                        <input type="hidden" id="input-satuan1" name="SatuanProduksi[]" value="">
+                                        <td>
+                                            <input type="text" class="form-control" id="text-satuan1" readonly>
+                                        </td>
                                         <td></td>
                                     </tr>
                                 </table>
@@ -176,9 +181,8 @@
         var res = "<tr class='tambah" + count + "'>" + markup + "</tr>";
         res = res.replace("text-nomor1", "text-nomor" + count);
         res = res.replace("select-karyawan1", "select-karyawan" + count);
-        res = res.replace("input-jumlah1", "input-jumlah" + count);
         res = res.replace("text-satuan1", "text-satuan" + count);
-        res = res.replace("input-satuan1", "input-satuan" + count);
+        res = res.replace("input-jumlah1", "input-jumlah" + count);
         res = res.replace('urutan="1"', 'urutan="' + count + '"');
         res = res.replace("<td></td>", '<td><button type="button" onclick="del(' + count + ')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button></td>');
 
@@ -189,6 +193,9 @@
         $('#select-karyawan1').select2({
             width: '100%'
         });
+
+        var namasatuan = $('#text-satuan1').val();
+        $('#text-satuan' + count).val(namasatuan);
     }
 
     function del(int) {
@@ -200,8 +207,14 @@
         var resep = $('option:selected', this).attr('nomor');
         var kodesatuan = $('.idsatuanresep[nomor="' + resep + '"]').val();
         var namasatuan = $('.namasatuanresep[nomor="' + resep + '"]').val();
-        $('#text-satuan' + resep).text(namasatuan);
-        $('#input-satuan' + resep).val(kodesatuan);
+
+        $('#input-satuan').val(kodesatuan);
+        $('#text-satuan1').val(namasatuan);
+
+        var count = $("#totalItem").val();
+        for (var i = 1; i <= count; i++) {
+            $('#text-satuan' + i).val(namasatuan);
+        };
     });
 </script>
 @endpush

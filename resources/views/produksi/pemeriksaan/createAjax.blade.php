@@ -63,7 +63,7 @@
                         <input type="hidden" name="satuan[]" class="form-control" readonly value="{{$data->KodeSatuan}}">
                     </td>
                     <td>
-                        <textarea class="form-control" name="keterangan[]" rows="2"></textarea>
+                        <input type="text" class="form-control" name="keterangan[]">
                     </td>
                 </tr>
                 @endforeach

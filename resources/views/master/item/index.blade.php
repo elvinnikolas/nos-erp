@@ -41,7 +41,7 @@
                             <tr>
                                 <th>Kode Item</th>
                                 <th>Nama Item</th>
-                                <th>Jenis Item</th>
+                                <th>Bahan</th>
                                 <th>Satuan</th>
                                 <th>Harga Jual</th>
                                 <th>Harga Beli</th>
@@ -77,7 +77,22 @@
                 },
                 {
                     data: 'jenisitem',
-                    name: 'jenisitem'
+                    name: 'jenisitem',
+                    render: function(data, type, row) {
+                        switch (data) {
+                            case 'bahanbaku':
+                                return 'Baku';
+                                break;
+                            case 'bahanjadi':
+                                return 'Jadi';
+                                break;
+                            case 'bahansetengahjadi':
+                                return 'Setengah Jadi';
+                                break;
+                            default:
+                                return data;
+                        }
+                    }
                 },
                 {
                     data: 'KodeSatuan',

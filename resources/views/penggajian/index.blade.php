@@ -38,8 +38,8 @@
     });
 
     $('#content-penggajian table').DataTable({
-      scrollY: "45vh",
-      scrollX: true,
+      scrollY: "50vh",
+      // scrollX: true,
       scrollCollapse: true,
       paging: false,
       info: false,
@@ -78,12 +78,13 @@
         $(`#body-${form} button[type="submit"]`).prop('disabled', false);
         $(`#body-${form} button[type="submit"] span`).toggleClass('fa fa-spinner fa-spin');
       }
-      $(`#body-${form} form`)[0].reset();
-      $(`#body-${form} .subtotal`).text('0');
-      $(`#body-${form} .input-subtotal`).attr('value', 0);
-      $(`#body-${form} .total-item`).text('0');
-      $(`#body-${form} .input-bonus`).val(0);
-      $(`#body-${form} .input-bonus`).attr('value', 0);
+      // $(`#body-${form} form`)[0].reset();
+      // $(`#body-${form} .subtotal`).val('0');
+      // $(`#body-${form} .input-subtotal`).attr('value', 0);
+      // $(`#body-${form} .total-packing`).val('0');
+      // $(`#body-${form} .total-nutuk`).val('0');
+      // $(`#body-${form} .input-bonus`).val(0);
+      // $(`#body-${form} .input-bonus`).attr('value', 0);
     });
   });
 
@@ -129,17 +130,18 @@
       }).done((response) => {
         alert('Gaji karyawan berhasil disimpan');
         this.reset();
+        location.reload();
         $('button[type="submit"]', this).prop('disabled', false);
         $('button[type="submit"] span', this).toggleClass('fa fa-spinner fa-spin');
 
-        $(`#body-${form} .subtotal`).text('0');
-        $(`#body-${form} .input-subtotal`).attr('value', 0);
-        $(`#body-${form} .total-item`).text('0');
-        $(`#body-${form} .input-bonus`).val(0);
-        $(`#body-${form} .input-bonus`).attr('value', 0);
+        // $(`#body-${form} .subtotal`).text('0');
+        // $(`#body-${form} .input-subtotal`).attr('value', 0);
+        // $(`#body-${form} .total-item`).text('0');
+        // $(`#body-${form} .input-bonus`).val(0);
+        // $(`#body-${form} .input-bonus`).attr('value', 0);
       }).fail((error) => {
         console.log(error);
-        alert('SERVER error saat simpan gaji');
+        alert('Terjadi kesalahan saat simpan gaji');
         $('button[type="submit"]', this).prop('disabled', false);
         $('button[type="submit"] span', this).toggleClass('fa fa-spinner fa-spin');
       });
@@ -290,9 +292,37 @@
         $('.total-packing', $tr).text(totalPacking);
       }
 
-      $('.subtotal', $tr).text(subTotal);
+      var subtotal_format = number_format(subTotal);
+
+      $('.subtotal', $tr).text(subtotal_format);
       $('.input-subtotal', $tr).attr('value', subTotal);
     });
   });
+
+  function number_format(number, decimals, decPoint, thousandsSep) {
+    number = (number + '').replace(/[^0-9+\-Ee.]/g, '')
+    var n = !isFinite(+number) ? 0 : +number
+    var prec = !isFinite(+decimals) ? 0 : Math.abs(decimals)
+    var sep = (typeof thousandsSep === 'undefined') ? '.' : thousandsSep
+    var dec = (typeof decPoint === 'undefined') ? ',' : decPoint
+    var s = ''
+
+    var toFixedFix = function(n, prec) {
+      var k = Math.pow(10, prec)
+      return '' + (Math.round(n * k) / k)
+        .toFixed(prec)
+    }
+
+    s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.')
+    if (s[0].length > 3) {
+      s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep)
+    }
+    if ((s[1] || '').length < prec) {
+      s[1] = s[1] || ''
+      s[1] += new Array(prec - s[1].length + 1).join('0')
+    }
+
+    return s.join(dec)
+  }
 </script>
 @endpush

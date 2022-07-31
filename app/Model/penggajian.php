@@ -33,9 +33,9 @@ class penggajian extends Model
     $kodeGaji = 'GJ' . date_format(date_create($data['TanggalGaji']), 'Ymd') . $data['Golongan'];
     $idGaji = DB::table('new_gajian')->insertGetId([
       'KodeGaji' => $kodeGaji,
-      'TanggalGaji' => $tanggalGaji,
       'NoGolongan' => $data['Golongan'],
       'TotalGaji' => array_sum($data['Subtotal']),
+      'TanggalGaji' => $tanggalGaji,
       'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
     ]);
 
@@ -47,11 +47,13 @@ class penggajian extends Model
       $id_karyawan = DB::table('new_gajiandetailkaryawan')->insertGetId([
         'NoGajian' => $idGaji,
         'KodeKaryawan' => $value,
-        'AbsenMasuk' => $data['Hadir'][$key],
-        'LemburHarian' => $data['Harian'][$key],
-        'LemburJam' => isset($data['Harian'][$key]) ? $data['Harian'][$key] : 0,
+        'AbsenLengkap' => isset($data['Hadir'][$key]) ? $data['Hadir'][$key] : 0,
+        'AbsenTidakLengkap' => isset($data['HadirHarian'][$key]) ? $data['HadirHarian'][$key] : 0,
+        'AbsenHarian' => isset($data['Harian'][$key]) ? $data['Harian'][$key] : 0,
+        'LemburJam' => isset($data['Jam'][$key]) ? $data['Jam'][$key] : 0,
         'LemburMinggu' => isset($data['Minggu'][$key]) ? $data['Minggu'][$key] : 0,
         'Bonus' => isset($data['Bonus'][$key]) ? $data['Bonus'][$key] : 0,
+        'BonusLain' => isset($data['BonusLain'][$key]) ? $data['BonusLain'][$key] : 0,
         'Hutang' => isset($data['Hutang'][$key]) ? $data['Hutang'][$key] : 0,
         'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
       ]);
@@ -125,37 +127,28 @@ class penggajian extends Model
         ['KodeGolongan', '=', $gol->KodeGolongan]
       ])->select('KodeKaryawan', 'Nama')->get();
 
-      // $hutang = DB::table('prod_hutangdetail')
-      //   ->join('prod_hutangheader', 'prod_hutangheader.id', '=', 'prod_hutangdetail.IDHutang')
-      //   ->where('prod_hutangheader.Status', '=', 'OPN')
-      //   ->select(
-      //     DB::raw('SUM(Total) as Total, KodeKaryawan')
-      //   )
-      //   ->get();
-
-      $hutang = DB::select("SELECT phd.KodeKaryawan, SUM(phd.Total) as Total FROM prod_hutangdetail phd
+      $hutang = DB::select(
+        "SELECT phd.KodeKaryawan, SUM(phd.Total) as Total FROM prod_hutangdetail phd
         JOIN prod_hutangheader ph ON ph.id = phd.IDHutang
         WHERE ph.Status = 'OPN'
-        GROUP BY phd.KodeKaryawan
-      ");
+        GROUP BY phd.KodeKaryawan"
+      );
 
       foreach ($karyawan as $k) {
+        $hutangKaryawan = null;
         if ($hutang) {
           foreach ($hutang as $h) {
             if ($h->KodeKaryawan == $k->KodeKaryawan) {
-              array_push($dataKaryawan, array(
-                'KodeKaryawan' => $k->KodeKaryawan,
-                'NamaKaryawan' => $k->Nama,
-                'Hutang' => $h->Total
-              ));
-            } else {
-              array_push($dataKaryawan, array(
-                'KodeKaryawan' => $k->KodeKaryawan,
-                'NamaKaryawan' => $k->Nama,
-                'Hutang' => 0
-              ));
+              $hutangKaryawan = $h->Total;
             }
           }
+        }
+        if ($hutangKaryawan) {
+          array_push($dataKaryawan, array(
+            'KodeKaryawan' => $k->KodeKaryawan,
+            'NamaKaryawan' => $k->Nama,
+            'Hutang' => $hutangKaryawan
+          ));
         } else {
           array_push($dataKaryawan, array(
             'KodeKaryawan' => $k->KodeKaryawan,
@@ -170,6 +163,7 @@ class penggajian extends Model
         'KodeGolongan' => $gol->KodeGolongan,
         'NamaGolongan' => $gol->NamaGolongan,
         'UangHadir' => $gol->UangHadir,
+        'UangHadirHarian' => $gol->UangHadirHarian,
         'UangLembur' => $gol->UangLembur,
         'UangMinggu' => $gol->UangMinggu,
         'Borongan' => $gol->Borongan,

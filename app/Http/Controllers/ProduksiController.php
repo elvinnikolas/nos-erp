@@ -106,7 +106,7 @@ class ProduksiController extends Controller
                     'KodeProduksi' => $request->KodeProduksi,
                     'KodeKaryawan' => $karyawan[$key],
                     'QtyHasil' => $jumlah[$key],
-                    'KodeSatuan' => $satuan[$key],
+                    'KodeSatuan' => $request->KodeSatuan,
                     'created_at' => \Carbon\Carbon::now(),
                     'updated_at' => \Carbon\Carbon::now()
                 ]);
@@ -229,8 +229,8 @@ class ProduksiController extends Controller
                     '<form style="display:inline-block;">' .
                     '<button type="button" class="btn btn-primary btn-xs" onclick="detailProduksi(\'' . $produksi->KodeProduksi . '\')"><i class="fa fa-eye"></i>&nbsp;Lihat Rincian</button></form>' .
 
-                    '<form style="display:inline-block;" type="submit" action="/produksi/' . $produksi->id . '/edit" method="get">' .
-                    '<button data-function="ubah" class="btn btn-success btn-xs"><i class="fa fa-pencil"></i>&nbsp;Ubah</button></form>' .
+                    // '<form style="display:inline-block;" type="submit" action="/produksi/' . $produksi->id . '/edit" method="get">' .
+                    // '<button data-function="ubah" class="btn btn-success btn-xs"><i class="fa fa-pencil"></i>&nbsp;Ubah</button></form>' .
 
                     '<form style="display:inline-block;" action="/produksi/' . $produksi->id . '" method="post" onsubmit="return showConfirm()">' .
                     '<input type="hidden" name="_method" value="delete">' .

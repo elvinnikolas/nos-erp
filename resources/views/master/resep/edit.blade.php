@@ -57,14 +57,12 @@
                                         <option selected disabled>-- Pilih nama barang --</option>
                                         @foreach($bahanjadi as $barang)
                                         <option value="{{$barang->KodeItem}}">{{$barang->NamaItem}}</option>
-                                        @endforeach
+                                    @endforeach
                                     </select>--}}
 
                                     <input type="hidden" class="form-control bahanjadi" name="NamaResep" id="namaresep" value="{{$resep->KodeItem}}">
                                     <input type="text" class="form-control bahanjadi" value="{{$resep->NamaItem}}" readonly>
                                 </div>
-                                <label for="keteranganresep">Keterangan: </label>
-                                <textarea class="form-control bahanjadi" name="KeteranganResep" id="keteranganresep" rows="5" required>{{$resep->Keterangan}}</textarea>
                             </div>
                             <!-- pembatas -->
                             <div class="form-group col-md-1"></div>
@@ -79,6 +77,13 @@
                                     <label for="qtyresep">Jumlah: </label>
                                     <input type="number" required step=1 class="form-control bahanjadi" name="JumlahResep" id="jumlahresep" placeholder="1" value="{{$resep->Qty}}" required>
                                 </div>
+                            </div>
+                            <!-- pembatas -->
+                            <div class="form-group col-md-1"></div>
+                            <!-- column 3 -->
+                            <div class="form-group col-md-3">
+                                <label for="keteranganresep">Keterangan: </label>
+                                <textarea class="form-control bahanjadi" name="KeteranganResep" id="keteranganresep" rows="4" required>{{$resep->Keterangan}}</textarea>
                             </div>
                         </div>
                         <div class="form-row">
@@ -102,22 +107,22 @@
                                         <td id="header" style="width:3%;"></td>
                                     </tr>
                                     @php
-                                        $x = 1
+                                    $x = 1
                                     @endphp
                                     @foreach($bahanbakuresep as $baku)
-                                        @if($x == 1)
-                                        <tr class="rowinput">
+                                    @if($x == 1)
+                                    <tr class="rowinput">
                                         @else
-                                        <tr class="tambah{{$x}}">
+                                    <tr class="tambah{{$x}}">
                                         @endif
                                         <td>
                                             <select name="BahanBaku[]" class="form-control" id="select-bahanbaku{{$x}}" placeholder="Pilih bahan baku" onchange="satuanbaku(this)" urutan="{{$x}}" required>
                                                 @foreach($bahanbaku as $bahan)
-                                                    @if($bahan->KodeItem == $baku->KodeItem)
-                                                    <option value="{{$bahan->KodeItem}}" selected>{{$bahan->NamaItem}}</option>
-                                                    @else
-                                                    <option value="{{$bahan->KodeItem}}">{{$bahan->NamaItem}}</option>
-                                                    @endif
+                                                @if($bahan->KodeItem == $baku->KodeItem)
+                                                <option value="{{$bahan->KodeItem}}" selected>{{$bahan->NamaItem}}</option>
+                                                @else
+                                                <option value="{{$bahan->KodeItem}}">{{$bahan->NamaItem}}</option>
+                                                @endif
                                                 @endforeach
                                             </select>
                                         </td>
@@ -134,7 +139,7 @@
                                         <td></td>
                                     </tr>
                                     @php
-                                        $x = $x + 1
+                                    $x = $x + 1
                                     @endphp
                                     @endforeach
                                 </table>
@@ -155,71 +160,72 @@
 
 @push('scripts')
 <script type="text/javascript">
-$(function() {
-    $('select').select2();
+    $(function() {
+        $('select').select2();
 
-    var resep = $('#namaresep').val();
-    $('#satuanresep').empty();
-    $.ajax({
-        url: "{!! route('api.masterresep.satuan') !!}",
-        data: {
-            kode: resep
-        }
-    }).done(function(result) {
-        $('#satuanresep').append(result);
-    }).fail(function(status) {
-        console.log(status);
+        var resep = $('#namaresep').val();
+        $('#satuanresep').empty();
+        $.ajax({
+            url: "{!! route('api.masterresep.satuan') !!}",
+            data: {
+                kode: resep
+            }
+        }).done(function(result) {
+            $('#satuanresep').append(result);
+        }).fail(function(status) {
+            console.log(status);
+        });
     });
-});
-function addrow() {
-    $('#select-bahanbaku1').select2('destroy');
-    $('#select-satuan1').select2('destroy');
-    $("#totalItem").val(parseInt($("#totalItem").val()) + 1);
-    var count = $("#totalItem").val();
-    var markup = $(".rowinput").html();
-    var res = "<tr class='tambah" + count + "'>" + markup + "</tr>";
-    res = res.replace("bahanbaku1", "bahanbaku" + count);
-    res = res.replace("select-bahanbaku1", "select-bahanbaku" + count);
-    res = res.replace("select-satuan1", "select-satuan" + count);
-    res = res.replace("input-jumlah1", "input-jumlah" + count);
-    res = res.replace("textarea-keterangan1", "textarea-keterangan" + count);
-    res = res.replace('urutan="1"', 'urutan="'+count+'"');
-    res = res.replace("<td></td>", '<td><button type="button" onclick="del(' + count + ')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button></td>');
 
-    $("#items tbody").append(res);
-    $('#select-bahanbaku' + count).select2({
-        width: '100%'
-    });
-    $('#select-satuan' + count).select2({
-        width: '100%'
-    });
-    $('#select-satuan' + count).empty();
-    $('#select-bahanbaku1').select2({
-        width: '100%'
-    });
-    $('#select-satuan1').select2({
-        width: '100%'
-    });
-}
+    function addrow() {
+        $('#select-bahanbaku1').select2('destroy');
+        $('#select-satuan1').select2('destroy');
+        $("#totalItem").val(parseInt($("#totalItem").val()) + 1);
+        var count = $("#totalItem").val();
+        var markup = $(".rowinput").html();
+        var res = "<tr class='tambah" + count + "'>" + markup + "</tr>";
+        res = res.replace("bahanbaku1", "bahanbaku" + count);
+        res = res.replace("select-bahanbaku1", "select-bahanbaku" + count);
+        res = res.replace("select-satuan1", "select-satuan" + count);
+        res = res.replace("input-jumlah1", "input-jumlah" + count);
+        res = res.replace("textarea-keterangan1", "textarea-keterangan" + count);
+        res = res.replace('urutan="1"', 'urutan="' + count + '"');
+        res = res.replace("<td></td>", '<td><button type="button" onclick="del(' + count + ')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button></td>');
 
-function del(int) {
-    $(".tambah" + int).remove();
-    $("#totalItem").val(parseInt($("#totalItem").val()) - 1);
-}
+        $("#items tbody").append(res);
+        $('#select-bahanbaku' + count).select2({
+            width: '100%'
+        });
+        $('#select-satuan' + count).select2({
+            width: '100%'
+        });
+        $('#select-satuan' + count).empty();
+        $('#select-bahanbaku1').select2({
+            width: '100%'
+        });
+        $('#select-satuan1').select2({
+            width: '100%'
+        });
+    }
 
-function satuanbaku(element) {
-    var bahan   = $(element).val();
-    var urutan  = $(element).attr('urutan');
-    $('#select-satuan'+urutan).empty();
+    function del(int) {
+        $(".tambah" + int).remove();
+        $("#totalItem").val(parseInt($("#totalItem").val()) - 1);
+    }
 
-    $.ajax({
-        url: "{!! route('api.masterresep.satuan') !!}",
-        data: {
-            kode: bahan
-        }
-    }).done(function(result) {
-        $('#select-satuan'+urutan).append(result);
-    });
-}
+    function satuanbaku(element) {
+        var bahan = $(element).val();
+        var urutan = $(element).attr('urutan');
+        $('#select-satuan' + urutan).empty();
+
+        $.ajax({
+            url: "{!! route('api.masterresep.satuan') !!}",
+            data: {
+                kode: bahan
+            }
+        }).done(function(result) {
+            $('#select-satuan' + urutan).append(result);
+        });
+    }
 </script>
 @endpush

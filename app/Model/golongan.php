@@ -10,21 +10,32 @@ class golongan extends Model
 {
     public static function setGolongan(array $data)
     {
+        $borongan = ($data['Borongan'] == 1) ? 1 : 0;
         $noGolongan = empty($data['NoGolongan']) ? 0 : $data['NoGolongan'];
         if ($noGolongan == 0) {
+            $last_data = DB::select(
+                "SELECT * FROM new_golongan
+                ORDER BY NoGolongan desc
+                LIMIT 1"
+            );
+
+            if ($last_data) {
+                $kode = substr($last_data[0]->KodeGolongan, -2, 2);
+                $kode_new = (int)$kode + 1;
+                $kodeGolongan = $kode_new < 10 ? 'GOL-0' . $kode_new : 'GOL-' . $kode_new;
+            } else {
+                $kodeGolongan = 'GOL-01';
+            }
+
             $noGolongan = DB::table('new_golongan')->insertGetId([
+                'KodeGolongan' => $kodeGolongan,
                 'NamaGolongan' => strtoupper($data['NamaGolongan']),
                 'UangHadir' => $data['UangHadir'],
                 'UangHadirHarian' => $data['UangHadirHarian'],
                 'UangLembur' => $data['UangLembur'],
                 'UangMinggu' => $data['UangMinggu'],
-                'Borongan' => 1,
+                'Borongan' => $borongan,
                 'modified_at' => \Carbon\Carbon::now()
-            ]);
-
-            $kodeGolongan = $noGolongan < 10 ? 'GOL-0' . $noGolongan : 'GOL-' . $noGolongan;
-            DB::table('new_golongan')->where('NoGolongan', $noGolongan)->update([
-                'KodeGolongan' => $kodeGolongan
             ]);
         } else {
             DB::table('new_golongan')->where('NoGolongan', $data['NoGolongan'])->update([
@@ -33,7 +44,7 @@ class golongan extends Model
                 'UangHadirHarian' => $data['UangHadirHarian'],
                 'UangLembur' => $data['UangLembur'],
                 'UangMinggu' => $data['UangMinggu'],
-                'Borongan' => 1,
+                'Borongan' => $borongan,
                 'modified_at' => \Carbon\Carbon::now()
             ]);
         }
@@ -49,8 +60,8 @@ class golongan extends Model
                         ORDER BY NoGroupItem desc
                         LIMIT 1"
                     );
-                    $lastId = $last_data[0]->NoGroupItem;
-                    if (!empty($lastId)) {
+                    if ($last_data) {
+                        $lastId = $last_data[0]->NoGroupItem;
                         $lastId = $lastId + 1;
                     } else {
                         $lastId = 1;
@@ -62,7 +73,7 @@ class golongan extends Model
                 DB::table('new_golongangroupitem')->updateOrInsert(
                     ['NoGroupItem' => $lastId],
                     [
-                        'NamaGroupItem' => $value,
+                        'NamaGroupItem' => strtoupper($value),
                         'NoGolongan' => $noGolongan,
                         'NominalGroupItem' => $data['NominalGroupItem'][$key],
                         'NominalGroupItemNutuk' => $data['NominalGroupItemNutuk'][$key]

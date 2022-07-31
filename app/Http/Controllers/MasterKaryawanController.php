@@ -19,7 +19,14 @@ class MasterKaryawanController extends Controller
     public function index()
     {
         // return view('master.karyawan.index');
-        $karyawan   = DB::table('karyawans')->where('Status', 'OPN')->get();
+        $karyawan = DB::table('karyawans')
+            ->leftJoin('new_golongan', 'new_golongan.KodeGolongan', '=', 'karyawans.KodeGolongan')
+            ->where('karyawans.Status', 'OPN')
+            ->select(
+                'karyawans.*',
+                'new_golongan.NamaGolongan'
+            )
+            ->get();
         return view('master.karyawan.index', compact('karyawan'));
     }
 

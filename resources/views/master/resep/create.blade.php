@@ -80,7 +80,7 @@
                             <!-- column 3 -->
                             <div class="form-group col-md-3">
                                 <label for="keteranganresep">Keterangan: </label>
-                                <textarea class="form-control bahanjadi" name="KeteranganResep" id="keteranganresep" rows="5" required></textarea>
+                                <textarea class="form-control bahanjadi" name="KeteranganResep" id="keteranganresep" rows="4" required></textarea>
                             </div>
                         </div>
                         <div class="form-row">
@@ -89,7 +89,7 @@
                                 <div class="x_title">
                                 </div>
                                 <br>
-                                <h3 id="header">Daftar Bahan Baku/Setengah Jadi</h3>
+                                <h3 id="header">Daftar Bahan Setengah Jadi</h3>
                                 <a href="javascript:;" class="btn btn-primary pull-right" onclick="addrow()">
                                     <i class="fa fa-plus" aria-hidden="true"></i>
                                 </a>
@@ -98,16 +98,16 @@
 
                                 <table id="items" class="table">
                                     <tr>
-                                        <td id="header" style="width:25%;">Nama Bahan</td>
-                                        <td id="header" style="width:16%;">Satuan</td>
-                                        <td id="header" style="width:9%;">Jumlah</td>
-                                        <td id="header" style="width:25%;">Keterangan</td>
-                                        <td id="header" style="width:3%;"></td>
+                                        <th id="header" style="width:25%;">Nama Bahan</th>
+                                        <th id="header" style="width:16%;">Satuan</th>
+                                        <th id="header" style="width:9%;">Jumlah</th>
+                                        <th id="header" style="width:25%;">Keterangan</th>
+                                        <th id="header" style="width:3%;"></th>
                                     </tr>
                                     <tr class="rowinput">
                                         <td>
                                             <select name="BahanBaku[]" class="form-control" id="select-bahanbaku1" placeholder="Pilih bahan baku" onchange="satuanbaku(this)" urutan="1" required>
-                                                <option selected disabled>-- Pilih bahan baku --</option>
+                                                <option selected disabled>-- Pilih bahan --</option>
                                                 @foreach($bahanbaku as $baku)
                                                 <option value="{{$baku->KodeItem}}">{{$baku->NamaItem}}</option>
                                                 @endforeach
@@ -118,10 +118,11 @@
                                             </select>
                                         </td>
                                         <td>
-                                            <input type="number" step=1 name="JumlahBahanBaku[]" class="form-control" id="input-jumlah1" required="" urutan="1" required>
+                                            <input type="number" step=1 name="JumlahBahanBaku[]" class="form-control" id="input-jumlah1" urutan="1" required>
                                         </td>
                                         <td>
-                                            <textarea class="form-control" name="KeteranganBahanBaku[]" id="textarea-keterangan1" rows="2" urutan="1" required></textarea>
+                                            <input type="text" step=1 name="KeteranganBahanBaku[]" class="form-control" id="input-keterangan1" urutan="1" required>
+                                            <!-- <textarea class="form-control" name="KeteranganBahanBaku[]" id="textarea-keterangan1" urutan="2" required></textarea> -->
                                         </td>
                                         <td></td>
                                     </tr>
@@ -157,7 +158,8 @@
         res = res.replace("select-bahanbaku1", "select-bahanbaku" + count);
         res = res.replace("select-satuan1", "select-satuan" + count);
         res = res.replace("input-jumlah1", "input-jumlah" + count);
-        res = res.replace("textarea-keterangan1", "textarea-keterangan" + count);
+        res = res.replace("input-keterangan1", "input-keterangan" + count);
+        // res = res.replace("textarea-keterangan1", "textarea-keterangan" + count);
         res = res.replace('urutan="1"', 'urutan="' + count + '"');
         res = res.replace("<td></td>", '<td><button type="button" onclick="del(' + count + ')" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button></td>');
 
