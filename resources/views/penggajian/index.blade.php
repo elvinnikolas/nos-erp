@@ -9,11 +9,11 @@
 @endsection
 @section('content')
 <ul class="nav nav-tabs">
-  <li class="nav-item" style="border-right: 1px solid #ddd;">
+  <!-- <li class="nav-item" style="border-right: 1px solid #ddd;">
     <a href="#body-absen" data-toggle="tab" class="nav-link"><span class="fa fa-clock-o"></span>&nbsp;Absen Karyawan</a>
-  </li>
+  </li> -->
   <li class="dropdown nav-item" style="border-right: 1px solid #ddd;">
-    <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown"><span class="fa fa-money"></span>&nbsp;Gaji Karyawan&nbsp;<span class="caret"></span></a>
+    <a href="#" class="dropdown-toggle nav-link" data-toggle="dropdown">&nbsp;Pilih Golongan&nbsp;<span class="caret"></span></a>
     <ul class="dropdown-menu">
       @foreach($golongan as $data)
       <li><a href="#body-gaji-{{$data['NoGolongan']}}" data-toggle="tab">{{$data['NamaGolongan']}}</a></li>

@@ -11,98 +11,238 @@ class golongan extends Model
     public static function setGolongan(array $data)
     {
         $borongan = ($data['Borongan'] == 1) ? 1 : 0;
-        $noGolongan = empty($data['NoGolongan']) ? 0 : $data['NoGolongan'];
-        if ($noGolongan == 0) {
-            $last_data = DB::select(
-                "SELECT * FROM new_golongan
-                ORDER BY NoGolongan desc
-                LIMIT 1"
-            );
-
-            if ($last_data) {
-                $kode = substr($last_data[0]->KodeGolongan, -2, 2);
-                $kode_new = (int)$kode + 1;
-                $kodeGolongan = $kode_new < 10 ? 'GOL-0' . $kode_new : 'GOL-' . $kode_new;
-            } else {
-                $kodeGolongan = 'GOL-01';
-            }
-
-            $noGolongan = DB::table('new_golongan')->insertGetId([
-                'KodeGolongan' => $kodeGolongan,
-                'NamaGolongan' => strtoupper($data['NamaGolongan']),
-                'UangHadir' => $data['UangHadir'],
-                'UangHadirHarian' => $data['UangHadirHarian'],
-                'UangLembur' => $data['UangLembur'],
-                'UangMinggu' => $data['UangMinggu'],
-                'Borongan' => $borongan,
-                'modified_at' => \Carbon\Carbon::now()
-            ]);
-        } else {
-            DB::table('new_golongan')->where('NoGolongan', $data['NoGolongan'])->update([
-                'NamaGolongan' => strtoupper($data['NamaGolongan']),
-                'UangHadir' => $data['UangHadir'],
-                'UangHadirHarian' => $data['UangHadirHarian'],
-                'UangLembur' => $data['UangLembur'],
-                'UangMinggu' => $data['UangMinggu'],
-                'Borongan' => $borongan,
-                'modified_at' => \Carbon\Carbon::now()
-            ]);
-        }
-
-        if (isset($data['GroupItem'])) {
-            $listGroupItem = [];
-            foreach ($data['GroupItem'] as $key => $value) {
-                if (isset($data['NoGroupItem'][$key])) {
-                    $lastId = $data['NoGroupItem'][$key];
-                } else {
-                    $last_data = DB::select(
-                        "SELECT * FROM new_golongangroupitem
-                        ORDER BY NoGroupItem desc
-                        LIMIT 1"
-                    );
-                    if ($last_data) {
-                        $lastId = $last_data[0]->NoGroupItem;
-                        $lastId = $lastId + 1;
-                    } else {
-                        $lastId = 1;
-                    }
-                }
-
-                array_push($listGroupItem, $lastId);
-
-                DB::table('new_golongangroupitem')->updateOrInsert(
-                    ['NoGroupItem' => $lastId],
-                    [
-                        'NamaGroupItem' => strtoupper($value),
-                        'NoGolongan' => $noGolongan,
-                        'NominalGroupItem' => $data['NominalGroupItem'][$key],
-                        'NominalGroupItemNutuk' => $data['NominalGroupItemNutuk'][$key]
-                    ]
+        //golongan borongan
+        if ($borongan == 1) {
+            $noGolongan = empty($data['NoGolongan']) ? 0 : $data['NoGolongan'];
+            if ($noGolongan == 0) {
+                $last_data = DB::select(
+                    "SELECT * FROM new_golongan
+                    ORDER BY NoGolongan desc
+                    LIMIT 1"
                 );
 
-                if (isset($data['GroupItemDetail'][$value])) {
-                    DB::table('new_golongangroupitemdetail')
-                        ->where('NoGroupItem', $lastId)
-                        ->delete();
-
-                    foreach ($data['GroupItemDetail'][$value] as $idx => $val) {
-                        DB::table('new_golongangroupitemdetail')->insert([
-                            'NoGolongan' => $noGolongan,
-                            'NoGroupItem' => $lastId,
-                            'KodeItem' => $val
-                        ]);
-                    }
+                if ($last_data) {
+                    $kode = substr($last_data[0]->KodeGolongan, -2, 2);
+                    $kode_new = (int)$kode + 1;
+                    $kodeGolongan = $kode_new < 10 ? 'GOL-0' . $kode_new : 'GOL-' . $kode_new;
+                } else {
+                    $kodeGolongan = 'GOL-01';
                 }
+
+                $noGolongan = DB::table('new_golongan')->insertGetId([
+                    'KodeGolongan' => $kodeGolongan,
+                    'NamaGolongan' => strtoupper($data['NamaGolongan']),
+                    'UangHadir' => $data['UangHadir'],
+                    'UangHadirHarian' => $data['UangHadirHarian'],
+                    'UangLembur' => $data['UangLembur'],
+                    'UangMinggu' => $data['UangMinggu'],
+                    'Borongan' => $borongan,
+                    'modified_at' => \Carbon\Carbon::now()
+                ]);
+            } else {
+                DB::table('new_golongan')->where('NoGolongan', $data['NoGolongan'])->update([
+                    'NamaGolongan' => strtoupper($data['NamaGolongan']),
+                    'UangHadir' => $data['UangHadir'],
+                    'UangHadirHarian' => $data['UangHadirHarian'],
+                    'UangLembur' => $data['UangLembur'],
+                    'UangMinggu' => $data['UangMinggu'],
+                    'Borongan' => $borongan,
+                    'modified_at' => \Carbon\Carbon::now()
+                ]);
             }
 
-            DB::table('new_golongangroupitem')
-                ->where('NoGolongan', $noGolongan)
-                ->whereNotIn('NoGroupItem', $listGroupItem)
-                ->delete();
-        } else {
-            DB::table('new_golongangroupitem')
-                ->where('NoGolongan', $noGolongan)
-                ->delete();
+            if (isset($data['GroupItem'])) {
+                $listGroupItem = [];
+                foreach ($data['GroupItem'] as $key => $value) {
+                    if (isset($data['NoGroupItem'][$key])) {
+                        $lastId = $data['NoGroupItem'][$key];
+                    } else {
+                        $last_data = DB::select(
+                            "SELECT * FROM new_golongangroupitem
+                        ORDER BY NoGroupItem desc
+                        LIMIT 1"
+                        );
+                        if ($last_data) {
+                            $lastId = $last_data[0]->NoGroupItem;
+                            $lastId = $lastId + 1;
+                        } else {
+                            $lastId = 1;
+                        }
+                    }
+
+                    array_push($listGroupItem, $lastId);
+
+                    DB::table('new_golongangroupitem')->updateOrInsert(
+                        ['NoGroupItem' => $lastId],
+                        [
+                            'NamaGroupItem' => strtoupper($value),
+                            'NoGolongan' => $noGolongan,
+                            'NominalGroupItem' => $data['NominalGroupItem'][$key],
+                            'NominalGroupItemNutuk' => $data['NominalGroupItemNutuk'][$key]
+                        ]
+                    );
+
+                    if (isset($data['GroupItemDetail'][$value])) {
+                        DB::table('new_golongangroupitemdetail')
+                            ->where('NoGroupItem', $lastId)
+                            ->delete();
+
+                        foreach ($data['GroupItemDetail'][$value] as $idx => $val) {
+                            DB::table('new_golongangroupitemdetail')->insert([
+                                'NoGolongan' => $noGolongan,
+                                'NoGroupItem' => $lastId,
+                                'KodeItem' => $val
+                            ]);
+                        }
+                    }
+                }
+
+                DB::table('new_golongangroupitem')
+                    ->where('NoGolongan', $noGolongan)
+                    ->whereNotIn('NoGroupItem', $listGroupItem)
+                    ->delete();
+            } else {
+                DB::table('new_golongangroupitem')
+                    ->where('NoGolongan', $noGolongan)
+                    ->delete();
+            }
+
+            //golongan non borongan
+        } else if ($borongan == 0) {
+            $noGolongan = empty($data['NoGolongan']) ? 0 : $data['NoGolongan'];
+            if ($noGolongan == 0) {
+                $last_data = DB::select(
+                    "SELECT * FROM new_golongan
+                    ORDER BY NoGolongan desc
+                    LIMIT 1"
+                );
+
+                if ($last_data) {
+                    $kode = substr($last_data[0]->KodeGolongan, -2, 2);
+                    $kode_new = (int)$kode + 1;
+                    $kodeGolongan = $kode_new < 10 ? 'GOL-0' . $kode_new : 'GOL-' . $kode_new;
+                } else {
+                    $kodeGolongan = 'GOL-01';
+                }
+
+                $noGolongan = DB::table('new_golongan')->insertGetId([
+                    'KodeGolongan' => $kodeGolongan,
+                    'NamaGolongan' => strtoupper($data['NamaGolongan']),
+                    'UangHadir' => $data['UangHadir'],
+                    'UangHadirHarian' => 0,
+                    'UangLembur' => $data['UangLembur'],
+                    'UangMinggu' => $data['UangMinggu'],
+                    'Borongan' => $borongan,
+                    'modified_at' => \Carbon\Carbon::now()
+                ]);
+            } else {
+                DB::table('new_golongan')->where('NoGolongan', $data['NoGolongan'])->update([
+                    'NamaGolongan' => strtoupper($data['NamaGolongan']),
+                    'UangHadir' => $data['UangHadir'],
+                    'UangHadirHarian' => 0,
+                    'UangLembur' => $data['UangLembur'],
+                    'UangMinggu' => $data['UangMinggu'],
+                    'Borongan' => $borongan,
+                    'modified_at' => \Carbon\Carbon::now()
+                ]);
+            }
+
+            if (isset($data['NamaBonus'])) {
+                $listBonus = [];
+                foreach ($data['NamaBonus'] as $key => $value) {
+                    if (isset($data['NoBonus'][$key])) {
+                        $lastId_bonus = $data['NoBonus'][$key];
+                    } else {
+                        $last_data = DB::select(
+                            "SELECT * FROM new_golonganbonus
+                            ORDER BY NoBonus desc
+                            LIMIT 1"
+                        );
+                        if ($last_data) {
+                            $lastId_bonus = $last_data[0]->NoBonus;
+                            $lastId_bonus = $lastId_bonus + 1;
+                        } else {
+                            $lastId_bonus = 1;
+                        }
+                    }
+
+                    array_push($listBonus, $lastId_bonus);
+
+                    DB::table('new_golonganbonus')->updateOrInsert(
+                        ['NoBonus' => $lastId_bonus],
+                        [
+                            'NamaBonus' => strtoupper($value),
+                            'NominalBonus' => $data['NominalBonus'][$key],
+                            'NoGolongan' => $noGolongan
+                        ]
+                    );
+                }
+
+                DB::table('new_golonganbonus')
+                    ->where('NoGolongan', $noGolongan)
+                    ->whereNotIn('NoBonus', $listBonus)
+                    ->delete();
+            } else {
+                DB::table('new_golonganbonus')
+                    ->where('NoGolongan', $noGolongan)
+                    ->delete();
+            }
+
+            if (isset($data['GroupItem'])) {
+                $listGroupItem = [];
+                foreach ($data['GroupItem'] as $key => $value) {
+                    if (isset($data['NoGroupItem'][$key])) {
+                        $lastId = $data['NoGroupItem'][$key];
+                    } else {
+                        $last_data = DB::select(
+                            "SELECT * FROM new_golongangroupitem
+                            ORDER BY NoGroupItem desc
+                            LIMIT 1"
+                        );
+                        if ($last_data) {
+                            $lastId = $last_data[0]->NoGroupItem;
+                            $lastId = $lastId + 1;
+                        } else {
+                            $lastId = 1;
+                        }
+                    }
+
+                    array_push($listGroupItem, $lastId);
+
+                    DB::table('new_golongangroupitem')->updateOrInsert(
+                        ['NoGroupItem' => $lastId],
+                        [
+                            'NamaGroupItem' => strtoupper($value),
+                            'NoGolongan' => $noGolongan,
+                            'NominalGroupItem' => $data['NominalGroupItem'][$key],
+                            'NominalGroupItemNutuk' => 0
+                        ]
+                    );
+
+                    if (isset($data['GroupItemDetail'][$value])) {
+                        DB::table('new_golongangroupitemdetail')
+                            ->where('NoGroupItem', $lastId)
+                            ->delete();
+
+                        foreach ($data['GroupItemDetail'][$value] as $idx => $val) {
+                            DB::table('new_golongangroupitemdetail')->insert([
+                                'NoGolongan' => $noGolongan,
+                                'NoGroupItem' => $lastId,
+                                'KodeItem' => $val
+                            ]);
+                        }
+                    }
+                }
+
+                DB::table('new_golongangroupitem')
+                    ->where('NoGolongan', $noGolongan)
+                    ->whereNotIn('NoGroupItem', $listGroupItem)
+                    ->delete();
+            } else {
+                DB::table('new_golongangroupitem')
+                    ->where('NoGolongan', $noGolongan)
+                    ->delete();
+            }
         }
 
         DB::table('eventlogs')->insert([
@@ -169,6 +309,19 @@ class golongan extends Model
                 ));
             }
 
+            $dataBonus = [];
+            $bonus = DB::table('new_golonganbonus')
+                ->where('NoGolongan', $gol->NoGolongan)
+                ->get();
+
+            foreach ($bonus as $bon) {
+                array_push($dataBonus, array(
+                    'NoBonus' => $bon->NoBonus,
+                    'NamaBonus' => $bon->NamaBonus,
+                    'NominalBonus' => $bon->NominalBonus
+                ));
+            }
+
             array_push($result, array(
                 'NoGolongan' => $gol->NoGolongan,
                 'KodeGolongan' => $gol->KodeGolongan,
@@ -179,6 +332,7 @@ class golongan extends Model
                 'UangMinggu' => $gol->UangMinggu,
                 'Borongan' => $gol->Borongan,
                 'GroupItem' => $dataGroup,
+                'Bonus' => $dataBonus,
                 'DataItem' => $dataItem
             ));
         }

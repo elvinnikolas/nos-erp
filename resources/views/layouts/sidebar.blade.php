@@ -131,11 +131,17 @@
                     <li><a href="{{ url('/laporanpenjualan') }}">Penjualan</a></li>
                     <!-- <li><a href="{{ url('/laporanpembelian') }}">Pembelian</a></li> -->
                     <li><a href="{{ url('/laporanproduksi') }}">Produksi</a></li>
+                    <li><a href="{{ url('/laporangaji') }}">Gaji</a></li>
                 </ul>
             </li>
 
             <li>
-                <a href="/penggajian"><i class="fa fa-money"></i> Penggajian </a>
+                <a><i class="fa fa-money"></i> Penggajian <span class="fa fa-chevron-down"></span></a>
+                <ul class="nav child_menu">
+                    <li><a href="{{ url('/penggajian') }}">Buat Penggajian</a></li>
+                    <li><a href="{{ url('/penggajianselesai') }}">Penggajian Selesai</a></li>
+                    <li><a href="{{ url('/penggajiancashbon') }}">Setoran & Cashbon</a></li>
+                </ul>
             </li>
 
             <li>

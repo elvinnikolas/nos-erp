@@ -257,6 +257,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::post('/laporanproduksi/filtergolongan', 'LaporanProduksiController@filtergolongan');
     Route::post('/laporanproduksi/filteritem', 'LaporanProduksiController@filteritem');
 
+    //route gaji
+    Route::get('/laporangaji', 'LaporanGajiController@index');
+    Route::post('/laporangaji/show', 'LaporanGajiController@show');
+
     //ROUTE OPERASIONAL
     //route pengeluaran tambahan
     Route::get('/pengeluarantambahan', 'PengeluaranTambahanController@index');
@@ -356,10 +360,25 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/gaji/searchitembykode/{kode}', 'GajiController@searchItemByKode');
 
     //ROUTE PENGGAJIAN
+    //route penggajian
     Route::get('penggajian', 'PenggajianKaryawanController@index')->name('penggajian');
     Route::post('penggajian/absen', 'PenggajianKaryawanController@absen')->name('penggajian.absen');
     Route::post('penggajian/gaji', 'PenggajianKaryawanController@gaji')->name('penggajian.gaji');
     Route::post('penggajian/laporan', 'PenggajianKaryawanController@laporan')->name('penggajian.laporan');
+
+    //route penggajian selesai
+    Route::get('/penggajianselesai', 'PenggajianKaryawanController@index_selesai');
+    Route::get('/penggajianselesai/show', 'PenggajianKaryawanController@show');
+    Route::post('/penggajianselesai/filter', 'PenggajianKaryawanController@filter');
+
+    //route penggajian cashbon
+    Route::get('/penggajiancashbon', 'PenggajianKaryawanController@index_cashbon');
+    Route::get('/penggajiancashbon/create', 'PenggajianKaryawanController@create_cashbon');
+    Route::post('/penggajiancashbon/store', 'PenggajianKaryawanController@store_cashbon');
+    Route::get('/penggajiancashbon/show/{id}', 'PenggajianKaryawanController@show_cashbon');
+    Route::get('/penggajiancashbon/edit/{id}', 'PenggajianKaryawanController@edit_cashbon');
+    Route::post('/penggajiancashbon/update/{id}', 'PenggajianKaryawanController@update_cashbon');
+    Route::get('/penggajiancashbon/delete/{id}', 'PenggajianKaryawanController@destroy_cashbon');
 
     //ROUTE PRODUKSI
     //route hasil produksi

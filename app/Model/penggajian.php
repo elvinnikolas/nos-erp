@@ -43,39 +43,87 @@ class penggajian extends Model
       ->where('NoGolongan', $data['Golongan'])
       ->get();
 
-    foreach ($data['Karyawan'] as $key => $value) {
-      $id_karyawan = DB::table('new_gajiandetailkaryawan')->insertGetId([
-        'NoGajian' => $idGaji,
-        'KodeKaryawan' => $value,
-        'AbsenLengkap' => isset($data['Hadir'][$key]) ? $data['Hadir'][$key] : 0,
-        'AbsenTidakLengkap' => isset($data['HadirHarian'][$key]) ? $data['HadirHarian'][$key] : 0,
-        'AbsenHarian' => isset($data['Harian'][$key]) ? $data['Harian'][$key] : 0,
-        'LemburJam' => isset($data['Jam'][$key]) ? $data['Jam'][$key] : 0,
-        'LemburMinggu' => isset($data['Minggu'][$key]) ? $data['Minggu'][$key] : 0,
-        'Bonus' => isset($data['Bonus'][$key]) ? $data['Bonus'][$key] : 0,
-        'BonusLain' => isset($data['BonusLain'][$key]) ? $data['BonusLain'][$key] : 0,
-        'Hutang' => isset($data['Hutang'][$key]) ? $data['Hutang'][$key] : 0,
-        'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
-      ]);
+    $bonus = DB::table('new_golonganbonus')
+      ->where('NoGolongan', $data['Golongan'])
+      ->get();
 
-      foreach ($group as $k => $kode) {
-        if ($data['Produksi'][$kode->NoGroupItem][$key] > 0) {
-          DB::table('new_gajiandetailproduksi')->insert([
-            'NoGajianDetailKaryawan' => $id_karyawan,
-            'KodeGolongan' => $kode->NoGroupItem,
-            'Jenis' => 'Packing',
-            'JumlahProduksi' => $data['Produksi'][$kode->NoGroupItem][$key],
-            'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
-          ]);
+    //karyawan borongan
+    if ($data['Borongan'] == 1) {
+      foreach ($data['Karyawan'] as $key => $value) {
+        $id_karyawan = DB::table('new_gajiandetailkaryawan')->insertGetId([
+          'NoGajian' => $idGaji,
+          'KodeKaryawan' => $value,
+          'AbsenLengkap' => isset($data['Hadir'][$key]) ? $data['Hadir'][$key] : 0,
+          'AbsenTidakLengkap' => isset($data['HadirHarian'][$key]) ? $data['HadirHarian'][$key] : 0,
+          'AbsenHarian' => isset($data['Harian'][$key]) ? $data['Harian'][$key] : 0,
+          'LemburJam' => isset($data['Jam'][$key]) ? $data['Jam'][$key] : 0,
+          'LemburMinggu' => isset($data['Minggu'][$key]) ? $data['Minggu'][$key] : 0,
+          'Bonus' => isset($data['Bonus'][$key]) ? $data['Bonus'][$key] : 0,
+          'BonusLain' => isset($data['BonusLain'][$key]) ? $data['BonusLain'][$key] : 0,
+          'Hutang' => isset($data['Hutang'][$key]) ? $data['Hutang'][$key] : 0,
+          'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+
+        foreach ($group as $k => $kode) {
+          if ($data['Produksi'][$kode->NoGroupItem][$key] > 0) {
+            DB::table('new_gajiandetailproduksi')->insert([
+              'NoGajianDetailKaryawan' => $id_karyawan,
+              'KodeGolongan' => $kode->NoGroupItem,
+              'Jenis' => 'Packing',
+              'JumlahProduksi' => $data['Produksi'][$kode->NoGroupItem][$key],
+              'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+          }
+          if ($data['ProduksiNutuk'][$kode->NoGroupItem][$key] > 0) {
+            DB::table('new_gajiandetailproduksi')->insert([
+              'NoGajianDetailKaryawan' => $id_karyawan,
+              'KodeGolongan' => $kode->NoGroupItem,
+              'Jenis' => 'Nutuk',
+              'JumlahProduksi' => $data['ProduksiNutuk'][$kode->NoGroupItem][$key],
+              'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+          }
         }
-        if ($data['ProduksiNutuk'][$kode->NoGroupItem][$key] > 0) {
-          DB::table('new_gajiandetailproduksi')->insert([
-            'NoGajianDetailKaryawan' => $id_karyawan,
-            'KodeGolongan' => $kode->NoGroupItem,
-            'Jenis' => 'Nutuk',
-            'JumlahProduksi' => $data['ProduksiNutuk'][$kode->NoGroupItem][$key],
-            'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
-          ]);
+      }
+      //karyawan non borongan
+    } else if ($data['Borongan'] == 0) {
+      foreach ($data['Karyawan'] as $key => $value) {
+        $id_karyawan = DB::table('new_gajiandetailkaryawan')->insertGetId([
+          'NoGajian' => $idGaji,
+          'KodeKaryawan' => $value,
+          'AbsenLengkap' => isset($data['Hadir'][$key]) ? $data['Hadir'][$key] : 0,
+          'AbsenTidakLengkap' => 0,
+          'AbsenHarian' => 0,
+          'LemburJam' => isset($data['Jam'][$key]) ? $data['Jam'][$key] : 0,
+          'LemburMinggu' => isset($data['Minggu'][$key]) ? $data['Minggu'][$key] : 0,
+          'Bonus' => 0,
+          'BonusLain' => 0,
+          'Hutang' => 0,
+          'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+        ]);
+
+        foreach ($group as $k => $kode) {
+          if ($data['Produksi'][$kode->NoGroupItem][$key] > 0) {
+            DB::table('new_gajiandetailproduksi')->insert([
+              'NoGajianDetailKaryawan' => $id_karyawan,
+              'KodeGolongan' => $kode->NoGroupItem,
+              'Jenis' => 'Produksi',
+              'JumlahProduksi' => $data['Produksi'][$kode->NoGroupItem][$key],
+              'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+          }
+        }
+
+        foreach ($bonus as $b => $kode) {
+          if ($data['Bonus'][$kode->NoBonus][$key] > 0) {
+            DB::table('new_gajiandetailbonus')->insert([
+              'NoGajianDetailKaryawan' => $id_karyawan,
+              'KodeGolongan' => $kode->NoGolongan,
+              'KodeBonus' => $kode->NoBonus,
+              'JumlahBonus' => $data['Bonus'][$kode->NoBonus][$key],
+              'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
+            ]);
+          }
         }
       }
     }
@@ -158,6 +206,21 @@ class penggajian extends Model
         }
       }
 
+      $dataBonus = [];
+      $bonus = DB::table('new_golonganbonus')->where([
+        ['NoGolongan', '=', $gol->NoGolongan]
+      ])->select('NoBonus', 'NamaBonus', 'NominalBonus')->get();
+
+      if ($bonus) {
+        foreach ($bonus as $b) {
+          array_push($dataBonus, array(
+            'NoBonus' => $b->NoBonus,
+            'NamaBonus' => $b->NamaBonus,
+            'NominalBonus' => $b->NominalBonus
+          ));
+        }
+      }
+
       array_push($result, array(
         'NoGolongan' => $gol->NoGolongan,
         'KodeGolongan' => $gol->KodeGolongan,
@@ -168,7 +231,8 @@ class penggajian extends Model
         'UangMinggu' => $gol->UangMinggu,
         'Borongan' => $gol->Borongan,
         'GroupItem' => $dataGroup,
-        'DataKaryawan' => $dataKaryawan
+        'DataKaryawan' => $dataKaryawan,
+        'DataBonus' => $dataBonus
       ));
     }
 

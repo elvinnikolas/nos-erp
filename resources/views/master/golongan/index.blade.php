@@ -155,25 +155,19 @@
           </div>
           <hr>
           <div class="row">
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="form-group">
-                <label>Hadir (Lengkap)</label>
+                <label>Hadir (Pokok)</label>
                 <input type="number" name="UangHadir" class="form-control" step="1" min="0" placeholder="0" required>
               </div>
             </div>
-            <div class="col-md-3">
-              <div class="form-group">
-                <label>Hadir (Tidak Lengkap)</label>
-                <input type="number" name="UangHadirHarian" class="form-control" step="1" min="0" placeholder="0" required>
-              </div>
-            </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="form-group">
                 <label>Lembur (Jam)</label>
                 <input type="number" name="UangLembur" class="form-control" step="1" min="0" placeholder="0" required>
               </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-md-4">
               <div class="form-group">
                 <label>Lembur (Minggu)</label>
                 <input type="number" name="UangMinggu" class="form-control" step="1" min="0" placeholder="0" required>
@@ -181,6 +175,29 @@
             </div>
             <input type="hidden" name="Borongan" class="form-control" value="0">
           </div>
+          <!-- bonus -->
+          <hr>
+          <div class="row">
+            <div class="col-md-12">
+              <button type="button" id="btn_bonus" class="btn btn-sm btn-primary pull-right" onclick="addrow_bonus()">
+                <span class="fa fa-plus"></span>
+              </button>
+              <h5><b>Daftar Bonus</b></h5>
+              <input type="hidden" name="JumlahBonus" value="0">
+              <table id="table-list-bonus" class="table table-bordered">
+                <thead>
+                  <tr>
+                    <th>Nama Bonus</th>
+                    <th>Nominal</th>
+                    <th width="10%"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <!-- group item -->
           <hr>
           <div class="row">
             <div class="col-md-12">
@@ -193,8 +210,7 @@
                 <thead>
                   <tr>
                     <th width="20%">Nama Group</th>
-                    <th width="10%">Packing</th>
-                    <th width="10%">Nutuk</th>
+                    <th width="20%">Nominal</th>
                     <th>Daftar Item</th>
                     <th width="10%"></th>
                   </tr>
@@ -366,6 +382,7 @@
     $('input[name="UangHadirHarian"]').attr('value', '');
     $('input[name="UangLembur"]').attr('value', '');
     $('input[name="UangMinggu"]').attr('value', '');
+    $('#table-list-bonus tbody').empty();
     $('#table-list-group-item tbody').empty();
     $('#table-list-group-item-non tbody').empty();
 
@@ -445,13 +462,35 @@
             keyboard: false,
             backdrop: "static"
           });
+
         } else if (response[0].Borongan == 0) {
           $('input[name="NoGolongan"]').attr('value', response[0].NoGolongan);
           $('input[name="NamaGolongan"]').attr('value', response[0].NamaGolongan);
           $('input[name="UangHadir"]').attr('value', response[0].UangHadir);
-          $('input[name="UangHadirHarian"]').attr('value', response[0].UangHadirHarian);
           $('input[name="UangLembur"]').attr('value', response[0].UangLembur);
           $('input[name="UangMinggu"]').attr('value', response[0].UangMinggu);
+
+          $.each(response[0].Bonus, function(index, value) {
+            let jumlahBonus = parseInt($('input[name="JumlahBonus"]').val());
+            jumlahBonus = jumlahBonus + 1;
+            let tableRow = `
+              <tr>
+                <td>
+                  <input type="hidden" name="NoBonus[]" value="${value.NoBonus}">
+                  <input type="text" name="NamaBonus[]" class="form-control group" placeholder="Nama Bonus" style="text-transform: uppercase;" group="${jumlahBonus}" value="${value.NamaBonus}" required>
+                </td>
+                <td>
+                  <input type="number" name="NominalBonus[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahBonus}" value="${value.NominalBonus}" required>
+                </td>
+                <td>
+                  <button type="button" onclick="deleterow(this)" class="btn btn-sm btn-danger">
+                    <span class="fa fa-trash"></span>
+                  </button>
+                </td>
+              </tr>
+            `;
+            $('#table-list-bonus tbody').append(tableRow);
+          });
 
           $.each(response[0].GroupItem, function(index, value) {
             let jumlahGroup = parseInt($('input[name="JumlahGroupItemNon"]').val());
@@ -464,9 +503,6 @@
                 </td>
                 <td>
                   <input type="number" name="NominalGroupItem[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" value="${value.NominalGroupItem}" required>
-                </td>
-                <td>
-                  <input type="number" name="NominalGroupItemNutuk[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" value="${value.NominalGroupItemNutuk}" required>
                 </td>
                 <td>
                   <select multiple class="form-control ${jumlahGroup}" name="GroupItemDetail[${value.NamaGroupItem}][]" group="${jumlahGroup}" required>
@@ -533,28 +569,29 @@
     var result;
     let jumlahGroup = parseInt($('input[name="JumlahGroupItem"]').val());
     jumlahGroup = jumlahGroup + 1;
+
     result = `
-    <tr>
-      <td>
-        <input type="text" name="GroupItem[]" class="form-control group" width="50%" placeholder="Group Item" style="text-transform: uppercase;" group="${jumlahGroup}" required>
-      </td>
-      <td>
-        <input type="number" name="NominalGroupItem[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" required>
-      </td>
-      <td>
-        <input type="number" name="NominalGroupItemNutuk[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" required>
-      </td>
-      <td>
-        <select multiple class="form-control ${jumlahGroup}" name="" group="${jumlahGroup}" required>
-        </select>
-      </td>
-      <td>
-        <button type="button" onclick="deleterow(this)" class="btn btn-sm btn-danger">
-          <span class="fa fa-trash"></span>
-        </button>
-      </td>
-    </tr>
-  `;
+      <tr>
+        <td>
+          <input type="text" name="GroupItem[]" class="form-control group" width="50%" placeholder="Group Item" style="text-transform: uppercase;" group="${jumlahGroup}" required>
+        </td>
+        <td>
+          <input type="number" name="NominalGroupItem[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" required>
+        </td>
+        <td>
+          <input type="number" name="NominalGroupItemNutuk[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" required>
+        </td>
+        <td>
+          <select multiple class="form-control ${jumlahGroup}" name="" group="${jumlahGroup}" required>
+          </select>
+        </td>
+        <td>
+          <button type="button" onclick="deleterow(this)" class="btn btn-sm btn-danger">
+            <span class="fa fa-trash"></span>
+          </button>
+        </td>
+      </tr>
+    `;
 
     $('#table-list-group-item tbody').append(result);
 
@@ -588,28 +625,26 @@
     var result;
     let jumlahGroup = parseInt($('input[name="JumlahGroupItemNon"]').val());
     jumlahGroup = jumlahGroup + 1;
+
     result = `
-    <tr>
-      <td>
-        <input type="text" name="GroupItem[]" class="form-control group" width="50%" placeholder="Group Item" style="text-transform: uppercase;" group="${jumlahGroup}" required>
-      </td>
-      <td>
-        <input type="number" name="NominalGroupItem[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" required>
-      </td>
-      <td>
-        <input type="number" name="NominalGroupItemNutuk[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" required>
-      </td>
-      <td>
-        <select multiple class="form-control ${jumlahGroup}" name="" group="${jumlahGroup}" required>
-        </select>
-      </td>
-      <td>
-        <button type="button" onclick="deleterow(this)" class="btn btn-sm btn-danger">
-          <span class="fa fa-trash"></span>
-        </button>
-      </td>
-    </tr>
-  `;
+      <tr>
+        <td>
+          <input type="text" name="GroupItem[]" class="form-control group" width="50%" placeholder="Group Item" style="text-transform: uppercase;" group="${jumlahGroup}" required>
+        </td>
+        <td>
+          <input type="number" name="NominalGroupItem[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahGroup}" required>
+        </td>
+        <td>
+          <select multiple class="form-control ${jumlahGroup}" name="" group="${jumlahGroup}" required>
+          </select>
+        </td>
+        <td>
+          <button type="button" onclick="deleterow(this)" class="btn btn-sm btn-danger">
+            <span class="fa fa-trash"></span>
+          </button>
+        </td>
+      </tr>
+    `;
 
     $('#table-list-group-item-non tbody').append(result);
 
@@ -637,6 +672,38 @@
       $('select[group="' + noGroup + '"]').attr('name', `GroupItemDetail[${inputGroup}][]`);
       $('select[group="' + noGroup + '"]').prop('disabled', false);
     });
+  }
+
+  function addrow_bonus(table) {
+    var result;
+    let jumlahBonus = parseInt($('input[name="JumlahBonus"]').val());
+    jumlahBonus = jumlahBonus + 1;
+
+    // if (jumlahBonus >= 4) {
+    //   $("#btn_bonus").hide();
+    // } else {
+    //   $("#btn_bonus").show();
+    // }
+
+    result = `
+      <tr>
+        <td>
+          <input type="text" name="NamaBonus[]" class="form-control group" placeholder="Nama Bonus" style="text-transform: uppercase;" group="${jumlahBonus}" required>
+        </td>
+        <td>
+          <input type="number" name="NominalBonus[]" class="form-control group" placeholder="0" step="1" min="0" group="${jumlahBonus}" required>
+        </td>
+        <td>
+          <button type="button" onclick="deleterow(this)" class="btn btn-sm btn-danger">
+            <span class="fa fa-trash"></span>
+          </button>
+        </td>
+      </tr>
+    `;
+
+    $('#table-list-bonus tbody').append(result);
+
+    $('input[name="JumlahBonus"]').attr('value', jumlahBonus);
   }
 
   function deleterow(row) {
