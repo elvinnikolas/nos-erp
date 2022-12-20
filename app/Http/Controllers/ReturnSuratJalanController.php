@@ -27,21 +27,26 @@ class ReturnSuratJalanController extends Controller
 
     public function add($id)
     {
-        $sj = DB::select("SELECT DISTINCT a.KodeSuratJalan, a.KodeSuratJalanID from (
-            SELECT sj.KodeSuratJalanID,a.KodeSuratJalan,a.KodeItem, 
-            COALESCE(SUM(a.qty))-COALESCE(SUM(sjrd.Qty),0) as jml
-            FROM suratjalandetails a 
-            inner join items i on a.KodeItem = i.KodeItem
-            inner join itemkonversis k on i.KodeItem = k.KodeItem
-            inner join satuans s on s.KodeSatuan = k.KodeSatuan
-            inner join suratjalans sj on sj.KodeSuratJalan = a.KodeSuratJalan and sj.Status='CFM'
-    		inner join invoicepiutangdetails ipd on ipd.KodeSuratJalan = sj.KodeSuratJalan
-    		inner join invoicepiutangs ip on ip.KodeInvoicePiutang = ipd.KodeInvoicePiutang and ip.Status='OPN'
-            left join suratjalanreturns sjr on sjr.KodeSuratJalanID = sj.KodeSuratJalanID
-            left join suratjalanreturndetails sjrd on sjrd.KodeSuratJalanReturn = sjr.KodeSuratJalanReturn and sjrd.KodeItem = a.KodeItem and sjrd.KodeSatuan = k.KodeSatuan
-            where sj.Status = 'CFM' and a.KodeSatuan = k.KodeSatuan
-            group by a.KodeItem, a.KodeSatuan, a.KodeSuratJalan
-            having jml > 0) as a");
+        // $sj = DB::select("SELECT DISTINCT a.KodeSuratJalan, a.KodeSuratJalanID from (
+        //     SELECT sj.KodeSuratJalanID,a.KodeSuratJalan,a.KodeItem, 
+        //     COALESCE(SUM(a.qty))-COALESCE(SUM(sjrd.Qty),0) as jml
+        //     FROM suratjalandetails a 
+        //     inner join items i on a.KodeItem = i.KodeItem
+        //     inner join itemkonversis k on i.KodeItem = k.KodeItem
+        //     inner join satuans s on s.KodeSatuan = k.KodeSatuan
+        //     inner join suratjalans sj on sj.KodeSuratJalan = a.KodeSuratJalan and sj.Status='CFM'
+        // 	inner join invoicepiutangdetails ipd on ipd.KodeSuratJalan = sj.KodeSuratJalan
+        // 	inner join invoicepiutangs ip on ip.KodeInvoicePiutang = ipd.KodeInvoicePiutang and ip.Status='OPN'
+        //     left join suratjalanreturns sjr on sjr.KodeSuratJalanID = sj.KodeSuratJalanID
+        //     left join suratjalanreturndetails sjrd on sjrd.KodeSuratJalanReturn = sjr.KodeSuratJalanReturn and sjrd.KodeItem = a.KodeItem and sjrd.KodeSatuan = k.KodeSatuan
+        //     where sj.Status = 'CFM' and a.KodeSatuan = k.KodeSatuan
+        //     group by a.KodeItem, a.KodeSatuan, a.KodeSuratJalan
+        //     having jml > 0) as a");
+
+        $sj = DB::select("SELECT sj.KodeSuratJalanID, sj.KodeSuratJalan 
+            FROM invoicepiutangdetails ipd 
+            INNER JOIN suratjalans sj ON sj.KodeSuratJalan = ipd.KodeSuratJalan
+            WHERE ipd.Subtotal-ipd.TotalReturn > 0");
 
         if ($id == "0") {
             if (count($sj) <= 0) {

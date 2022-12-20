@@ -62,9 +62,13 @@
             @endif
             @if($golongan['Borongan'] == 1)
             <th colspan="2">Total Item</th>
+            @if($golongan['NamaGolongan'] == 'GRENDEL')
             <th colspan="2">Bonus</th>
+            @else
+            <th colspan="1">Bonus</th>
             @endif
-            @if($golongan['Borongan'] == 1)
+            @endif
+            @if($golongan['Borongan'] == 1 && $golongan['NamaGolongan'] == 'GRENDEL')
             <th rowspan="2">Hutang</th>
             @elseif($golongan['Borongan'] == 0)
             @if(count($golongan['DataBonus']) > 0)
@@ -72,6 +76,9 @@
             <th rowspan="2">{{ strtoupper($bonus['NamaBonus']) }}</th>
             @endforeach
             @endif
+            @endif
+            @if($golongan['Borongan'] == 0)
+            <th rowspan="2">Bonus Lain</th>
             @endif
             <th rowspan="2">Subtotal</th>
           </tr>
@@ -105,7 +112,9 @@
             @endif
             <!-- bonus -->
             @if($golongan['Borongan'] == 1)
+            @if($golongan['NamaGolongan'] == 'GRENDEL')
             <th>Item</th>
+            @endif
             <th>Lain</th>
             @endif
           </tr>
@@ -120,13 +129,13 @@
             <td><input type="number" name="Hadir[]" class="input-hadir form-control" step="1" min="0" max="6" data-multiplier="{{ $golongan['UangHadir'] }}" placeholder="0"></td>
             <td><input type="number" name="HadirHarian[]" class="input-hadirharian form-control" step="1" min="0" max="6" data-multiplier="{{ $golongan['UangHadirHarian'] }}" placeholder="0"></td>
             <!-- harian -->
-            <td><input type="number" name="Harian[]" class="input-harian form-control" min="0" data-multiplier="1" placeholder="0"></td>
+            <td><input type="number" name="Harian[]" class="input-harian form-control" step="1" min="0" max="6" data-multiplier="{{ $karyawan['GajiPokok'] }}" placeholder="0"></td>
             @elseif($golongan['Borongan'] == 0)
             <!-- hadir -->
-            <td><input type="number" name="Hadir[]" class="input-hadir form-control" step="1" min="0" max="6" data-multiplier="{{ $golongan['UangHadir'] }}" placeholder="0"></td>
+            <td><input type="number" name="Hadir[]" class="input-hadir form-control" step="1" min="0" max="6" data-multiplier="{{ $karyawan['GajiPokok'] }}" placeholder="0"></td>
             @endif
             <!-- lembur -->
-            <td><input type="number" name="Jam[]" class="input-jam form-control" step="1" min="0" max="24" data-multiplier="{{ $golongan['UangLembur'] }}" placeholder="0"></td>
+            <td><input type="number" name="Jam[]" class="input-jam form-control" step="1" min="0" max="24" data-multiplier="{{ $karyawan['LemburJam'] }}" placeholder="0"></td>
             <td><input type="number" name="Minggu[]" class="input-minggu form-control" step="1" min="0" max="1" data-multiplier="{{ $golongan['UangMinggu'] }}" placeholder="0"></td>
             <!-- group item -->
             @if(count($golongan['GroupItem']) > 0)
@@ -144,10 +153,12 @@
             <td class="total-packing">0</td>
             <td class="total-nutuk">0</td>
             <!-- bonus -->
+            @if($golongan['NamaGolongan'] == 'GRENDEL')
             <td><input type="number" name="Bonus[]" class="input-bonus form-control" data-multiplier="1" placeholder="0" readonly></td>
+            @endif
             <td><input type="number" name="BonusLain[]" class="form-control" data-multiplier="1" placeholder="0"></td>
             @endif
-            @if($golongan['Borongan'] == 1)
+            @if($golongan['Borongan'] == 1 && $golongan['NamaGolongan'] == 'GRENDEL')
             <!-- hutang -->
             <td><input type="number" name="Hutang[]" class="input-hutang form-control" data-multiplier="-1" value="{{ $karyawan['Hutang'] }}"></td>
             @elseif($golongan['Borongan'] == 0)
@@ -155,6 +166,7 @@
             @foreach($golongan['DataBonus'] as $bonus)
             <td><input type="number" name="Bonus[{{$bonus['NoBonus']}}][]" class="form-control input-item" step="1" min="0" data-multiplier="{{ $bonus['NominalBonus'] }}" placeholder="0"></td>
             @endforeach
+            <td><input type="number" name="BonusLain[]" class="form-control" data-multiplier="1" placeholder="0"></td>
             @endif
             @endif
             <!-- subtotal -->

@@ -10,7 +10,7 @@
         <div class="col-md-12">
             <div class="x_panel">
                 <div class="x_title">
-                    <h1 id="header">Setoran & Cashbon</h1><br>
+                    <h1 id="header">Tunai Cashbon</h1><br>
                 </div>
                 <a href="{{ url('/penggajiancashbon/create')}}" class="btn btn-success">
                     <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;&nbsp;Tambah Data

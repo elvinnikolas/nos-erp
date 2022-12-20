@@ -34,7 +34,7 @@ class golongan extends Model
                     'NamaGolongan' => strtoupper($data['NamaGolongan']),
                     'UangHadir' => $data['UangHadir'],
                     'UangHadirHarian' => $data['UangHadirHarian'],
-                    'UangLembur' => $data['UangLembur'],
+                    'UangLembur' => 0,
                     'UangMinggu' => $data['UangMinggu'],
                     'Borongan' => $borongan,
                     'modified_at' => \Carbon\Carbon::now()
@@ -44,7 +44,7 @@ class golongan extends Model
                     'NamaGolongan' => strtoupper($data['NamaGolongan']),
                     'UangHadir' => $data['UangHadir'],
                     'UangHadirHarian' => $data['UangHadirHarian'],
-                    'UangLembur' => $data['UangLembur'],
+                    'UangLembur' => 0,
                     'UangMinggu' => $data['UangMinggu'],
                     'Borongan' => $borongan,
                     'modified_at' => \Carbon\Carbon::now()
@@ -128,9 +128,9 @@ class golongan extends Model
                 $noGolongan = DB::table('new_golongan')->insertGetId([
                     'KodeGolongan' => $kodeGolongan,
                     'NamaGolongan' => strtoupper($data['NamaGolongan']),
-                    'UangHadir' => $data['UangHadir'],
+                    'UangHadir' => 0,
                     'UangHadirHarian' => 0,
-                    'UangLembur' => $data['UangLembur'],
+                    'UangLembur' => 0,
                     'UangMinggu' => $data['UangMinggu'],
                     'Borongan' => $borongan,
                     'modified_at' => \Carbon\Carbon::now()
@@ -138,9 +138,9 @@ class golongan extends Model
             } else {
                 DB::table('new_golongan')->where('NoGolongan', $data['NoGolongan'])->update([
                     'NamaGolongan' => strtoupper($data['NamaGolongan']),
-                    'UangHadir' => $data['UangHadir'],
+                    'UangHadir' => 0,
                     'UangHadirHarian' => 0,
-                    'UangLembur' => $data['UangLembur'],
+                    'UangLembur' => 0,
                     'UangMinggu' => $data['UangMinggu'],
                     'Borongan' => $borongan,
                     'modified_at' => \Carbon\Carbon::now()

@@ -61,6 +61,7 @@ class penggajian extends Model
           'Bonus' => isset($data['Bonus'][$key]) ? $data['Bonus'][$key] : 0,
           'BonusLain' => isset($data['BonusLain'][$key]) ? $data['BonusLain'][$key] : 0,
           'Hutang' => isset($data['Hutang'][$key]) ? $data['Hutang'][$key] : 0,
+          'Status' => 'OPN',
           'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
         ]);
 
@@ -97,8 +98,9 @@ class penggajian extends Model
           'LemburJam' => isset($data['Jam'][$key]) ? $data['Jam'][$key] : 0,
           'LemburMinggu' => isset($data['Minggu'][$key]) ? $data['Minggu'][$key] : 0,
           'Bonus' => 0,
-          'BonusLain' => 0,
+          'BonusLain' => isset($data['BonusLain'][$key]) ? $data['BonusLain'][$key] : 0,
           'Hutang' => 0,
+          'Status' => 'OPN',
           'modified_at' => \Carbon\Carbon::now()->format('Y-m-d H:i:s')
         ]);
 
@@ -173,7 +175,7 @@ class penggajian extends Model
       $karyawan = DB::table('karyawans')->where([
         ['Status', '=', 'OPN'],
         ['KodeGolongan', '=', $gol->KodeGolongan]
-      ])->select('KodeKaryawan', 'Nama')->get();
+      ])->select('KodeKaryawan', 'Nama', 'GajiPokok', 'LemburJam')->get();
 
       $hutang = DB::select(
         "SELECT phd.KodeKaryawan, SUM(phd.Total) as Total FROM prod_hutangdetail phd
@@ -195,13 +197,17 @@ class penggajian extends Model
           array_push($dataKaryawan, array(
             'KodeKaryawan' => $k->KodeKaryawan,
             'NamaKaryawan' => $k->Nama,
-            'Hutang' => $hutangKaryawan
+            'Hutang' => $hutangKaryawan,
+            'GajiPokok' => $k->GajiPokok,
+            'LemburJam' => $k->LemburJam
           ));
         } else {
           array_push($dataKaryawan, array(
             'KodeKaryawan' => $k->KodeKaryawan,
             'NamaKaryawan' => $k->Nama,
-            'Hutang' => 0
+            'Hutang' => 0,
+            'GajiPokok' => $k->GajiPokok,
+            'LemburJam' => $k->LemburJam
           ));
         }
       }

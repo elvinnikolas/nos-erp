@@ -62,21 +62,10 @@ class ReturnPenerimaanBarangController extends Controller
      */
     public function create($id)
     {
-        $pb = DB::select("SELECT DISTINCT a.KodePenerimaanBarang from (
-            SELECT a.KodePenerimaanBarang, a.KodeItem, 
-            COALESCE(SUM(a.qty))-COALESCE(SUM(pbrd.Qty),0) as jml
-            FROM penerimaanbarangdetails a 
-            inner join items i on a.KodeItem = i.KodeItem
-            inner join itemkonversis k on i.KodeItem = k.KodeItem
-            inner join satuans s on s.KodeSatuan = k.KodeSatuan
-            inner join penerimaanbarangs pb on pb.KodePenerimaanBarang = a.KodePenerimaanBarang and pb.Status='CFM'
-            inner join invoicehutangdetails ihd on ihd.KodeLPB = pb.KodePenerimaanBarang
-    		inner join invoicehutangs ih on ih.KodeInvoiceHutang = ihd.KodeInvoiceHutang and ih.Status='OPN'
-            left join penerimaanbarangreturns pbr on pbr.KodePenerimaanBarang = pb.KodePenerimaanBarang
-            left join penerimaanbarangreturndetails pbrd on pbrd.KodePenerimaanBarangReturn = pbr.KodePenerimaanBarangReturn and pbrd.KodeItem = a.KodeItem and pbrd.KodeSatuan = k.KodeSatuan
-            where pb.Status = 'CFM' and a.KodeSatuan = k.KodeSatuan
-            group by a.KodeItem, a.KodeSatuan, a.KodePenerimaanBarang
-            having jml > 0) as a");
+        $pb = DB::select("SELECT pb.KodePenerimaanBarang
+            FROM invoicehutangdetails ihd 
+            INNER JOIN penerimaanbarangs pb ON pb.KodePenerimaanBarang = ihd.KodeLPB
+            WHERE ihd.Subtotal-ihd.TotalReturn > 0");
 
         if ($id == "0") {
             if (count($pb) <= 0) {

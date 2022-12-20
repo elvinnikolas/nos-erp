@@ -46,6 +46,11 @@
                             <input type="text" id="GajiPokokFormat" class="form-control" disabled>
                         </div>
                         <div class="form-group">
+                            <label>Lembur (Jam): </label>
+                            <input type="text" name="LemburJam" class="form-control" id="LemburJam" placeholder="Gaji Pokok" value="{{$kar->LemburJam}}">
+                            <input type="text" id="LemburJamFormat" class="form-control" disabled>
+                        </div>
+                        <div class="form-group">
                             <label>Alamat: </label>
                             <textarea class="form-control" name="Alamat" placeholder="Alamat" required>{{ $kar->Alamat }}</textarea>
                         </div>
@@ -103,6 +108,10 @@
     $('#GajiPokok').on('change', function() {
         var gaji = +($('#GajiPokok').val());
         $('#GajiPokokFormat').val(number_format(gaji));
+    });
+    $('#LemburJam').on('change', function() {
+        var gaji = +($('#LemburJam').val());
+        $('#LemburJamFormat').val(number_format(gaji));
     });
 
     function number_format(number, decimals, decPoint, thousandsSep) {

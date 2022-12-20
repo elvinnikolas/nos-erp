@@ -46,7 +46,7 @@
                 <th>Nama Golongan</th>
                 <th>Hadir (Lengkap)</th>
                 <th>Hadir (Tidak Lengkap)</th>
-                <th>Lembur (Jam)</th>
+                <!-- <th>Lembur (Jam)</th> -->
                 <th>Lembur (Minggu)</th>
                 <th width="15%"></th>
               </tr>
@@ -89,12 +89,12 @@
                 <input type="number" name="UangHadirHarian" class="form-control" step="1" min="0" placeholder="0" required>
               </div>
             </div>
-            <div class="col-md-3">
+            <!-- <div class="col-md-3">
               <div class="form-group">
                 <label>Lembur (Jam)</label>
                 <input type="number" name="UangLembur" class="form-control" step="1" min="0" placeholder="0" required>
               </div>
-            </div>
+            </div> -->
             <div class="col-md-3">
               <div class="form-group">
                 <label>Lembur (Minggu)</label>
@@ -155,18 +155,18 @@
           </div>
           <hr>
           <div class="row">
-            <div class="col-md-4">
+            <!-- <div class="col-md-4">
               <div class="form-group">
                 <label>Hadir (Pokok)</label>
                 <input type="number" name="UangHadir" class="form-control" step="1" min="0" placeholder="0" required>
               </div>
-            </div>
-            <div class="col-md-4">
+            </div> -->
+            <!-- <div class="col-md-4">
               <div class="form-group">
                 <label>Lembur (Jam)</label>
                 <input type="number" name="UangLembur" class="form-control" step="1" min="0" placeholder="0" required>
               </div>
-            </div>
+            </div> -->
             <div class="col-md-4">
               <div class="form-group">
                 <label>Lembur (Minggu)</label>
@@ -238,7 +238,7 @@
       scrollY: false,
       scrollX: false,
       columnDefs: [{
-        targets: 6,
+        targets: 5,
         orderable: false,
         searchable: false,
         render: (data) => {
@@ -276,10 +276,10 @@
           data: "UangHadirHarian",
           render: $.fn.dataTable.render.number('.', ',', 0, 'Rp. ')
         },
-        {
-          data: "UangLembur",
-          render: $.fn.dataTable.render.number('.', ',', 0, 'Rp. ')
-        },
+        // {
+        //   data: "UangLembur",
+        //   render: $.fn.dataTable.render.number('.', ',', 0, 'Rp. ')
+        // },
         {
           data: "UangMinggu",
           render: $.fn.dataTable.render.number('.', ',', 0, 'Rp. ')
@@ -380,7 +380,7 @@
     $('input[name="NamaGolongan"]').attr('value', '');
     $('input[name="UangHadir"]').attr('value', '');
     $('input[name="UangHadirHarian"]').attr('value', '');
-    $('input[name="UangLembur"]').attr('value', '');
+    // $('input[name="UangLembur"]').attr('value', '');
     $('input[name="UangMinggu"]').attr('value', '');
     $('#table-list-bonus tbody').empty();
     $('#table-list-group-item tbody').empty();
@@ -399,7 +399,7 @@
           $('input[name="NamaGolongan"]').attr('value', response[0].NamaGolongan);
           $('input[name="UangHadir"]').attr('value', response[0].UangHadir);
           $('input[name="UangHadirHarian"]').attr('value', response[0].UangHadirHarian);
-          $('input[name="UangLembur"]').attr('value', response[0].UangLembur);
+          // $('input[name="UangLembur"]').attr('value', response[0].UangLembur);
           $('input[name="UangMinggu"]').attr('value', response[0].UangMinggu);
 
           $.each(response[0].GroupItem, function(index, value) {
@@ -467,7 +467,7 @@
           $('input[name="NoGolongan"]').attr('value', response[0].NoGolongan);
           $('input[name="NamaGolongan"]').attr('value', response[0].NamaGolongan);
           $('input[name="UangHadir"]').attr('value', response[0].UangHadir);
-          $('input[name="UangLembur"]').attr('value', response[0].UangLembur);
+          // $('input[name="UangLembur"]').attr('value', response[0].UangLembur);
           $('input[name="UangMinggu"]').attr('value', response[0].UangMinggu);
 
           $.each(response[0].Bonus, function(index, value) {
@@ -678,12 +678,6 @@
     var result;
     let jumlahBonus = parseInt($('input[name="JumlahBonus"]').val());
     jumlahBonus = jumlahBonus + 1;
-
-    // if (jumlahBonus >= 4) {
-    //   $("#btn_bonus").hide();
-    // } else {
-    //   $("#btn_bonus").show();
-    // }
 
     result = `
       <tr>

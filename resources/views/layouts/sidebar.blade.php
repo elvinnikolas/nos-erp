@@ -140,7 +140,7 @@
                 <ul class="nav child_menu">
                     <li><a href="{{ url('/penggajian') }}">Buat Penggajian</a></li>
                     <li><a href="{{ url('/penggajianselesai') }}">Penggajian Selesai</a></li>
-                    <li><a href="{{ url('/penggajiancashbon') }}">Setoran & Cashbon</a></li>
+                    <li><a href="{{ url('/penggajiancashbon') }}">Tunai Cashbon</a></li>
                 </ul>
             </li>
 
